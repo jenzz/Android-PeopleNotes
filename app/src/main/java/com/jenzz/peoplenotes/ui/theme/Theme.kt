@@ -26,7 +26,7 @@ private val LightColorPalette = lightColors(
 )
 
 @Composable
-fun AndroidPeopleNotesTheme(
+fun PeopleNotesTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit,
 ) {

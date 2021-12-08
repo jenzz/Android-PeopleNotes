@@ -8,7 +8,7 @@ import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
-import com.jenzz.peoplenotes.ui.theme.AndroidPeopleNotesTheme
+import com.jenzz.peoplenotes.ui.theme.PeopleNotesTheme
 
 class MainActivity : ComponentActivity() {
 
@@ -16,7 +16,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         setContent {
-            AndroidPeopleNotesTheme {
+            PeopleNotesTheme {
                 Surface(color = MaterialTheme.colors.background) {
                     Greeting("Android")
                 }
@@ -33,7 +33,7 @@ fun Greeting(name: String) {
 @Preview(showBackground = true)
 @Composable
 fun DefaultPreview() {
-    AndroidPeopleNotesTheme {
+    PeopleNotesTheme {
         Greeting("Android")
     }
 }
