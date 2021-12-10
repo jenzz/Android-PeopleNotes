@@ -3,7 +3,6 @@ package com.jenzz.peoplenotes.feature.settings
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import com.jenzz.peoplenotes.feature.Feature
-import com.jenzz.peoplenotes.feature.home.HomeFeature
 
 object SettingsFeature : Feature {
 
@@ -11,10 +10,6 @@ object SettingsFeature : Feature {
 
     @Composable
     override fun Content(navController: NavHostController) {
-        SettingsScreen(
-            onHomeClicked = {
-                navController.navigate(HomeFeature.route)
-            }
-        )
+        SettingsScreen()
     }
 }

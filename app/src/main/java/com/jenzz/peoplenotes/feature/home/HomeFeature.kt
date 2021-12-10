@@ -12,7 +12,7 @@ object HomeFeature : Feature {
     @Composable
     override fun Content(navController: NavHostController) {
         HomeScreen(
-            onSettingsClicked = {
+            onSettingsClick = {
                 navController.navigate(SettingsFeature.route)
             }
         )

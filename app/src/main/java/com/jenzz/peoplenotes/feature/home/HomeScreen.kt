@@ -2,27 +2,56 @@ package com.jenzz.peoplenotes.feature.home
 
 import android.content.res.Configuration.UI_MODE_NIGHT_NO
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.height
-import androidx.compose.material.Button
+import android.widget.Toast
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material.Scaffold
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
+import androidx.compose.runtime.*
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
+import com.jenzz.peoplenotes.R
 import com.jenzz.peoplenotes.ui.theme.PeopleNotesTheme
 
 @Composable
 fun HomeScreen(
-    onSettingsClicked: () -> Unit,
+    onSettingsClick: () -> Unit,
 ) {
-    Column {
-        Text(text = "Hello Home!")
-        Spacer(modifier = Modifier.height(12.dp))
-        Button(onClick = onSettingsClicked) {
-            Text(text = "Go To Settings")
+    val context = LocalContext.current
+    var sortedBy by remember { mutableStateOf(SortBy.LastModified) }
+    HomeContent(
+        sortedBy = sortedBy,
+        onSortBy = { sortBy ->
+            sortedBy = sortBy
+            Toast.makeText(
+                context,
+                context.getString(R.string.sorted_by, sortBy),
+                Toast.LENGTH_LONG
+            ).show()
+        },
+        onSettingsClick = onSettingsClick,
+    )
+}
+
+@Composable
+private fun HomeContent(
+    sortedBy: SortBy,
+    onSortBy: (SortBy) -> Unit,
+    onSettingsClick: () -> Unit,
+) {
+    Scaffold(
+        topBar = {
+            HomeTopAppBar(
+                sortedBy = sortedBy,
+                onSortBy = onSortBy,
+                onSettingsClick = onSettingsClick,
+            )
+        },
+    ) {
+        LazyColumn {
+            items(50) {
+                Text("Item $it")
+            }
         }
     }
 }
@@ -40,7 +69,7 @@ fun HomeScreenPreview() {
     PeopleNotesTheme {
         Surface {
             HomeScreen(
-                onSettingsClicked = {},
+                onSettingsClick = {}
             )
         }
     }

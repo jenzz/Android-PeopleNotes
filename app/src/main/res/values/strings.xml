@@ -1,5 +1,11 @@
 <resources>
 
     <string name="app_name">People Notes</string>
+    <string name="sort_by">Sort by</string>
+    <string name="sorted_by">Sorted by %1$s</string>
+    <string name="last_modified">Last Modified</string>
+    <string name="first_name">First Name</string>
+    <string name="last_name">Last Name</string>
+    <string name="settings">Settings</string>
 
 </resources>

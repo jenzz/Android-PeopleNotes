@@ -34,7 +34,7 @@ fun MainScreen() {
     val navController = rememberNavController()
     val features = listOf(
         HomeFeature,
-        SettingsFeature
+        SettingsFeature,
     )
 
     NavHost(
