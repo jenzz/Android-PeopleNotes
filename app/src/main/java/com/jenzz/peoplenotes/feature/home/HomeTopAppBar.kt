@@ -6,6 +6,7 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -38,7 +39,7 @@ private fun Actions(
     onSettingsClick: () -> Unit,
 ) {
     Box {
-        var expanded by remember { mutableStateOf(false) }
+        var expanded by rememberSaveable { mutableStateOf(false) }
         IconButton(
             onClick = { expanded = !expanded },
         ) {

@@ -12,6 +12,7 @@ import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
@@ -25,7 +26,7 @@ fun MultiFloatingActionButton(
     items: List<MultiFloatingActionButtonItem>,
     onItemClick: (MultiFloatingActionButtonItem) -> Unit,
 ) {
-    var expanded by remember { mutableStateOf(false) }
+    var expanded by rememberSaveable { mutableStateOf(false) }
     val rotation by animateFloatAsState(
         targetValue = if (expanded) 45f else 0f
     )

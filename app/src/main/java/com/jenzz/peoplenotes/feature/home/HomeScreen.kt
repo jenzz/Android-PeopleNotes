@@ -8,6 +8,7 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import com.jenzz.peoplenotes.R
@@ -18,7 +19,7 @@ fun HomeScreen(
     onSettingsClick: () -> Unit,
 ) {
     val context = LocalContext.current
-    var sortedBy by remember { mutableStateOf(SortBy.LastModified) }
+    var sortedBy by rememberSaveable { mutableStateOf(SortBy.LastModified) }
     HomeContent(
         sortedBy = sortedBy,
         onSortBy = { sortBy ->
