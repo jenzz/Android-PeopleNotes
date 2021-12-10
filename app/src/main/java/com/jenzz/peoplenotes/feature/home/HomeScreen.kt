@@ -39,6 +39,7 @@ private fun HomeContent(
     onSortBy: (SortBy) -> Unit,
     onSettingsClick: () -> Unit,
 ) {
+    val context = LocalContext.current
     Scaffold(
         topBar = {
             HomeTopAppBar(
@@ -47,6 +48,24 @@ private fun HomeContent(
                 onSettingsClick = onSettingsClick,
             )
         },
+        floatingActionButton = {
+            HomeFloatingActionButton(
+                onAddManuallyClick = {
+                    Toast.makeText(
+                        context,
+                        "Add Manually",
+                        Toast.LENGTH_LONG
+                    ).show()
+                },
+                onFromContactsClick = {
+                    Toast.makeText(
+                        context,
+                        "From Contacts",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+            )
+        }
     ) {
         LazyColumn {
             items(50) {

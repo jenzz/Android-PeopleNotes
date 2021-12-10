@@ -18,6 +18,16 @@ buildscript {
     }
 }
 
+allprojects {
+    tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach { task ->
+        task.kotlinOptions {
+            freeCompilerArgs += [
+                    "-Xopt-in=androidx.compose.animation.ExperimentalAnimationApi"
+            ]
+        }
+    }
+}
+
 task clean(type: Delete) {
     delete rootProject.buildDir
 }
