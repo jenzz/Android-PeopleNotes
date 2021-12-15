@@ -10,5 +10,9 @@
     <string name="add">Add</string>
     <string name="add_manually">Add manually</string>
     <string name="from_contacts">From Contacts</string>
+    <string name="theme">Theme</string>
+    <string name="light">Light</string>
+    <string name="dark">Dark</string>
+    <string name="system_default">System Default</string>
 
 </resources>
