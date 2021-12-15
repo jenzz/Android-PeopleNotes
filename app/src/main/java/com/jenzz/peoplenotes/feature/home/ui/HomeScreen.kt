@@ -88,10 +88,12 @@ private fun HomeContent(
     uiMode = UI_MODE_NIGHT_YES,
 )
 @Composable
-fun HomeScreenPreview() {
+private fun HomeContentPreview() {
     PeopleNotesTheme {
         Surface {
-            HomeScreen(
+            HomeContent(
+                sortedBy = SortBy.LastModified,
+                onSortBy = {},
                 onSettingsClick = {}
             )
         }

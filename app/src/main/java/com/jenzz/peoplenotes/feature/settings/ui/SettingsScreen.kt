@@ -183,7 +183,7 @@ private fun SettingsThemeDialogItem(
     uiMode = UI_MODE_NIGHT_YES,
 )
 @Composable
-fun SettingsScreenPreview(
+private fun SettingsContentPreview(
     @PreviewParameter(SettingsPreviewParameterProvider::class)
     state: SettingsUiState,
 ) {
