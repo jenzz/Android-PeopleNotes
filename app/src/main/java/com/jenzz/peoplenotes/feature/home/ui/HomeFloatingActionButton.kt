@@ -11,28 +11,28 @@ import com.jenzz.peoplenotes.common.ui.common.MultiFloatingActionButtonItem
 
 @Composable
 fun HomeFloatingActionButton(
-    onAddManuallyClick: () -> Unit,
-    onFromContactsClick: () -> Unit,
+    onAddPersonManuallyClick: () -> Unit,
+    onImportFromContactsClick: () -> Unit,
 ) {
-    val addManuallyItem = MultiFloatingActionButtonItem(
+    val addPersonManuallyItem = MultiFloatingActionButtonItem(
         id = 1,
-        label = stringResource(id = R.string.add_manually),
+        label = stringResource(id = R.string.add_person_manually),
         icon = Icons.Rounded.Add,
     )
-    val fromContactsItem = MultiFloatingActionButtonItem(
+    val importFromContactsItem = MultiFloatingActionButtonItem(
         id = 2,
-        label = stringResource(id = R.string.from_contacts),
+        label = stringResource(id = R.string.import_from_contacts),
         icon = Icons.Default.Person,
     )
     MultiFloatingActionButton(
         items = listOf(
-            addManuallyItem,
-            fromContactsItem,
+            addPersonManuallyItem,
+            importFromContactsItem,
         ),
         onItemClick = { item ->
             when (item.id) {
-                addManuallyItem.id -> onAddManuallyClick()
-                fromContactsItem.id -> onFromContactsClick()
+                addPersonManuallyItem.id -> onAddPersonManuallyClick()
+                importFromContactsItem.id -> onImportFromContactsClick()
             }
         }
     )

@@ -32,7 +32,7 @@ fun SettingsScreen(
     val state = viewModel.state.value
     SettingsContent(
         state = state,
-        onThemeSelected = viewModel::onThemeSelected
+        onThemeSelected = viewModel::onThemeSelected,
     )
 }
 

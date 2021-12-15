@@ -19,6 +19,7 @@ import com.jenzz.peoplenotes.common.ui.theme.PeopleNotesTheme
 
 @Composable
 fun HomeScreen(
+    onAddPersonManuallyClick: () -> Unit,
     onSettingsClick: () -> Unit,
 ) {
     val context = LocalContext.current
@@ -33,6 +34,7 @@ fun HomeScreen(
                 Toast.LENGTH_LONG
             ).show()
         },
+        onAddPersonManuallyClick = onAddPersonManuallyClick,
         onSettingsClick = onSettingsClick,
     )
 }
@@ -41,6 +43,7 @@ fun HomeScreen(
 private fun HomeContent(
     sortedBy: SortBy,
     onSortBy: (SortBy) -> Unit,
+    onAddPersonManuallyClick: () -> Unit,
     onSettingsClick: () -> Unit,
 ) {
     val context = LocalContext.current
@@ -54,17 +57,11 @@ private fun HomeContent(
         },
         floatingActionButton = {
             HomeFloatingActionButton(
-                onAddManuallyClick = {
+                onAddPersonManuallyClick = onAddPersonManuallyClick,
+                onImportFromContactsClick = {
                     Toast.makeText(
                         context,
-                        "Add Manually",
-                        Toast.LENGTH_LONG
-                    ).show()
-                },
-                onFromContactsClick = {
-                    Toast.makeText(
-                        context,
-                        "From Contacts",
+                        "Import from contacts",
                         Toast.LENGTH_LONG
                     ).show()
                 }
@@ -94,6 +91,7 @@ private fun HomeContentPreview() {
             HomeContent(
                 sortedBy = SortBy.LastModified,
                 onSortBy = {},
+                onAddPersonManuallyClick = {},
                 onSettingsClick = {}
             )
         }

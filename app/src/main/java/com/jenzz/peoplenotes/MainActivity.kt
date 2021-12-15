@@ -8,6 +8,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.jenzz.peoplenotes.common.ui.theme.PeopleNotesTheme
+import com.jenzz.peoplenotes.feature.add_person.AddPersonFeature
 import com.jenzz.peoplenotes.feature.home.HomeFeature
 import com.jenzz.peoplenotes.feature.settings.SettingsFeature
 import dagger.hilt.android.AndroidEntryPoint
@@ -31,6 +32,7 @@ private fun MainScreen() {
     val navController = rememberNavController()
     val features = listOf(
         HomeFeature,
+        AddPersonFeature,
         SettingsFeature,
     )
 

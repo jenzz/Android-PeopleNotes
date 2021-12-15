@@ -53,7 +53,7 @@ fun MultiFloatingActionButton(
                         },
                     ) {
                         Row(
-                            modifier = Modifier.padding(4.dp),
+                            modifier = Modifier.padding(8.dp),
                             horizontalArrangement = Arrangement.spacedBy(4.dp),
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
