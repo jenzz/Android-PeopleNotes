@@ -1,4 +1,4 @@
-package com.jenzz.peoplenotes.feature.home
+package com.jenzz.peoplenotes.feature.home.ui
 
 import android.content.res.Configuration.UI_MODE_NIGHT_NO
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
@@ -7,12 +7,15 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import com.jenzz.peoplenotes.R
-import com.jenzz.peoplenotes.ui.theme.PeopleNotesTheme
+import com.jenzz.peoplenotes.common.ui.theme.PeopleNotesTheme
 
 @Composable
 fun HomeScreen(

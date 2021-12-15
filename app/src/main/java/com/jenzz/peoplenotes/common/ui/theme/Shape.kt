@@ -1,4 +1,4 @@
-package com.jenzz.peoplenotes.ui.theme
+package com.jenzz.peoplenotes.common.ui.theme
 
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Shapes

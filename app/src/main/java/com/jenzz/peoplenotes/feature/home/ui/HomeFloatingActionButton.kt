@@ -1,4 +1,4 @@
-package com.jenzz.peoplenotes.feature.home
+package com.jenzz.peoplenotes.feature.home.ui
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Person
@@ -6,8 +6,8 @@ import androidx.compose.material.icons.rounded.Add
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import com.jenzz.peoplenotes.R
-import com.jenzz.peoplenotes.ui.common.MultiFloatingActionButton
-import com.jenzz.peoplenotes.ui.common.MultiFloatingActionButtonItem
+import com.jenzz.peoplenotes.common.ui.common.MultiFloatingActionButton
+import com.jenzz.peoplenotes.common.ui.common.MultiFloatingActionButtonItem
 
 @Composable
 fun HomeFloatingActionButton(

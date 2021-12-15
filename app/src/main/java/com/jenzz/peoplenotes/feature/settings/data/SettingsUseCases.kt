@@ -1,4 +1,4 @@
-package com.jenzz.peoplenotes.feature.settings
+package com.jenzz.peoplenotes.feature.settings.data
 
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject

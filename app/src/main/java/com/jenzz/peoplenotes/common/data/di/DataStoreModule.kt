@@ -1,4 +1,4 @@
-package com.jenzz.peoplenotes.db.prefs
+package com.jenzz.peoplenotes.common.data.di
 
 import android.content.Context
 import androidx.datastore.core.DataStore

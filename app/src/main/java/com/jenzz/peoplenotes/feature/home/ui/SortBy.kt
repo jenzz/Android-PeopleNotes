@@ -1,4 +1,4 @@
-package com.jenzz.peoplenotes.feature.home
+package com.jenzz.peoplenotes.feature.home.ui
 
 import androidx.annotation.StringRes
 import com.jenzz.peoplenotes.R

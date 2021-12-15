@@ -1,9 +1,9 @@
-package com.jenzz.peoplenotes.feature.settings
+package com.jenzz.peoplenotes.feature.settings.data
 
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
-import com.jenzz.peoplenotes.db.prefs.PreferencesDataStore
+import com.jenzz.peoplenotes.common.data.di.PreferencesDataStore
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject

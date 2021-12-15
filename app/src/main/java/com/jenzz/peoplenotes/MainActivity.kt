@@ -7,9 +7,9 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.jenzz.peoplenotes.common.ui.theme.PeopleNotesTheme
 import com.jenzz.peoplenotes.feature.home.HomeFeature
 import com.jenzz.peoplenotes.feature.settings.SettingsFeature
-import com.jenzz.peoplenotes.ui.theme.PeopleNotesTheme
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint

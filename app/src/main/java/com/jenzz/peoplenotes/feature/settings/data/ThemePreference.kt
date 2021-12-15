@@ -1,4 +1,4 @@
-package com.jenzz.peoplenotes.feature.settings
+package com.jenzz.peoplenotes.feature.settings.data
 
 import androidx.annotation.StringRes
 import com.jenzz.peoplenotes.R

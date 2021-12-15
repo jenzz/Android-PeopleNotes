@@ -1,4 +1,4 @@
-package com.jenzz.peoplenotes.feature.settings
+package com.jenzz.peoplenotes.feature.settings.data
 
 enum class ThemePreferenceEntity(val id: ThemeIdEntity) {
 
