@@ -23,6 +23,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.jenzz.peoplenotes.R
 import com.jenzz.peoplenotes.common.data.people.Person
 import com.jenzz.peoplenotes.common.data.people.PersonId
+import com.jenzz.peoplenotes.common.data.people.di.FirstName
+import com.jenzz.peoplenotes.common.data.people.di.LastName
 import com.jenzz.peoplenotes.common.ui.theme.PeopleNotesTheme
 import com.jenzz.peoplenotes.ext.toNonEmptyString
 import com.jenzz.peoplenotes.feature.home.data.HomeViewModel
@@ -160,8 +162,8 @@ class HomePreviewParameterProvider : CollectionPreviewParameterProvider<HomeUiSt
             people = (0..10).map { i ->
                 Person(
                     id = PersonId(i),
-                    firstName = "$i First Name".toNonEmptyString(),
-                    lastName = "$i Last Name".toNonEmptyString(),
+                    firstName = FirstName("$i First Name".toNonEmptyString()),
+                    lastName = LastName("$i Last Name".toNonEmptyString()),
                     lastModified = "$i Last Modified",
                 )
             }

@@ -1,11 +1,12 @@
 package com.jenzz.peoplenotes.common.data.people
 
-import com.jenzz.peoplenotes.ext.NonEmptyString
+import com.jenzz.peoplenotes.common.data.people.di.FirstName
+import com.jenzz.peoplenotes.common.data.people.di.LastName
 
 data class Person(
     val id: PersonId,
-    val firstName: NonEmptyString,
-    val lastName: NonEmptyString,
+    val firstName: FirstName,
+    val lastName: LastName,
     val lastModified: String, // TODO JD Date.
 )
 

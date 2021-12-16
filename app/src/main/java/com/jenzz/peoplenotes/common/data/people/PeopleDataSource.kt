@@ -1,7 +1,9 @@
 package com.jenzz.peoplenotes.common.data.people
 
 import com.jenzz.peoplenotes.common.data.PersonQueries
-import com.jenzz.peoplenotes.ext.NonEmptyString
+import com.jenzz.peoplenotes.common.data.people.di.FirstName
+import com.jenzz.peoplenotes.common.data.people.di.LastName
+import com.jenzz.peoplenotes.ext.toNonEmptyString
 import com.squareup.sqldelight.runtime.coroutines.asFlow
 import com.squareup.sqldelight.runtime.coroutines.mapToList
 import kotlinx.coroutines.flow.Flow
@@ -22,8 +24,8 @@ class PeopleLocalDataSource @Inject constructor(
         { id: Int, firstName: String, lastName: String, lastModified: String ->
             Person(
                 id = PersonId(id),
-                firstName = NonEmptyString(firstName),
-                lastName = NonEmptyString(lastName),
+                firstName = FirstName(firstName.toNonEmptyString()),
+                lastName = LastName(lastName.toNonEmptyString()),
                 lastModified = lastModified,
             )
         }
@@ -36,7 +38,10 @@ class PeopleLocalDataSource @Inject constructor(
 
     override suspend fun add(person: NewPerson): Person =
         personQueries.transactionWithResult {
-            personQueries.insert(person.firstName.toString(), person.lastName.toString())
+            personQueries.insert(
+                firstName = person.firstName.value.toString(),
+                lastName = person.lastName.value.toString(),
+            )
             val rowId = personQueries.selectLastInsertRowId().executeAsOne()
             personQueries
                 .selectByRowId(rowId, toPerson)
