@@ -1,4 +1,4 @@
-package com.jenzz.peoplenotes.common.ui.common
+package com.jenzz.peoplenotes.common.ui.widgets
 
 import androidx.compose.animation.*
 import androidx.compose.animation.core.animateFloatAsState

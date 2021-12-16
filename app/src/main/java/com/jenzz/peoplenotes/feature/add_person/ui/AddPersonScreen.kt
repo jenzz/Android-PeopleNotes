@@ -20,6 +20,7 @@ import androidx.compose.ui.tooling.preview.datasource.CollectionPreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.jenzz.peoplenotes.R
+import com.jenzz.peoplenotes.common.ui.TextFieldUiState
 import com.jenzz.peoplenotes.common.ui.theme.PeopleNotesTheme
 import com.jenzz.peoplenotes.feature.add_person.data.AddPersonViewModel
 
@@ -32,7 +33,7 @@ fun AddPersonScreen(
         state = viewModel.state,
         onFirstNameChanged = viewModel::onFirstNameChanged,
         onLastNameChanged = viewModel::onLastNameChanged,
-        onNotesChanged = viewModel::onNotesChanged,
+        onNoteChanged = viewModel::onNoteChanged,
         onAddPersonClick = viewModel::onAddPerson,
         onPersonAdded = onPersonAdded,
     )
@@ -43,7 +44,7 @@ private fun AddPersonContent(
     state: AddPersonUiState,
     onFirstNameChanged: (String) -> Unit,
     onLastNameChanged: (String) -> Unit,
-    onNotesChanged: (String) -> Unit,
+    onNoteChanged: (String) -> Unit,
     onAddPersonClick: () -> Unit,
     onPersonAdded: () -> Unit,
 ) {
@@ -78,7 +79,7 @@ private fun AddPersonContent(
                 enabled = state.inputsEnabled,
                 imeAction = ImeAction.Next,
                 keyboardActions = KeyboardActions(onNext = { lastNameInput.requestFocus() }),
-                value = state.firstName,
+                state = state.firstName,
                 onValueChanged = onFirstNameChanged,
             )
             LastNameInputField(
@@ -86,7 +87,7 @@ private fun AddPersonContent(
                 enabled = state.inputsEnabled,
                 imeAction = ImeAction.Next,
                 keyboardActions = KeyboardActions(onNext = { notesInput.requestFocus() }),
-                value = state.lastName,
+                state = state.lastName,
                 onValueChanged = onLastNameChanged,
             )
             NotesInputField(
@@ -94,8 +95,8 @@ private fun AddPersonContent(
                 enabled = state.inputsEnabled,
                 imeAction = ImeAction.Done,
                 keyboardActions = KeyboardActions(onDone = { onSubmit() }),
-                value = state.notes,
-                onValueChanged = onNotesChanged,
+                state = TextFieldUiState(state.note),
+                onValueChanged = onNoteChanged,
             )
             SubmitButton(
                 enabled = state.inputsEnabled,
@@ -114,7 +115,7 @@ private fun FirstNameInputField(
     enabled: Boolean,
     imeAction: ImeAction,
     keyboardActions: KeyboardActions,
-    value: String,
+    state: TextFieldUiState,
     onValueChanged: (String) -> Unit,
 ) {
     PersonInputField(
@@ -124,7 +125,7 @@ private fun FirstNameInputField(
         singleLine = true,
         imeAction = imeAction,
         keyboardActions = keyboardActions,
-        value = value,
+        state = state,
         onValueChanged = onValueChanged,
     )
 }
@@ -135,7 +136,7 @@ private fun LastNameInputField(
     enabled: Boolean,
     imeAction: ImeAction,
     keyboardActions: KeyboardActions,
-    value: String,
+    state: TextFieldUiState,
     onValueChanged: (String) -> Unit,
 ) {
     PersonInputField(
@@ -145,7 +146,7 @@ private fun LastNameInputField(
         singleLine = true,
         imeAction = imeAction,
         keyboardActions = keyboardActions,
-        value = value,
+        state = state,
         onValueChanged = onValueChanged,
     )
 }
@@ -156,7 +157,7 @@ private fun NotesInputField(
     enabled: Boolean,
     imeAction: ImeAction,
     keyboardActions: KeyboardActions,
-    value: String,
+    state: TextFieldUiState,
     onValueChanged: (String) -> Unit,
 ) {
     PersonInputField(
@@ -166,7 +167,7 @@ private fun NotesInputField(
         singleLine = false,
         imeAction = imeAction,
         keyboardActions = keyboardActions,
-        value = value,
+        state = state,
         onValueChanged = onValueChanged,
     )
 }
@@ -179,19 +180,28 @@ private fun PersonInputField(
     singleLine: Boolean,
     imeAction: ImeAction,
     keyboardActions: KeyboardActions,
-    value: String,
+    state: TextFieldUiState,
     onValueChanged: (String) -> Unit,
 ) {
-    OutlinedTextField(
-        modifier = modifier.fillMaxWidth(),
-        enabled = enabled,
-        singleLine = singleLine,
-        placeholder = { Text(text = stringResource(id = placeholder)) },
-        keyboardOptions = KeyboardOptions.Default.copy(imeAction = imeAction),
-        keyboardActions = keyboardActions,
-        value = value,
-        onValueChange = onValueChanged,
-    )
+    Column {
+        OutlinedTextField(
+            modifier = modifier.fillMaxWidth(),
+            enabled = enabled,
+            singleLine = singleLine,
+            placeholder = { Text(text = stringResource(id = placeholder)) },
+            keyboardOptions = KeyboardOptions.Default.copy(imeAction = imeAction),
+            keyboardActions = keyboardActions,
+            value = state.value,
+            isError = state.isError,
+            onValueChange = onValueChanged,
+        )
+        if (state.isError) {
+            Text(
+                text = stringResource(id = state.requireError()),
+                color = MaterialTheme.colors.error,
+            )
+        }
+    }
 }
 
 @Composable
@@ -226,7 +236,7 @@ fun AddPersonContentPreview(
                 state = state,
                 onFirstNameChanged = {},
                 onLastNameChanged = {},
-                onNotesChanged = {},
+                onNoteChanged = {},
                 onAddPersonClick = {},
                 onPersonAdded = {},
             )
@@ -237,17 +247,24 @@ fun AddPersonContentPreview(
 class AddPersonPreviewParameterProvider : CollectionPreviewParameterProvider<AddPersonUiState>(
     listOf(
         AddPersonUiState(
-            firstName = "First Name",
-            lastName = "Last Name",
-            notes = "Notes...",
+            firstName = TextFieldUiState("First Name"),
+            lastName = TextFieldUiState("Last Name"),
+            note = "Notes...",
             inputsEnabled = true,
             isUserAdded = false,
         ),
         AddPersonUiState(
-            firstName = "First Name",
-            lastName = "Last Name",
-            notes = "Notes...",
+            firstName = TextFieldUiState("First Name"),
+            lastName = TextFieldUiState("Last Name"),
+            note = "Notes...",
             inputsEnabled = false,
+            isUserAdded = false,
+        ),
+        AddPersonUiState(
+            firstName = TextFieldUiState("First Name", R.string.first_name_cannot_be_empty),
+            lastName = TextFieldUiState("Last Name", R.string.last_name_cannot_be_empty),
+            note = "Notes...",
+            inputsEnabled = true,
             isUserAdded = false,
         ),
     )

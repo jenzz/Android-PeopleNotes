@@ -1,8 +1,6 @@
 package com.jenzz.peoplenotes.feature.add_person
 
-import android.widget.Toast
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
 import com.jenzz.peoplenotes.feature.Feature
 import com.jenzz.peoplenotes.feature.add_person.ui.AddPersonScreen
@@ -14,7 +12,6 @@ object AddPersonFeature : Feature {
 
     @Composable
     override fun Content(navController: NavHostController) {
-        val context = LocalContext.current
         AddPersonScreen(
             onPersonAdded = {
                 navController.navigate(HomeFeature.route) {
@@ -22,7 +19,6 @@ object AddPersonFeature : Feature {
                         inclusive = true
                     }
                 }
-                Toast.makeText(context, "User added.", Toast.LENGTH_LONG).show()
             }
         )
     }

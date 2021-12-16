@@ -1,4 +1,4 @@
-package com.jenzz.peoplenotes.common.data
+package com.jenzz.peoplenotes.ext
 
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle

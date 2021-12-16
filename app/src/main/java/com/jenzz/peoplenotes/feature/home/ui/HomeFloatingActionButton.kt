@@ -6,8 +6,8 @@ import androidx.compose.material.icons.rounded.Add
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import com.jenzz.peoplenotes.R
-import com.jenzz.peoplenotes.common.ui.common.MultiFloatingActionButton
-import com.jenzz.peoplenotes.common.ui.common.MultiFloatingActionButtonItem
+import com.jenzz.peoplenotes.common.ui.widgets.MultiFloatingActionButton
+import com.jenzz.peoplenotes.common.ui.widgets.MultiFloatingActionButtonItem
 
 @Composable
 fun HomeFloatingActionButton(

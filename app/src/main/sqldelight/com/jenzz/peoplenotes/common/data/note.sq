@@ -1,0 +1,21 @@
+CREATE TABLE NoteEntity (
+    id INTEGER AS Integer NOT NULL PRIMARY KEY AUTOINCREMENT,
+    text TEXT NOT NULL,
+    personId INTEGER AS Integer NOT NULL,
+    lastModified TEXT NOT NULL,
+    FOREIGN KEY (personId) REFERENCES PersonEntity(id)
+);
+
+selectAll:
+SELECT *
+FROM NoteEntity;
+
+insert:
+INSERT
+INTO NoteEntity(text, personId, lastModified)
+VALUES (?, ?, datetime('now'));
+
+delete:
+DELETE
+FROM NoteEntity
+WHERE id = ?;

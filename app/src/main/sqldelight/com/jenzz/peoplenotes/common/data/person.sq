@@ -1,0 +1,27 @@
+CREATE TABLE PersonEntity (
+    id INTEGER AS Integer NOT NULL PRIMARY KEY AUTOINCREMENT,
+    firstName TEXT NOT NULL,
+    lastName TEXT NOT NULL,
+    lastModified TEXT NOT NULL
+);
+
+selectAll:
+SELECT *
+FROM PersonEntity;
+
+selectLastInsertRowId:
+SELECT last_insert_rowid();
+
+selectByRowId:
+SELECT *
+FROM PersonEntity
+WHERE rowid = ?;
+
+insert:
+INSERT INTO PersonEntity(firstName, lastName, lastModified)
+VALUES (?, ?, datetime('now'));
+
+delete:
+DELETE
+FROM PersonEntity
+WHERE id = ?;

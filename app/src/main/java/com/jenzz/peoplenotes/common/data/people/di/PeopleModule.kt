@@ -1,7 +1,7 @@
-package com.jenzz.peoplenotes.common.data.di
+package com.jenzz.peoplenotes.common.data.people.di
 
-import com.jenzz.peoplenotes.common.data.PeopleDataSource
-import com.jenzz.peoplenotes.common.data.PeopleLocalDataSource
+import com.jenzz.peoplenotes.common.data.people.PeopleDataSource
+import com.jenzz.peoplenotes.common.data.people.PeopleLocalDataSource
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
