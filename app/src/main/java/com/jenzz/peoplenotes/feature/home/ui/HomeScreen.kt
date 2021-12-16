@@ -8,10 +8,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -27,6 +23,7 @@ import com.jenzz.peoplenotes.common.data.people.di.FirstName
 import com.jenzz.peoplenotes.common.data.people.di.LastName
 import com.jenzz.peoplenotes.common.ui.theme.PeopleNotesTheme
 import com.jenzz.peoplenotes.ext.toNonEmptyString
+import com.jenzz.peoplenotes.feature.home.data.Home
 import com.jenzz.peoplenotes.feature.home.data.HomeViewModel
 
 @Composable
@@ -36,12 +33,10 @@ fun HomeScreen(
     onSettingsClick: () -> Unit,
 ) {
     val context = LocalContext.current
-    var sortedBy by rememberSaveable { mutableStateOf(SortBy.LastModified) }
     HomeContent(
         state = viewModel.state.value,
-        sortedBy = sortedBy,
         onSortBy = { sortBy ->
-            sortedBy = sortBy
+            viewModel.onSortBy(sortBy)
             Toast.makeText(
                 context,
                 context.getString(R.string.sorted_by, sortBy),
@@ -56,7 +51,6 @@ fun HomeScreen(
 @Composable
 private fun HomeContent(
     state: HomeUiState,
-    sortedBy: SortBy,
     onSortBy: (SortBy) -> Unit,
     onAddPersonManuallyClick: () -> Unit,
     onSettingsClick: () -> Unit,
@@ -65,7 +59,7 @@ private fun HomeContent(
     Scaffold(
         topBar = {
             HomeTopAppBar(
-                sortedBy = sortedBy,
+                sortedBy = (state as? HomeUiState.Loaded)?.home?.sortedBy,
                 onSortBy = onSortBy,
                 onSettingsClick = onSettingsClick,
             )
@@ -87,7 +81,7 @@ private fun HomeContent(
             is HomeUiState.Loading ->
                 HomeLoading()
             is HomeUiState.Loaded ->
-                HomeLoaded(people = state.people)
+                HomeLoaded(home = state.home)
         }
     }
 }
@@ -103,12 +97,12 @@ private fun HomeLoading() {
 }
 
 @Composable
-private fun HomeLoaded(people: List<Person>) {
+private fun HomeLoaded(home: Home) {
     LazyColumn(
         contentPadding = PaddingValues(8.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        items(people) { person ->
+        items(home.people) { person ->
             PersonRow(person)
         }
     }
@@ -146,7 +140,6 @@ private fun HomeContentPreview(
         Surface {
             HomeContent(
                 state = state,
-                sortedBy = SortBy.LastModified,
                 onSortBy = {},
                 onAddPersonManuallyClick = {},
                 onSettingsClick = {}
@@ -159,14 +152,17 @@ class HomePreviewParameterProvider : CollectionPreviewParameterProvider<HomeUiSt
     listOf(
         HomeUiState.Loading,
         HomeUiState.Loaded(
-            people = (0..10).map { i ->
-                Person(
-                    id = PersonId(i),
-                    firstName = FirstName("$i First Name".toNonEmptyString()),
-                    lastName = LastName("$i Last Name".toNonEmptyString()),
-                    lastModified = "$i Last Modified",
-                )
-            }
+            Home(
+                sortedBy = SortBy.LastModified,
+                people = (0..10).map { i ->
+                    Person(
+                        id = PersonId(i),
+                        firstName = FirstName("$i First Name".toNonEmptyString()),
+                        lastName = LastName("$i Last Name".toNonEmptyString()),
+                        lastModified = "$i Last Modified",
+                    )
+                },
+            )
         ),
     )
 )

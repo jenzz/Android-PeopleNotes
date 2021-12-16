@@ -5,9 +5,20 @@ CREATE TABLE PersonEntity (
     lastModified TEXT NOT NULL
 );
 
-selectAll:
+selectAllSortedByLastModified:
 SELECT *
-FROM PersonEntity;
+FROM PersonEntity
+ORDER BY lastModified DESC;
+
+selectAllSortedByFirstName:
+SELECT *
+FROM PersonEntity
+ORDER BY firstName;
+
+selectAllSortedByLastName:
+SELECT *
+FROM PersonEntity
+ORDER BY lastName;
 
 selectLastInsertRowId:
 SELECT last_insert_rowid();

@@ -5,6 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.jenzz.peoplenotes.feature.home.ui.HomeUiState
+import com.jenzz.peoplenotes.feature.home.ui.SortBy
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
@@ -20,9 +21,21 @@ class HomeViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            useCases.getPeople().collect { people ->
-                _state.value = HomeUiState.Loaded(people)
-            }
+            getPeople(SortBy.LastModified)
         }
+    }
+
+    fun onSortBy(sortBy: SortBy) {
+        viewModelScope.launch {
+            getPeople(sortBy)
+        }
+    }
+
+    private suspend fun getPeople(sortBy: SortBy) {
+        useCases
+            .getPeople(sortBy)
+            .collect { home ->
+                _state.value = HomeUiState.Loaded(home)
+            }
     }
 }

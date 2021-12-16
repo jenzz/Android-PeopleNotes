@@ -1,12 +1,12 @@
 package com.jenzz.peoplenotes.feature.home.ui
 
-import com.jenzz.peoplenotes.common.data.people.Person
+import com.jenzz.peoplenotes.feature.home.data.Home
 
 sealed class HomeUiState {
 
     object Loading : HomeUiState()
 
     data class Loaded(
-        val people: List<Person>,
+        val home: Home,
     ) : HomeUiState()
 }

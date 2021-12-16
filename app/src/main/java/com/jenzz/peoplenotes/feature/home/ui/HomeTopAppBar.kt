@@ -14,7 +14,7 @@ import com.jenzz.peoplenotes.R
 
 @Composable
 fun HomeTopAppBar(
-    sortedBy: SortBy,
+    sortedBy: SortBy?,
     onSortBy: (SortBy) -> Unit,
     onSettingsClick: () -> Unit,
 ) {
@@ -34,34 +34,36 @@ fun HomeTopAppBar(
 
 @Composable
 private fun Actions(
-    sortedBy: SortBy,
+    sortedBy: SortBy?,
     onSortBy: (SortBy) -> Unit,
     onSettingsClick: () -> Unit,
 ) {
     CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.high) {
-        Box {
-            var expanded by rememberSaveable { mutableStateOf(false) }
-            IconButton(
-                onClick = { expanded = !expanded },
-            ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_sort),
-                    contentDescription = stringResource(id = R.string.sort_by),
-                )
-            }
-            DropdownMenu(
-                expanded = expanded,
-                onDismissRequest = { expanded = false },
-            ) {
-                SortBy.values().forEach { sortBy ->
-                    SortByDropdownItem(
-                        text = sortBy.label,
-                        isSelected = sortBy == sortedBy,
-                        onClick = {
-                            expanded = false
-                            onSortBy(sortBy)
-                        },
+        if (sortedBy != null) {
+            Box {
+                var expanded by rememberSaveable { mutableStateOf(false) }
+                IconButton(
+                    onClick = { expanded = !expanded },
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_sort),
+                        contentDescription = stringResource(id = R.string.sort_by),
                     )
+                }
+                DropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = { expanded = false },
+                ) {
+                    SortBy.values().forEach { sortBy ->
+                        SortByDropdownItem(
+                            text = sortBy.label,
+                            isSelected = sortBy == sortedBy,
+                            onClick = {
+                                expanded = false
+                                onSortBy(sortBy)
+                            },
+                        )
+                    }
                 }
             }
         }
