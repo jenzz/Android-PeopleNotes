@@ -7,6 +7,8 @@ import javax.inject.Inject
 interface NotesDataSource {
 
     suspend fun add(note: NewNote, personId: PersonId)
+
+    suspend fun deleteAllNotesByPerson(personId: PersonId)
 }
 
 class NotesLocalDataSource @Inject constructor(
@@ -15,5 +17,9 @@ class NotesLocalDataSource @Inject constructor(
 
     override suspend fun add(note: NewNote, personId: PersonId) {
         noteQueries.insert(note.text.toString(), personId.value)
+    }
+
+    override suspend fun deleteAllNotesByPerson(personId: PersonId) {
+        noteQueries.deleteAllNotesByPerson(personId.value)
     }
 }

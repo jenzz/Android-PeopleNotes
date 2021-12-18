@@ -12,9 +12,8 @@ class PeopleRepository @Inject constructor(
     fun getPeople(sortBy: SortBy): Flow<Home> =
         localDataSource.getPeople(sortBy)
 
-    suspend fun add(person: NewPerson) {
+    suspend fun add(person: NewPerson): Person =
         localDataSource.add(person)
-    }
 
     suspend fun delete(personId: PersonId) {
         localDataSource.delete(personId)

@@ -10,4 +10,8 @@ class NotesRepository @Inject constructor(
     suspend fun add(note: NewNote, personId: PersonId) {
         localDataSource.add(note, personId)
     }
+
+    suspend fun deleteAllNotesByPerson(personId: PersonId) {
+        localDataSource.deleteAllNotesByPerson(personId)
+    }
 }

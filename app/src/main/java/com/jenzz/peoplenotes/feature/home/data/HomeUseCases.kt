@@ -1,5 +1,6 @@
 package com.jenzz.peoplenotes.feature.home.data
 
+import com.jenzz.peoplenotes.common.data.notes.NotesRepository
 import com.jenzz.peoplenotes.common.data.people.PeopleRepository
 import com.jenzz.peoplenotes.common.data.people.PersonId
 import com.jenzz.peoplenotes.feature.home.ui.SortBy
@@ -17,14 +18,15 @@ class GetPeopleUseCase @Inject constructor(
 
     operator fun invoke(sortBy: SortBy): Flow<Home> =
         peopleRepository.getPeople(sortBy)
-
 }
 
 class DeletePersonUseCase @Inject constructor(
+    private val notesRepository: NotesRepository,
     private val peopleRepository: PeopleRepository,
 ) {
 
     suspend operator fun invoke(personId: PersonId) {
+        notesRepository.deleteAllNotesByPerson(personId)
         peopleRepository.delete(personId)
     }
 }

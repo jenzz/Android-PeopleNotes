@@ -1,18 +1,18 @@
 package com.jenzz.peoplenotes.common.data.people
 
 import com.jenzz.peoplenotes.common.data.notes.NewNote
-import com.jenzz.peoplenotes.common.data.notes.NotesDataSource
+import com.jenzz.peoplenotes.common.data.notes.NotesRepository
 import javax.inject.Inject
 
 class PeopleAndNotesRepository @Inject constructor(
-    private val peopleLocalDataSource: PeopleDataSource,
-    private val notesLocalDataSource: NotesDataSource,
+    private val peopleRepository: PeopleRepository,
+    private val notesRepository: NotesRepository,
 ) {
 
     suspend fun add(newPerson: NewPerson, newNote: NewNote?) {
-        val person = peopleLocalDataSource.add(newPerson)
+        val person = peopleRepository.add(newPerson)
         if (newNote != null) {
-            notesLocalDataSource.add(newNote, person.id)
+            notesRepository.add(newNote, person.id)
         }
     }
 }
