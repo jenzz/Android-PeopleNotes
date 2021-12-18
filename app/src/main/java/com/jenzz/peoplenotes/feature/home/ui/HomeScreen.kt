@@ -16,6 +16,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -87,6 +88,8 @@ private fun HomeContent(
         when (state) {
             is HomeUiState.Loading ->
                 HomeLoading()
+            is HomeUiState.Empty ->
+                HomeEmpty()
             is HomeUiState.Loaded ->
                 HomeLoaded(
                     home = state.home,
@@ -104,6 +107,25 @@ private fun HomeLoading() {
         contentAlignment = Alignment.Center,
     ) {
         CircularProgressIndicator()
+    }
+}
+
+@Composable
+private fun HomeEmpty() {
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Icon(
+            painter = painterResource(id = R.drawable.ic_note),
+            contentDescription = stringResource(id = R.string.no_notes),
+        )
+        Spacer(modifier = Modifier.height(4.dp))
+        Text(
+            text = stringResource(id = R.string.no_notes),
+            style = MaterialTheme.typography.caption,
+        )
     }
 }
 

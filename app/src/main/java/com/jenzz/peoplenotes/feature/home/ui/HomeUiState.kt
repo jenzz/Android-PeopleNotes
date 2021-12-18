@@ -6,6 +6,8 @@ sealed class HomeUiState {
 
     object Loading : HomeUiState()
 
+    object Empty : HomeUiState()
+
     data class Loaded(
         val home: Home,
     ) : HomeUiState()

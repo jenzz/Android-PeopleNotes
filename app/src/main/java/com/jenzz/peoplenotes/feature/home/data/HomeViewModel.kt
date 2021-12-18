@@ -42,7 +42,10 @@ class HomeViewModel @Inject constructor(
         useCases
             .getPeople(sortBy)
             .collect { home ->
-                _state.value = HomeUiState.Loaded(home)
+                if (home.people.isEmpty())
+                    _state.value = HomeUiState.Empty
+                else
+                    _state.value = HomeUiState.Loaded(home)
             }
     }
 }
