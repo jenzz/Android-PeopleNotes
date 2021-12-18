@@ -91,12 +91,12 @@ private fun SettingsThemeItem(
     selectedTheme: ThemePreference,
     onThemeSelected: (ThemePreference) -> Unit,
 ) {
-    var showDialog by rememberSaveable { mutableStateOf(false) }
+    var showDropDown by rememberSaveable { mutableStateOf(false) }
     Column {
         Column(
             modifier = modifier
                 .clickable(
-                    onClick = { showDialog = true }
+                    onClick = { showDropDown = true }
                 )
                 .padding(2.dp),
         ) {
@@ -109,66 +109,53 @@ private fun SettingsThemeItem(
             )
         }
         Divider()
-    }
-    if (showDialog) {
-        SettingsThemeDialog(
+        SettingsThemeDropDownMenu(
+            visible = showDropDown,
+            onDismissRequest = { showDropDown = false },
             selectedTheme = selectedTheme,
             onThemeSelected = { theme ->
-                showDialog = false
+                showDropDown = false
                 onThemeSelected(theme)
-            },
-            onDismissRequest = { showDialog = false }
+            }
         )
     }
 }
 
 @Composable
-private fun SettingsThemeDialog(
+private fun SettingsThemeDropDownMenu(
+    visible: Boolean,
+    onDismissRequest: () -> Unit,
     selectedTheme: ThemePreference,
     onThemeSelected: (ThemePreference) -> Unit,
-    onDismissRequest: () -> Unit,
 ) {
-    AlertDialog(
-        title = {
-            Text(text = stringResource(id = R.string.theme))
-        },
-        text = {
-            Column {
-                ThemePreference.values().forEach { theme ->
-                    SettingsThemeDialogItem(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 4.dp),
-                        theme = theme,
-                        isSelected = theme == selectedTheme,
-                        onClick = { onThemeSelected(theme) },
-                    )
-                }
-            }
-        },
-        buttons = {},
+    DropdownMenu(
+        expanded = visible,
         onDismissRequest = onDismissRequest,
-    )
+    ) {
+        ThemePreference.values().forEach { theme ->
+            SettingsThemeDropDownItem(
+                theme = theme,
+                isSelected = theme == selectedTheme,
+                onClick = { onThemeSelected(theme) },
+            )
+        }
+    }
 }
 
 @Composable
-private fun SettingsThemeDialogItem(
-    modifier: Modifier = Modifier,
+private fun SettingsThemeDropDownItem(
     theme: ThemePreference,
     isSelected: Boolean,
     onClick: () -> Unit,
 ) {
-    Row(
-        modifier = modifier
-            .clickable(onClick = onClick)
-    ) {
+    DropdownMenuItem(onClick = onClick) {
         RadioButton(
             selected = isSelected,
-            onClick = onClick
+            onClick = onClick,
         )
         Text(
             modifier = Modifier.padding(start = 8.dp),
-            text = stringResource(id = theme.label)
+            text = stringResource(id = theme.label),
         )
     }
 }
@@ -190,7 +177,7 @@ private fun SettingsContentPreview(
         Surface {
             SettingsContent(
                 state = state,
-                onThemeSelected = {}
+                onThemeSelected = {},
             )
         }
     }
@@ -201,7 +188,7 @@ class SettingsPreviewParameterProvider : CollectionPreviewParameterProvider<Sett
         SettingsUiState.Loading,
         SettingsUiState.Loaded(
             settings = Settings(
-                theme = ThemePreference.DEFAULT
+                theme = ThemePreference.DEFAULT,
             )
         ),
     )
