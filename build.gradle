@@ -24,6 +24,7 @@ allprojects {
         task.kotlinOptions {
             freeCompilerArgs += [
                     "-Xopt-in=androidx.compose.animation.ExperimentalAnimationApi",
+                    "-Xopt-in=androidx.compose.foundation.ExperimentalFoundationApi",
                     "-Xopt-in=androidx.compose.ui.ExperimentalComposeUiApi",
             ]
         }

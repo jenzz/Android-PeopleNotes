@@ -4,6 +4,7 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.jenzz.peoplenotes.common.data.people.Person
 import com.jenzz.peoplenotes.feature.home.ui.HomeUiState
 import com.jenzz.peoplenotes.feature.home.ui.SortBy
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -28,6 +29,12 @@ class HomeViewModel @Inject constructor(
     fun onSortBy(sortBy: SortBy) {
         viewModelScope.launch {
             getPeople(sortBy)
+        }
+    }
+
+    fun onDeletePerson(person: Person) {
+        viewModelScope.launch {
+            useCases.deletePerson(person.id)
         }
     }
 

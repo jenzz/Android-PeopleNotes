@@ -17,6 +17,8 @@ interface PeopleDataSource {
     fun getPeople(sortBy: SortBy): Flow<Home>
 
     suspend fun add(person: NewPerson): Person
+
+    suspend fun delete(personId: PersonId)
 }
 
 class PeopleLocalDataSource @Inject constructor(
@@ -56,4 +58,8 @@ class PeopleLocalDataSource @Inject constructor(
                 .selectByRowId(rowId, toPerson)
                 .executeAsOne()
         }
+
+    override suspend fun delete(personId: PersonId) {
+        personQueries.delete(personId.value)
+    }
 }

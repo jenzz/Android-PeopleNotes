@@ -2,15 +2,22 @@ package com.jenzz.peoplenotes.feature.home.ui
 
 import android.content.res.Configuration.UI_MODE_NIGHT_NO
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
-import android.widget.Toast
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.datasource.CollectionPreviewParameterProvider
@@ -22,6 +29,7 @@ import com.jenzz.peoplenotes.common.data.people.PersonId
 import com.jenzz.peoplenotes.common.data.people.di.FirstName
 import com.jenzz.peoplenotes.common.data.people.di.LastName
 import com.jenzz.peoplenotes.common.ui.theme.PeopleNotesTheme
+import com.jenzz.peoplenotes.ext.showLongToast
 import com.jenzz.peoplenotes.ext.toNonEmptyString
 import com.jenzz.peoplenotes.feature.home.data.Home
 import com.jenzz.peoplenotes.feature.home.data.HomeViewModel
@@ -35,13 +43,14 @@ fun HomeScreen(
     val context = LocalContext.current
     HomeContent(
         state = viewModel.state.value,
+        onPersonClick = { /* TODO JD */ },
+        onDeletePerson = { person ->
+            viewModel.onDeletePerson(person)
+            context.showLongToast(R.string.person_deleted)
+        },
         onSortBy = { sortBy ->
             viewModel.onSortBy(sortBy)
-            Toast.makeText(
-                context,
-                context.getString(R.string.sorted_by, sortBy),
-                Toast.LENGTH_LONG
-            ).show()
+            context.showLongToast(R.string.sorted_by)
         },
         onAddPersonManuallyClick = onAddPersonManuallyClick,
         onSettingsClick = onSettingsClick,
@@ -51,6 +60,8 @@ fun HomeScreen(
 @Composable
 private fun HomeContent(
     state: HomeUiState,
+    onPersonClick: (Person) -> Unit,
+    onDeletePerson: (Person) -> Unit,
     onSortBy: (SortBy) -> Unit,
     onAddPersonManuallyClick: () -> Unit,
     onSettingsClick: () -> Unit,
@@ -68,11 +79,7 @@ private fun HomeContent(
             HomeFloatingActionButton(
                 onAddPersonManuallyClick = onAddPersonManuallyClick,
                 onImportFromContactsClick = {
-                    Toast.makeText(
-                        context,
-                        "Import from contacts",
-                        Toast.LENGTH_LONG
-                    ).show()
+                    context.showLongToast(R.string.import_from_contacts)
                 }
             )
         }
@@ -81,7 +88,11 @@ private fun HomeContent(
             is HomeUiState.Loading ->
                 HomeLoading()
             is HomeUiState.Loaded ->
-                HomeLoaded(home = state.home)
+                HomeLoaded(
+                    home = state.home,
+                    onPersonClick = onPersonClick,
+                    onDeletePerson = onDeletePerson,
+                )
         }
     }
 }
@@ -97,20 +108,44 @@ private fun HomeLoading() {
 }
 
 @Composable
-private fun HomeLoaded(home: Home) {
+private fun HomeLoaded(
+    home: Home,
+    onPersonClick: (Person) -> Unit,
+    onDeletePerson: (Person) -> Unit,
+) {
     LazyColumn(
         contentPadding = PaddingValues(8.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         items(home.people) { person ->
-            PersonRow(person)
+            PersonRow(
+                person = person,
+                onClick = onPersonClick,
+                onDeletePerson = onDeletePerson,
+            )
         }
     }
 }
 
 @Composable
-private fun PersonRow(person: Person) {
-    Card {
+private fun PersonRow(
+    person: Person,
+    onClick: (Person) -> Unit,
+    onDeletePerson: (Person) -> Unit,
+) {
+    var selected by rememberSaveable { mutableStateOf(false) }
+    Card(
+        modifier = Modifier
+            .combinedClickable(
+                onClick = { onClick(person) },
+                onLongClick = { selected = true }
+            ),
+        border = if (selected)
+            BorderStroke(
+                width = 1.dp,
+                color = MaterialTheme.colors.onSurface
+            ) else null,
+    ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -119,6 +154,25 @@ private fun PersonRow(person: Person) {
             Text(text = "Id: ${person.id.value}")
             Text(text = "${person.firstName.value} ${person.lastName.value}")
             Text(text = "Last modified: ${person.lastModified}")
+        }
+        DropdownMenu(
+            expanded = selected,
+            onDismissRequest = { selected = false },
+        ) {
+            DropdownMenuItem(
+                onClick = {
+                    selected = false
+                    onDeletePerson(person)
+                }
+            ) {
+                Text(
+                    text = stringResource(id = R.string.delete),
+                    style = MaterialTheme.typography.body1.copy(
+                        fontWeight = FontWeight.Normal,
+                        color = MaterialTheme.colors.onSurface,
+                    ),
+                )
+            }
         }
     }
 }
@@ -140,6 +194,8 @@ private fun HomeContentPreview(
         Surface {
             HomeContent(
                 state = state,
+                onPersonClick = {},
+                onDeletePerson = {},
                 onSortBy = {},
                 onAddPersonManuallyClick = {},
                 onSettingsClick = {}
