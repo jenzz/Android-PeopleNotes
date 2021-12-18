@@ -226,7 +226,7 @@ private fun SubmitButton(
     uiMode = UI_MODE_NIGHT_YES,
 )
 @Composable
-fun AddPersonContentPreview(
+private fun AddPersonContentPreview(
     @PreviewParameter(AddPersonPreviewParameterProvider::class)
     state: AddPersonUiState
 ) {

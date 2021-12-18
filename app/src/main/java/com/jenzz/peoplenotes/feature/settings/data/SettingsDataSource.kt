@@ -43,6 +43,6 @@ class SettingsLocalDataSource @Inject constructor(
             return if (id != null)
                 ThemeIdEntity(id).toDomain()
             else
-                ThemePreference.SystemDefault
+                ThemePreference.DEFAULT
         }
 }

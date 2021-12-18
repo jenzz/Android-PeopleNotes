@@ -202,7 +202,7 @@ class SettingsPreviewParameterProvider : CollectionPreviewParameterProvider<Sett
         SettingsUiState.Loading,
         SettingsUiState.Loaded(
             settings = Settings(
-                theme = ThemePreference.SystemDefault
+                theme = ThemePreference.DEFAULT
             )
         ),
     )

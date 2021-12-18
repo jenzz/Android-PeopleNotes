@@ -5,10 +5,10 @@ import com.jenzz.peoplenotes.feature.settings.data.SettingsLocalDataSource
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
-import dagger.hilt.android.components.ViewModelComponent
+import dagger.hilt.android.components.ActivityRetainedComponent
 
 @Module
-@InstallIn(ViewModelComponent::class)
+@InstallIn(ActivityRetainedComponent::class)
 interface SettingsModule {
 
     @Binds

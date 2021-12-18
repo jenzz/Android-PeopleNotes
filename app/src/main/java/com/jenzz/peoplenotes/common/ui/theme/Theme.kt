@@ -6,6 +6,7 @@ import androidx.compose.material.darkColors
 import androidx.compose.material.lightColors
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
+import com.jenzz.peoplenotes.feature.settings.data.ThemePreference
 
 private val DarkColorPalette = darkColors(
     primary = Purple200,
@@ -27,9 +28,14 @@ private val LightColorPalette = lightColors(
 
 @Composable
 fun PeopleNotesTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
+    theme: ThemePreference = ThemePreference.DEFAULT,
     content: @Composable () -> Unit,
 ) {
+    val darkTheme = when (theme) {
+        ThemePreference.Dark -> true
+        ThemePreference.Light -> false
+        ThemePreference.SystemDefault -> isSystemInDarkTheme()
+    }
     val colors = if (darkTheme) {
         DarkColorPalette
     } else {

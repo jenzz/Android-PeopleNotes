@@ -7,7 +7,12 @@ enum class ThemePreference(@StringRes val label: Int) {
 
     Light(R.string.light),
     Dark(R.string.dark),
-    SystemDefault(R.string.system_default),
+    SystemDefault(R.string.system_default);
+
+    companion object {
+
+        val DEFAULT = SystemDefault
+    }
 }
 
 fun ThemePreference.toEntity(): ThemePreferenceEntity =
