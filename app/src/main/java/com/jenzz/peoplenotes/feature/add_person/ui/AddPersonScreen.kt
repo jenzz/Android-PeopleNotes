@@ -22,7 +22,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.jenzz.peoplenotes.R
 import com.jenzz.peoplenotes.common.ui.TextFieldUiState
 import com.jenzz.peoplenotes.common.ui.theme.PeopleNotesTheme
-import com.jenzz.peoplenotes.feature.add_person.data.AddPersonViewModel
 
 @Composable
 fun AddPersonScreen(

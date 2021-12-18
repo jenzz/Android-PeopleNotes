@@ -1,12 +1,11 @@
-package com.jenzz.peoplenotes.feature.home.data
+package com.jenzz.peoplenotes.feature.home.ui
 
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.jenzz.peoplenotes.common.data.people.Person
-import com.jenzz.peoplenotes.feature.home.ui.HomeUiState
-import com.jenzz.peoplenotes.feature.home.ui.SortBy
+import com.jenzz.peoplenotes.feature.home.data.HomeUseCases
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch

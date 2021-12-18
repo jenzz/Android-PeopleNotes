@@ -22,7 +22,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.jenzz.peoplenotes.R
 import com.jenzz.peoplenotes.common.ui.theme.PeopleNotesTheme
 import com.jenzz.peoplenotes.feature.settings.data.Settings
-import com.jenzz.peoplenotes.feature.settings.data.SettingsViewModel
 import com.jenzz.peoplenotes.feature.settings.data.ThemePreference
 
 @Composable

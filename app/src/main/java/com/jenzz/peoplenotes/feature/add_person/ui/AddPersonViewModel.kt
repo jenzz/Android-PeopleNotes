@@ -1,11 +1,12 @@
-package com.jenzz.peoplenotes.feature.add_person.data
+package com.jenzz.peoplenotes.feature.add_person.ui
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.jenzz.peoplenotes.common.ui.TextFieldUiState
 import com.jenzz.peoplenotes.ext.mutableStateOf
-import com.jenzz.peoplenotes.feature.add_person.ui.AddPersonUiState
+import com.jenzz.peoplenotes.feature.add_person.data.AddPersonResult
+import com.jenzz.peoplenotes.feature.add_person.data.AddPersonUseCases
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject

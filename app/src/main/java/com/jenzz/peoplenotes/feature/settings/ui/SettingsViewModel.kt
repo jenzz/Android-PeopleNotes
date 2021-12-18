@@ -1,10 +1,11 @@
-package com.jenzz.peoplenotes.feature.settings.data
+package com.jenzz.peoplenotes.feature.settings.ui
 
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.jenzz.peoplenotes.feature.settings.ui.SettingsUiState
+import com.jenzz.peoplenotes.feature.settings.data.SettingsUseCases
+import com.jenzz.peoplenotes.feature.settings.data.ThemePreference
 import com.jenzz.peoplenotes.feature.settings.ui.SettingsUiState.Loading
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.collect

@@ -33,7 +33,6 @@ import com.jenzz.peoplenotes.common.ui.theme.PeopleNotesTheme
 import com.jenzz.peoplenotes.ext.showLongToast
 import com.jenzz.peoplenotes.ext.toNonEmptyString
 import com.jenzz.peoplenotes.feature.home.data.Home
-import com.jenzz.peoplenotes.feature.home.data.HomeViewModel
 
 @Composable
 fun HomeScreen(
