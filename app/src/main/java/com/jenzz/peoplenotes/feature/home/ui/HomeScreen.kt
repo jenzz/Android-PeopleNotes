@@ -66,10 +66,13 @@ private fun HomeContent(
     onAddPersonManuallyClick: () -> Unit,
     onSettingsClick: () -> Unit,
 ) {
+    var listStyle by rememberSaveable { mutableStateOf(ListStyle.Rows) }
     val context = LocalContext.current
     Scaffold(
         topBar = {
             HomeTopAppBar(
+                listStyle = if (state is HomeUiState.Loaded) listStyle else null,
+                onListStyleChanged = { listStyle = it },
                 sortedBy = (state as? HomeUiState.Loaded)?.home?.sortedBy,
                 onSortBy = onSortBy,
                 onSettingsClick = onSettingsClick,
@@ -92,6 +95,7 @@ private fun HomeContent(
             is HomeUiState.Loaded ->
                 HomeLoaded(
                     home = state.home,
+                    listStyle = listStyle,
                     onPersonClick = onPersonClick,
                     onDeletePerson = onDeletePerson,
                 )
@@ -131,6 +135,29 @@ private fun HomeEmpty() {
 @Composable
 private fun HomeLoaded(
     home: Home,
+    listStyle: ListStyle,
+    onPersonClick: (Person) -> Unit,
+    onDeletePerson: (Person) -> Unit,
+) {
+    when (listStyle) {
+        ListStyle.Rows ->
+            HomeLoadedRows(
+                home = home,
+                onPersonClick = onPersonClick,
+                onDeletePerson = onDeletePerson,
+            )
+        ListStyle.Grid ->
+            HomeLoadedGrid(
+                home = home,
+                onPersonClick = onPersonClick,
+                onDeletePerson = onDeletePerson,
+            )
+    }
+}
+
+@Composable
+private fun HomeLoadedRows(
+    home: Home,
     onPersonClick: (Person) -> Unit,
     onDeletePerson: (Person) -> Unit,
 ) {
@@ -144,6 +171,36 @@ private fun HomeLoaded(
                 onClick = onPersonClick,
                 onDeletePerson = onDeletePerson,
             )
+        }
+    }
+}
+
+@Composable
+private fun HomeLoadedGrid(
+    home: Home,
+    columns: Int = 2,
+    onPersonClick: (Person) -> Unit,
+    onDeletePerson: (Person) -> Unit,
+) {
+    LazyColumn(
+        contentPadding = PaddingValues(4.dp),
+    ) {
+        items(home.people) { person ->
+            Row {
+                for (columnIndex in 0 until columns) {
+                    Box(
+                        modifier = Modifier
+                            .padding(4.dp)
+                            .weight(1f, fill = true),
+                    ) {
+                        PersonRow(
+                            person = person,
+                            onClick = onPersonClick,
+                            onDeletePerson = onDeletePerson,
+                        )
+                    }
+                }
+            }
         }
     }
 }

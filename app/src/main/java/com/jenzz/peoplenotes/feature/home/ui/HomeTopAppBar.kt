@@ -14,6 +14,8 @@ import com.jenzz.peoplenotes.R
 
 @Composable
 fun HomeTopAppBar(
+    listStyle: ListStyle?,
+    onListStyleChanged: (ListStyle) -> Unit,
     sortedBy: SortBy?,
     onSortBy: (SortBy) -> Unit,
     onSettingsClick: () -> Unit,
@@ -24,6 +26,8 @@ fun HomeTopAppBar(
         },
         actions = {
             Actions(
+                listStyle = listStyle,
+                onListStyleChanged = onListStyleChanged,
                 sortedBy = sortedBy,
                 onSortBy = onSortBy,
                 onSettingsClick = onSettingsClick,
@@ -34,11 +38,31 @@ fun HomeTopAppBar(
 
 @Composable
 private fun Actions(
+    listStyle: ListStyle?,
+    onListStyleChanged: (ListStyle) -> Unit,
     sortedBy: SortBy?,
     onSortBy: (SortBy) -> Unit,
     onSettingsClick: () -> Unit,
 ) {
     CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.high) {
+        when (listStyle) {
+            ListStyle.Rows -> {
+                IconButton(onClick = { onListStyleChanged(ListStyle.Grid) }) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_grid),
+                        contentDescription = stringResource(id = R.string.grid_view),
+                    )
+                }
+            }
+            ListStyle.Grid -> {
+                IconButton(onClick = { onListStyleChanged(ListStyle.Rows) }) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_rows),
+                        contentDescription = stringResource(id = R.string.rows),
+                    )
+                }
+            }
+        }
         if (sortedBy != null) {
             Box {
                 var expanded by rememberSaveable { mutableStateOf(false) }

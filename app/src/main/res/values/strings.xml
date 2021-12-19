@@ -20,5 +20,7 @@
     <string name="delete">Delete</string>
     <string name="person_deleted">Person deleted</string>
     <string name="no_notes">No notes</string>
+    <string name="grid_view">Grid view</string>
+    <string name="rows">Rows</string>
 
 </resources>
