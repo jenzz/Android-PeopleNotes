@@ -50,7 +50,9 @@ fun HomeScreen(
         },
         onSortBy = { sortBy ->
             viewModel.onSortBy(sortBy)
-            context.showLongToast(R.string.sorted_by)
+            context.showLongToast(
+                context.getString(R.string.sorted_by, context.getString(sortBy.label))
+            )
         },
         onAddPersonManuallyClick = onAddPersonManuallyClick,
         onSettingsClick = onSettingsClick,

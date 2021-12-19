@@ -5,5 +5,9 @@ import android.widget.Toast
 import androidx.annotation.StringRes
 
 fun Context.showLongToast(@StringRes text: Int) {
-    Toast.makeText(this, getString(text), Toast.LENGTH_LONG).show()
+    Toast.makeText(this, text, Toast.LENGTH_LONG).show()
+}
+
+fun Context.showLongToast(text: String) {
+    Toast.makeText(this, text, Toast.LENGTH_LONG).show()
 }
