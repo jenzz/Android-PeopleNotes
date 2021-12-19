@@ -15,5 +15,5 @@ data class TextFieldUiState(
     val isError: Boolean = error != null
 
     @StringRes
-    fun requireError(): Int = requireNotNull(error) { "Required error was null."}
+    fun requireError(): Int = requireNotNull(error) { "Required error was null." }
 }

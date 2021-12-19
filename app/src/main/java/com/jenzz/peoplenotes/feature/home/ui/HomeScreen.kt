@@ -233,24 +233,37 @@ private fun PersonRow(
             Text(text = "${person.firstName.value} ${person.lastName.value}")
             Text(text = "Last modified: ${person.lastModified}")
         }
-        DropdownMenu(
-            expanded = selected,
+        PersonDropDownMenu(
+            selected = selected,
             onDismissRequest = { selected = false },
-        ) {
-            DropdownMenuItem(
-                onClick = {
-                    selected = false
-                    onDeletePerson(person)
-                }
-            ) {
-                Text(
-                    text = stringResource(id = R.string.delete),
-                    style = MaterialTheme.typography.body1.copy(
-                        fontWeight = FontWeight.Normal,
-                        color = MaterialTheme.colors.onSurface,
-                    ),
-                )
-            }
+            onDeletePerson = { person ->
+                selected = false
+                onDeletePerson(person)
+            },
+            person = person
+        )
+    }
+}
+
+@Composable
+private fun PersonDropDownMenu(
+    selected: Boolean,
+    onDismissRequest: () -> Unit,
+    onDeletePerson: (Person) -> Unit,
+    person: Person,
+) {
+    DropdownMenu(
+        expanded = selected,
+        onDismissRequest = onDismissRequest,
+    ) {
+        DropdownMenuItem(onClick = { onDeletePerson(person) }) {
+            Text(
+                text = stringResource(id = R.string.delete),
+                style = MaterialTheme.typography.body1.copy(
+                    fontWeight = FontWeight.Normal,
+                    color = MaterialTheme.colors.onSurface,
+                ),
+            )
         }
     }
 }

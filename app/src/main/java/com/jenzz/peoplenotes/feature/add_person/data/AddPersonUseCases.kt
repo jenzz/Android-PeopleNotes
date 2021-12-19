@@ -48,7 +48,7 @@ class AddPersonWithNoteUseCase @Inject constructor(
     private suspend fun addPersonAndNote(
         firstName: NonEmptyString,
         lastName: NonEmptyString,
-        note: String
+        note: String,
     ) {
         val newPerson = NewPerson(
             firstName = FirstName(firstName),

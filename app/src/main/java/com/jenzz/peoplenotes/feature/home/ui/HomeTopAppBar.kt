@@ -45,58 +45,81 @@ private fun Actions(
     onSettingsClick: () -> Unit,
 ) {
     CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.high) {
-        when (listStyle) {
-            ListStyle.Rows -> {
-                IconButton(onClick = { onListStyleChanged(ListStyle.Grid) }) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_grid),
-                        contentDescription = stringResource(id = R.string.grid_view),
-                    )
-                }
+        ListStyleAction(listStyle, onListStyleChanged)
+        SortByAction(sortedBy, onSortBy)
+        SettingsAction(onSettingsClick)
+    }
+}
+
+@Composable
+private fun ListStyleAction(
+    listStyle: ListStyle?,
+    onListStyleChanged: (ListStyle) -> Unit,
+) {
+    when (listStyle) {
+        ListStyle.Rows -> {
+            IconButton(onClick = { onListStyleChanged(ListStyle.Grid) }) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_grid),
+                    contentDescription = stringResource(id = R.string.grid_view),
+                )
             }
-            ListStyle.Grid -> {
-                IconButton(onClick = { onListStyleChanged(ListStyle.Rows) }) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_rows),
-                        contentDescription = stringResource(id = R.string.rows),
+        }
+        ListStyle.Grid -> {
+            IconButton(onClick = { onListStyleChanged(ListStyle.Rows) }) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_rows),
+                    contentDescription = stringResource(id = R.string.rows),
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun SortByAction(
+    sortedBy: SortBy?,
+    onSortBy: (SortBy) -> Unit,
+) {
+    if (sortedBy != null) {
+        Box {
+            var expanded by rememberSaveable { mutableStateOf(false) }
+            IconButton(
+                onClick = { expanded = !expanded },
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_sort),
+                    contentDescription = stringResource(id = R.string.sort_by),
+                )
+            }
+            DropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false },
+            ) {
+                SortBy.values().forEach { sortBy ->
+                    SortByDropdownItem(
+                        text = sortBy.label,
+                        isSelected = sortBy == sortedBy,
+                        onClick = {
+                            expanded = false
+                            onSortBy(sortBy)
+                        },
                     )
                 }
             }
         }
-        if (sortedBy != null) {
-            Box {
-                var expanded by rememberSaveable { mutableStateOf(false) }
-                IconButton(
-                    onClick = { expanded = !expanded },
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_sort),
-                        contentDescription = stringResource(id = R.string.sort_by),
-                    )
-                }
-                DropdownMenu(
-                    expanded = expanded,
-                    onDismissRequest = { expanded = false },
-                ) {
-                    SortBy.values().forEach { sortBy ->
-                        SortByDropdownItem(
-                            text = sortBy.label,
-                            isSelected = sortBy == sortedBy,
-                            onClick = {
-                                expanded = false
-                                onSortBy(sortBy)
-                            },
-                        )
-                    }
-                }
-            }
-        }
-        IconButton(onClick = onSettingsClick) {
-            Icon(
-                imageVector = Icons.Rounded.Settings,
-                contentDescription = stringResource(id = R.string.settings),
-            )
-        }
+    }
+}
+
+@Composable
+private fun SettingsAction(
+    onSettingsClick: () -> Unit,
+) {
+    IconButton(onClick = onSettingsClick) {
+        Icon(
+            imageVector = Icons.Rounded.Settings,
+            contentDescription = stringResource(id = R.string.settings),
+        )
     }
 }
 

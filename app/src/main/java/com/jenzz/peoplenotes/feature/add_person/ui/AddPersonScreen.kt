@@ -26,7 +26,7 @@ import com.jenzz.peoplenotes.common.ui.theme.PeopleNotesTheme
 @Composable
 fun AddPersonScreen(
     viewModel: AddPersonViewModel = hiltViewModel(),
-    onPersonAdded: () -> Unit
+    onPersonAdded: () -> Unit,
 ) {
     AddPersonContent(
         state = viewModel.state,
@@ -227,7 +227,7 @@ private fun SubmitButton(
 @Composable
 private fun AddPersonContentPreview(
     @PreviewParameter(AddPersonPreviewParameterProvider::class)
-    state: AddPersonUiState
+    state: AddPersonUiState,
 ) {
     PeopleNotesTheme {
         Surface {
