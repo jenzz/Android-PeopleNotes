@@ -36,15 +36,15 @@ class PeopleLocalDataSource @Inject constructor(
         }
 
     override fun getPeople(sortBy: SortBy): Flow<Home> {
-        val selectAll = when (sortBy) {
-            SortBy.LastModified -> personQueries.selectAllSortedByLastModified(toPerson)
-            SortBy.FirstName -> personQueries.selectAllSortedByFirstName(toPerson)
-            SortBy.LastName -> personQueries.selectAllSortedByLastName(toPerson)
+        val orderBy = when (sortBy) {
+            SortBy.FirstName -> compareBy(Person::firstName)
+            SortBy.LastName -> compareBy(Person::lastName)
+            SortBy.LastModified -> compareByDescending(Person::lastModified)
         }
-        return selectAll
+        return personQueries.selectAll(toPerson)
             .asFlow()
             .mapToList()
-            .map { people -> Home(sortBy, people) }
+            .map { people -> Home(sortBy, people.sortedWith(orderBy)) }
     }
 
     override suspend fun add(person: NewPerson): Person =
