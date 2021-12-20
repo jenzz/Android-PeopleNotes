@@ -1,59 +1,125 @@
 package com.jenzz.peoplenotes.feature.home.ui
 
 import androidx.annotation.StringRes
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Settings
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
 import com.jenzz.peoplenotes.R
 
 @Composable
 fun HomeTopAppBar(
-    listStyle: ListStyle?,
+    showActions: Boolean,
+    filter: String,
+    onFilterChanged: (String) -> Unit,
+    listStyle: ListStyle,
     onListStyleChanged: (ListStyle) -> Unit,
-    sortedBy: SortBy?,
-    onSortBy: (SortBy) -> Unit,
+    sortBy: SortBy,
+    onSortByChanged: (SortBy) -> Unit,
     onSettingsClick: () -> Unit,
 ) {
-    TopAppBar(
-        title = {
-            Text(text = stringResource(id = R.string.app_name))
-        },
-        actions = {
-            Actions(
-                listStyle = listStyle,
-                onListStyleChanged = onListStyleChanged,
-                sortedBy = sortedBy,
-                onSortBy = onSortBy,
-                onSettingsClick = onSettingsClick,
-            )
+    Row(
+        modifier = Modifier
+            .padding(start = 8.dp, top = 8.dp, end = 8.dp)
+    ) {
+        FilterTextField(
+            modifier = Modifier.weight(1f),
+            showActions = showActions,
+            filter = filter,
+            onFilterChanged = onFilterChanged,
+            listStyle = listStyle,
+            onListStyleChanged = onListStyleChanged,
+            sortBy = sortBy,
+            onSortByChanged = onSortByChanged,
+        )
+        SettingsIcon(
+            modifier = Modifier.size(TextFieldDefaults.MinHeight),
+            onSettingsClick = onSettingsClick,
+        )
+    }
+}
+
+@Composable
+private fun FilterTextField(
+    modifier: Modifier = Modifier,
+    showActions: Boolean,
+    filter: String,
+    onFilterChanged: (String) -> Unit,
+    listStyle: ListStyle,
+    onListStyleChanged: (ListStyle) -> Unit,
+    sortBy: SortBy,
+    onSortByChanged: (SortBy) -> Unit,
+) {
+    TextField(
+        modifier = modifier
+            .background(
+                color = MaterialTheme.colors.onBackground.copy(alpha = 0.05f),
+                shape = RoundedCornerShape(50),
+            ),
+        colors = TextFieldDefaults.textFieldColors(
+            backgroundColor = Color.Transparent,
+            focusedIndicatorColor = Color.Transparent,
+            unfocusedIndicatorColor = Color.Transparent,
+        ),
+        singleLine = true,
+        value = filter,
+        onValueChange = onFilterChanged,
+        placeholder = { Text(text = stringResource(R.string.search_your_notes)) },
+        trailingIcon = {
+            if (showActions) {
+                Row {
+                    ListStyleAction(
+                        listStyle = listStyle,
+                        onListStyleChanged = onListStyleChanged
+                    )
+                    SortByAction(
+                        sortBy = sortBy,
+                        onSortByChanged = onSortByChanged
+                    )
+                }
+            }
         }
     )
 }
 
 @Composable
-private fun Actions(
-    listStyle: ListStyle?,
-    onListStyleChanged: (ListStyle) -> Unit,
-    sortedBy: SortBy?,
-    onSortBy: (SortBy) -> Unit,
+private fun SettingsIcon(
+    modifier: Modifier = Modifier,
     onSettingsClick: () -> Unit,
 ) {
-    CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.high) {
-        ListStyleAction(listStyle, onListStyleChanged)
-        SortByAction(sortedBy, onSortBy)
-        SettingsAction(onSettingsClick)
+    IconButton(
+        modifier = modifier,
+        onClick = onSettingsClick
+    ) {
+        Icon(
+            imageVector = Icons.Rounded.Settings,
+            tint = TextFieldDefaults.textFieldColors()
+                .trailingIconColor(enabled = true, isError = false)
+                .value,
+            contentDescription = stringResource(id = R.string.settings),
+        )
     }
 }
 
 @Composable
 private fun ListStyleAction(
-    listStyle: ListStyle?,
+    listStyle: ListStyle,
     onListStyleChanged: (ListStyle) -> Unit,
 ) {
     when (listStyle) {
@@ -78,48 +144,34 @@ private fun ListStyleAction(
 
 @Composable
 private fun SortByAction(
-    sortedBy: SortBy?,
-    onSortBy: (SortBy) -> Unit,
+    sortBy: SortBy,
+    onSortByChanged: (SortBy) -> Unit,
 ) {
-    if (sortedBy != null) {
-        Box {
-            var expanded by rememberSaveable { mutableStateOf(false) }
-            IconButton(
-                onClick = { expanded = !expanded },
-            ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_sort),
-                    contentDescription = stringResource(id = R.string.sort_by),
+    Box {
+        var expanded by rememberSaveable { mutableStateOf(false) }
+        IconButton(
+            onClick = { expanded = !expanded },
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.ic_sort),
+                contentDescription = stringResource(id = R.string.sort_by),
+            )
+        }
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false },
+        ) {
+            SortBy.values().forEach { sortByItem ->
+                SortByDropdownItem(
+                    text = sortByItem.label,
+                    isSelected = sortBy == sortByItem,
+                    onClick = {
+                        expanded = false
+                        onSortByChanged(sortByItem)
+                    },
                 )
             }
-            DropdownMenu(
-                expanded = expanded,
-                onDismissRequest = { expanded = false },
-            ) {
-                SortBy.values().forEach { sortBy ->
-                    SortByDropdownItem(
-                        text = sortBy.label,
-                        isSelected = sortBy == sortedBy,
-                        onClick = {
-                            expanded = false
-                            onSortBy(sortBy)
-                        },
-                    )
-                }
-            }
         }
-    }
-}
-
-@Composable
-private fun SettingsAction(
-    onSettingsClick: () -> Unit,
-) {
-    IconButton(onClick = onSettingsClick) {
-        Icon(
-            imageVector = Icons.Rounded.Settings,
-            contentDescription = stringResource(id = R.string.settings),
-        )
     }
 }
 

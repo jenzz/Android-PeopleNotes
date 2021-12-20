@@ -7,7 +7,11 @@ CREATE TABLE PersonEntity (
 
 selectAll:
 SELECT *
-FROM PersonEntity;
+FROM PersonEntity
+WHERE
+    CASE WHEN :filter IS NOT NULL
+    THEN firstName LIKE :filter OR lastName LIKE :filter OR (firstName || ' ' || lastName) LIKE :filter
+    ELSE 1 END;
 
 selectLastInsertRowId:
 SELECT last_insert_rowid();

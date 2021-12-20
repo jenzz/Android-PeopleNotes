@@ -1,7 +1,7 @@
 package com.jenzz.peoplenotes.ext
 
 @JvmInline
-value class NonEmptyString(private val value: String) : Comparable<NonEmptyString> {
+value class NonEmptyString(val value: String) : Comparable<NonEmptyString> {
 
     init {
         require(value.isNotEmpty()) { "String must not be empty." }

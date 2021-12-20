@@ -7,5 +7,10 @@ enum class SortBy(@StringRes val label: Int) {
 
     LastModified(R.string.last_modified),
     FirstName(R.string.first_name),
-    LastName(R.string.last_name),
+    LastName(R.string.last_name);
+
+    companion object {
+
+        val DEFAULT = LastModified
+    }
 }

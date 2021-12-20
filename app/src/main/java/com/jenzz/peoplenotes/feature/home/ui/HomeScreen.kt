@@ -32,7 +32,6 @@ import com.jenzz.peoplenotes.common.data.people.di.LastName
 import com.jenzz.peoplenotes.common.ui.theme.PeopleNotesTheme
 import com.jenzz.peoplenotes.ext.showLongToast
 import com.jenzz.peoplenotes.ext.toNonEmptyString
-import com.jenzz.peoplenotes.feature.home.data.Home
 
 @Composable
 fun HomeScreen(
@@ -42,14 +41,16 @@ fun HomeScreen(
 ) {
     val context = LocalContext.current
     HomeContent(
-        state = viewModel.state.value,
+        state = viewModel.state,
+        onListStyleChanged = viewModel::onListStyleChanged,
+        onFilterChanged = viewModel::onFilterChanged,
         onPersonClick = { /* TODO JD */ },
         onDeletePerson = { person ->
             viewModel.onDeletePerson(person)
             context.showLongToast(R.string.person_deleted)
         },
-        onSortBy = { sortBy ->
-            viewModel.onSortBy(sortBy)
+        onSortByChanged = { sortBy ->
+            viewModel.onSortByChanged(sortBy)
             context.showLongToast(
                 context.getString(R.string.sorted_by, context.getString(sortBy.label))
             )
@@ -62,21 +63,25 @@ fun HomeScreen(
 @Composable
 private fun HomeContent(
     state: HomeUiState,
+    onListStyleChanged: (ListStyle) -> Unit,
+    onFilterChanged: (String) -> Unit,
     onPersonClick: (Person) -> Unit,
     onDeletePerson: (Person) -> Unit,
-    onSortBy: (SortBy) -> Unit,
+    onSortByChanged: (SortBy) -> Unit,
     onAddPersonManuallyClick: () -> Unit,
     onSettingsClick: () -> Unit,
 ) {
-    var listStyle by rememberSaveable { mutableStateOf(ListStyle.Rows) }
     val context = LocalContext.current
     Scaffold(
         topBar = {
             HomeTopAppBar(
-                listStyle = if (state is HomeUiState.Loaded) listStyle else null,
-                onListStyleChanged = { listStyle = it },
-                sortedBy = (state as? HomeUiState.Loaded)?.home?.sortedBy,
-                onSortBy = onSortBy,
+                filter = state.filter,
+                showActions = state.showActions,
+                onFilterChanged = onFilterChanged,
+                listStyle = state.listStyle,
+                onListStyleChanged = onListStyleChanged,
+                sortBy = state.sortBy,
+                onSortByChanged = onSortByChanged,
                 onSettingsClick = onSettingsClick,
             )
         },
@@ -89,15 +94,14 @@ private fun HomeContent(
             )
         }
     ) {
-        when (state) {
-            is HomeUiState.Loading ->
+        when {
+            state.isLoading ->
                 HomeLoading()
-            is HomeUiState.Empty ->
+            state.isEmpty ->
                 HomeEmpty()
-            is HomeUiState.Loaded ->
+            else ->
                 HomeLoaded(
-                    home = state.home,
-                    listStyle = listStyle,
+                    state = state,
                     onPersonClick = onPersonClick,
                     onDeletePerson = onDeletePerson,
                 )
@@ -136,21 +140,20 @@ private fun HomeEmpty() {
 
 @Composable
 private fun HomeLoaded(
-    home: Home,
-    listStyle: ListStyle,
+    state: HomeUiState,
     onPersonClick: (Person) -> Unit,
     onDeletePerson: (Person) -> Unit,
 ) {
-    when (listStyle) {
+    when (state.listStyle) {
         ListStyle.Rows ->
             HomeLoadedRows(
-                home = home,
+                people = state.people,
                 onPersonClick = onPersonClick,
                 onDeletePerson = onDeletePerson,
             )
         ListStyle.Grid ->
             HomeLoadedGrid(
-                home = home,
+                people = state.people,
                 onPersonClick = onPersonClick,
                 onDeletePerson = onDeletePerson,
             )
@@ -159,7 +162,7 @@ private fun HomeLoaded(
 
 @Composable
 private fun HomeLoadedRows(
-    home: Home,
+    people: List<Person>,
     onPersonClick: (Person) -> Unit,
     onDeletePerson: (Person) -> Unit,
 ) {
@@ -167,7 +170,7 @@ private fun HomeLoadedRows(
         contentPadding = PaddingValues(8.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        items(home.people) { person ->
+        items(people) { person ->
             PersonRow(
                 person = person,
                 onClick = onPersonClick,
@@ -179,7 +182,7 @@ private fun HomeLoadedRows(
 
 @Composable
 private fun HomeLoadedGrid(
-    home: Home,
+    people: List<Person>,
     columns: Int = 2,
     onPersonClick: (Person) -> Unit,
     onDeletePerson: (Person) -> Unit,
@@ -187,7 +190,7 @@ private fun HomeLoadedGrid(
     LazyColumn(
         contentPadding = PaddingValues(4.dp),
     ) {
-        items(home.people) { person ->
+        items(people) { person ->
             Row {
                 for (columnIndex in 0 until columns) {
                     Box(
@@ -287,9 +290,11 @@ private fun HomeContentPreview(
         Surface {
             HomeContent(
                 state = state,
+                onListStyleChanged = {},
+                onFilterChanged = {},
                 onPersonClick = {},
                 onDeletePerson = {},
-                onSortBy = {},
+                onSortByChanged = {},
                 onAddPersonManuallyClick = {},
                 onSettingsClick = {}
             )
@@ -299,19 +304,26 @@ private fun HomeContentPreview(
 
 class HomePreviewParameterProvider : CollectionPreviewParameterProvider<HomeUiState>(
     listOf(
-        HomeUiState.Loading,
-        HomeUiState.Loaded(
-            Home(
-                sortedBy = SortBy.LastModified,
-                people = (0..10).map { i ->
-                    Person(
-                        id = PersonId(i),
-                        firstName = FirstName("$i First Name".toNonEmptyString()),
-                        lastName = LastName("$i Last Name".toNonEmptyString()),
-                        lastModified = "$i Last Modified",
-                    )
-                },
-            )
+        HomeUiState(
+            isLoading = true,
+            filter = "",
+            listStyle = ListStyle.Rows,
+            sortBy = SortBy.DEFAULT,
+            people = emptyList(),
+        ),
+        HomeUiState(
+            isLoading = false,
+            filter = "",
+            listStyle = ListStyle.Rows,
+            sortBy = SortBy.DEFAULT,
+            people = (0..10).map { i ->
+                Person(
+                    id = PersonId(i),
+                    firstName = FirstName("$i First Name".toNonEmptyString()),
+                    lastName = LastName("$i Last Name".toNonEmptyString()),
+                    lastModified = "$i Last Modified",
+                )
+            },
         ),
     )
 )

@@ -16,7 +16,7 @@ class SavedStateHandleDelegate<T>(
         savedStateHandle.get<T>(key) ?: defaultValue
     )
 
-    override fun getValue(thisRef: Any, property: KProperty<*>) =
+    override fun getValue(thisRef: Any, property: KProperty<*>): T =
         state.value
 
     override fun setValue(thisRef: Any, property: KProperty<*>, value: T) {

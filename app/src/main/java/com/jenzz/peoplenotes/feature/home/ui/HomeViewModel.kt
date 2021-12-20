@@ -1,10 +1,10 @@
 package com.jenzz.peoplenotes.feature.home.ui
 
-import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateOf
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.jenzz.peoplenotes.common.data.people.Person
+import com.jenzz.peoplenotes.ext.mutableStateOf
 import com.jenzz.peoplenotes.feature.home.data.HomeUseCases
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.collect
@@ -13,21 +13,53 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
+    savedStateHandle: SavedStateHandle,
     private val useCases: HomeUseCases,
 ) : ViewModel() {
 
-    private val _state = mutableStateOf<HomeUiState>(HomeUiState.Loading)
-    val state: State<HomeUiState> = _state
+    var state by savedStateHandle.mutableStateOf(
+        defaultValue = HomeUiState(
+            isLoading = true,
+            filter = "",
+            listStyle = ListStyle.DEFAULT,
+            sortBy = SortBy.DEFAULT,
+            people = emptyList(),
+        )
+    )
+        private set
 
     init {
         viewModelScope.launch {
-            getPeople(SortBy.LastModified)
+            useCases
+                .getPeople(
+                    sortBy = state.sortBy,
+                    filter = state.filter
+                )
+                .collect { people ->
+                    state = state.copy(
+                        isLoading = false,
+                        people = people
+                    )
+                }
         }
     }
 
-    fun onSortBy(sortBy: SortBy) {
+    fun onListStyleChanged(listStyle: ListStyle) {
+        state = state.copy(listStyle = listStyle)
+    }
+
+    fun onFilterChanged(filter: String) {
+        state = state.copy(filter = filter)
         viewModelScope.launch {
-            getPeople(sortBy)
+            val sortBy = checkNotNull(state.sortBy) { "Missing required sort order." }
+            getPeople(sortBy = sortBy, filter = filter)
+        }
+    }
+
+    fun onSortByChanged(sortBy: SortBy) {
+        state = state.copy(sortBy = sortBy)
+        viewModelScope.launch {
+            getPeople(sortBy = sortBy, filter = "")
         }
     }
 
@@ -37,14 +69,15 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    private suspend fun getPeople(sortBy: SortBy) {
+    private suspend fun getPeople(sortBy: SortBy, filter: String) {
+        state = state.copy(isLoading = true)
         useCases
-            .getPeople(sortBy)
-            .collect { home ->
-                if (home.people.isEmpty())
-                    _state.value = HomeUiState.Empty
-                else
-                    _state.value = HomeUiState.Loaded(home)
+            .getPeople(sortBy, filter)
+            .collect { people ->
+                state = state.copy(
+                    isLoading = false,
+                    people = people
+                )
             }
     }
 }
