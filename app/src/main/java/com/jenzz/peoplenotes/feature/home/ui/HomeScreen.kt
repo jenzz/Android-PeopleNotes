@@ -30,6 +30,7 @@ import com.jenzz.peoplenotes.common.data.people.PersonId
 import com.jenzz.peoplenotes.common.data.people.di.FirstName
 import com.jenzz.peoplenotes.common.data.people.di.LastName
 import com.jenzz.peoplenotes.common.ui.theme.PeopleNotesTheme
+import com.jenzz.peoplenotes.common.ui.widgets.StaggeredVerticalGrid
 import com.jenzz.peoplenotes.ext.showLongToast
 import com.jenzz.peoplenotes.ext.toNonEmptyString
 
@@ -183,42 +184,34 @@ private fun HomeLoadedRows(
 @Composable
 private fun HomeLoadedGrid(
     people: List<Person>,
-    columns: Int = 2,
     onPersonClick: (Person) -> Unit,
     onDeletePerson: (Person) -> Unit,
 ) {
-    LazyColumn(
-        contentPadding = PaddingValues(4.dp),
+    StaggeredVerticalGrid(
+        modifier = Modifier.padding(4.dp),
+        maxColumnWidth = 220.dp,
     ) {
-        items(people) { person ->
-            Row {
-                for (columnIndex in 0 until columns) {
-                    Box(
-                        modifier = Modifier
-                            .padding(4.dp)
-                            .weight(1f, fill = true),
-                    ) {
-                        PersonRow(
-                            person = person,
-                            onClick = onPersonClick,
-                            onDeletePerson = onDeletePerson,
-                        )
-                    }
-                }
-            }
+        people.forEach { person ->
+            PersonRow(
+                modifier = Modifier.padding(4.dp),
+                person = person,
+                onClick = onPersonClick,
+                onDeletePerson = onDeletePerson,
+            )
         }
     }
 }
 
 @Composable
 private fun PersonRow(
+    modifier: Modifier = Modifier,
     person: Person,
     onClick: (Person) -> Unit,
     onDeletePerson: (Person) -> Unit,
 ) {
     var selected by rememberSaveable { mutableStateOf(false) }
     Card(
-        modifier = Modifier
+        modifier = modifier
             .combinedClickable(
                 onClick = { onClick(person) },
                 onLongClick = { selected = true }
