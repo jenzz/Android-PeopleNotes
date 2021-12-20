@@ -2,6 +2,7 @@ package com.jenzz.peoplenotes.feature.settings.ui
 
 import android.content.res.Configuration.UI_MODE_NIGHT_NO
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
+import androidx.annotation.StringRes
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
@@ -19,6 +20,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.datasource.CollectionPreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.jenzz.peoplenotes.BuildConfig
 import com.jenzz.peoplenotes.R
 import com.jenzz.peoplenotes.common.ui.theme.PeopleNotesTheme
 import com.jenzz.peoplenotes.feature.settings.data.Settings
@@ -78,37 +80,27 @@ private fun SettingsLoaded(
 ) {
     Column {
         SettingsThemeItem(
-            modifier = Modifier.fillMaxWidth(),
             selectedTheme = settings.theme,
             onThemeSelected = onThemeSelected,
         )
+        SettingsDivider()
+        SettingsAppVersionItem()
     }
 }
 
 @Composable
 private fun SettingsThemeItem(
-    modifier: Modifier = Modifier,
     selectedTheme: ThemePreference,
     onThemeSelected: (ThemePreference) -> Unit,
 ) {
     var showDropDown by rememberSaveable { mutableStateOf(false) }
-    Column {
-        Column(
-            modifier = modifier
-                .clickable(
-                    onClick = { showDropDown = true }
-                )
-                .padding(2.dp),
-        ) {
-            Text(
-                text = stringResource(id = R.string.theme),
-                fontWeight = FontWeight.Bold,
-            )
-            Text(
-                text = stringResource(id = selectedTheme.label),
-            )
-        }
-        Divider()
+    Box {
+        SettingsItem(
+            label = R.string.theme,
+            value = stringResource(id = selectedTheme.label),
+            enabled = true,
+            onClick = { showDropDown = true },
+        )
         SettingsThemeDropDownMenu(
             visible = showDropDown,
             onDismissRequest = { showDropDown = false },
@@ -118,6 +110,30 @@ private fun SettingsThemeItem(
                 onThemeSelected(theme)
             }
         )
+    }
+}
+
+@Composable
+fun SettingsItem(
+    @StringRes label: Int,
+    value: String,
+    enabled: Boolean,
+    onClick: () -> Unit,
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(48.dp)
+            .clickable(enabled = enabled, onClick = onClick)
+            .padding(horizontal = 12.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(
+            text = stringResource(id = label),
+            fontWeight = FontWeight.Bold,
+        )
+        Text(text = value)
     }
 }
 
@@ -140,6 +156,21 @@ private fun SettingsThemeDropDownMenu(
             )
         }
     }
+}
+
+@Composable
+fun SettingsAppVersionItem() {
+    SettingsItem(
+        label = R.string.app_version,
+        value = BuildConfig.VERSION_NAME,
+        enabled = false,
+        onClick = {}
+    )
+}
+
+@Composable
+fun SettingsDivider() {
+    Divider(thickness = 48.dp)
 }
 
 @Composable
