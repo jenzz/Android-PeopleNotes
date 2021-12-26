@@ -119,7 +119,7 @@ private fun FirstNameInputField(
 ) {
     PersonInputField(
         modifier = modifier,
-        placeholder = R.string.first_name,
+        label = R.string.first_name,
         enabled = enabled,
         singleLine = true,
         imeAction = imeAction,
@@ -140,7 +140,7 @@ private fun LastNameInputField(
 ) {
     PersonInputField(
         modifier = modifier,
-        placeholder = R.string.last_name,
+        label = R.string.last_name,
         enabled = enabled,
         singleLine = true,
         imeAction = imeAction,
@@ -161,7 +161,7 @@ private fun NotesInputField(
 ) {
     PersonInputField(
         modifier = modifier.heightIn(min = 112.dp),
-        placeholder = R.string.notes_optional,
+        label = R.string.notes_optional,
         enabled = enabled,
         singleLine = false,
         imeAction = imeAction,
@@ -174,7 +174,7 @@ private fun NotesInputField(
 @Composable
 private fun PersonInputField(
     modifier: Modifier,
-    @StringRes placeholder: Int,
+    @StringRes label: Int,
     enabled: Boolean,
     singleLine: Boolean,
     imeAction: ImeAction,
@@ -187,7 +187,7 @@ private fun PersonInputField(
             modifier = modifier.fillMaxWidth(),
             enabled = enabled,
             singleLine = singleLine,
-            placeholder = { Text(text = stringResource(id = placeholder)) },
+            label = { Text(text = stringResource(id = label)) },
             keyboardOptions = KeyboardOptions.Default.copy(imeAction = imeAction),
             keyboardActions = keyboardActions,
             value = state.value,

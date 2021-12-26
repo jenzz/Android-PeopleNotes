@@ -25,7 +25,9 @@ class DatabaseTest {
             personQueries.insert("first name $i", "last name $i")
         }
 
-        val people = personQueries.selectAll().executeAsList()
+        val people = personQueries
+            .selectAll()
+            .executeAsList()
 
         assertEquals(1, people[0].id)
         assertEquals(2, people[1].id)
@@ -39,7 +41,9 @@ class DatabaseTest {
             noteQueries.insert("note $i", 1)
         }
 
-        val notes = noteQueries.selectAll().executeAsList()
+        val notes = noteQueries
+            .selectAllWithPeople(null)
+            .executeAsList()
 
         assertEquals(1, notes[0].id)
         assertEquals(2, notes[1].id)
@@ -54,6 +58,8 @@ class DatabaseTest {
         val exception = assertThrows<Exception> {
             personQueries.delete(1)
         }
-        assertTrue(exception.message!!.contains("SQLITE_CONSTRAINT_FOREIGNKEY"))
+        assertTrue(
+            exception.message!!.contains("SQLITE_CONSTRAINT_FOREIGNKEY")
+        )
     }
 }

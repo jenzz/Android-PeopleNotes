@@ -1,7 +1,7 @@
 package com.jenzz.peoplenotes.feature.home.ui
 
 import android.os.Parcelable
-import com.jenzz.peoplenotes.common.data.people.Person
+import com.jenzz.peoplenotes.common.data.notes.Note
 import com.jenzz.peoplenotes.ext.PartialSavedState
 import kotlinx.parcelize.Parcelize
 
@@ -10,10 +10,10 @@ data class HomeUiState(
     val filter: String,
     val listStyle: ListStyle,
     val sortBy: SortBy,
-    val people: List<Person>,
+    val notes: List<Note>,
 ) : PartialSavedState<HomeUiState, HomeSavedState> {
 
-    val isEmpty: Boolean = people.isEmpty()
+    val isEmpty: Boolean = notes.isEmpty()
 
     val showActions: Boolean = !isLoading
 

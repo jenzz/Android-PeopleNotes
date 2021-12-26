@@ -3,10 +3,12 @@ package com.jenzz.peoplenotes.feature.home.ui
 import android.content.res.Configuration.UI_MODE_NIGHT_NO
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -15,16 +17,22 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.datasource.CollectionPreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.jenzz.peoplenotes.R
+import com.jenzz.peoplenotes.common.data.notes.Note
+import com.jenzz.peoplenotes.common.data.notes.NoteId
 import com.jenzz.peoplenotes.common.data.people.Person
 import com.jenzz.peoplenotes.common.data.people.PersonId
 import com.jenzz.peoplenotes.common.data.people.di.FirstName
@@ -45,10 +53,10 @@ fun HomeScreen(
         state = viewModel.state,
         onListStyleChanged = viewModel::onListStyleChanged,
         onFilterChanged = viewModel::onFilterChanged,
-        onPersonClick = { /* TODO JD */ },
-        onDeletePerson = { person ->
-            viewModel.onDeletePerson(person)
-            context.showLongToast(R.string.person_deleted)
+        onClick = { /* TODO JD */ },
+        onDelete = { note ->
+            viewModel.onDelete(note)
+            context.showLongToast(R.string.note_deleted)
         },
         onSortByChanged = { sortBy ->
             viewModel.onSortByChanged(sortBy)
@@ -66,8 +74,8 @@ private fun HomeContent(
     state: HomeUiState,
     onListStyleChanged: (ListStyle) -> Unit,
     onFilterChanged: (String) -> Unit,
-    onPersonClick: (Person) -> Unit,
-    onDeletePerson: (Person) -> Unit,
+    onClick: (Note) -> Unit,
+    onDelete: (Note) -> Unit,
     onSortByChanged: (SortBy) -> Unit,
     onAddPersonManuallyClick: () -> Unit,
     onSettingsClick: () -> Unit,
@@ -103,8 +111,8 @@ private fun HomeContent(
             else ->
                 HomeLoaded(
                     state = state,
-                    onPersonClick = onPersonClick,
-                    onDeletePerson = onDeletePerson,
+                    onClick = onClick,
+                    onDelete = onDelete,
                 )
         }
     }
@@ -142,40 +150,40 @@ private fun HomeEmpty() {
 @Composable
 private fun HomeLoaded(
     state: HomeUiState,
-    onPersonClick: (Person) -> Unit,
-    onDeletePerson: (Person) -> Unit,
+    onClick: (Note) -> Unit,
+    onDelete: (Note) -> Unit,
 ) {
     when (state.listStyle) {
         ListStyle.Rows ->
             HomeLoadedRows(
-                people = state.people,
-                onPersonClick = onPersonClick,
-                onDeletePerson = onDeletePerson,
+                notes = state.notes,
+                onClick = onClick,
+                onDelete = onDelete,
             )
         ListStyle.Grid ->
             HomeLoadedGrid(
-                people = state.people,
-                onPersonClick = onPersonClick,
-                onDeletePerson = onDeletePerson,
+                notes = state.notes,
+                onClick = onClick,
+                onDelete = onDelete,
             )
     }
 }
 
 @Composable
 private fun HomeLoadedRows(
-    people: List<Person>,
-    onPersonClick: (Person) -> Unit,
-    onDeletePerson: (Person) -> Unit,
+    notes: List<Note>,
+    onClick: (Note) -> Unit,
+    onDelete: (Note) -> Unit,
 ) {
     LazyColumn(
         contentPadding = PaddingValues(8.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        items(people) { person ->
-            PersonRow(
-                person = person,
-                onClick = onPersonClick,
-                onDeletePerson = onDeletePerson,
+        items(notes) { note ->
+            NoteRow(
+                note = note,
+                onClick = onClick,
+                onDelete = onDelete,
             )
         }
     }
@@ -183,37 +191,39 @@ private fun HomeLoadedRows(
 
 @Composable
 private fun HomeLoadedGrid(
-    people: List<Person>,
-    onPersonClick: (Person) -> Unit,
-    onDeletePerson: (Person) -> Unit,
+    notes: List<Note>,
+    onClick: (Note) -> Unit,
+    onDelete: (Note) -> Unit,
 ) {
     StaggeredVerticalGrid(
         modifier = Modifier.padding(4.dp),
         maxColumnWidth = 220.dp,
     ) {
-        people.forEach { person ->
-            PersonRow(
-                modifier = Modifier.padding(4.dp),
-                person = person,
-                onClick = onPersonClick,
-                onDeletePerson = onDeletePerson,
+        notes.forEach { note ->
+            NoteRow(
+                modifier = Modifier.padding(8.dp),
+                note = note,
+                onClick = onClick,
+                onDelete = onDelete,
             )
         }
     }
 }
 
 @Composable
-private fun PersonRow(
+private fun NoteRow(
     modifier: Modifier = Modifier,
-    person: Person,
-    onClick: (Person) -> Unit,
-    onDeletePerson: (Person) -> Unit,
+    note: Note,
+    onClick: (Note) -> Unit,
+    onDelete: (Note) -> Unit,
 ) {
     var selected by rememberSaveable { mutableStateOf(false) }
     Card(
         modifier = modifier
+            .fillMaxWidth()
+            .defaultMinSize(minHeight = 110.dp)
             .combinedClickable(
-                onClick = { onClick(person) },
+                onClick = { onClick(note) },
                 onLongClick = { selected = true }
             ),
         border = if (selected)
@@ -222,39 +232,63 @@ private fun PersonRow(
                 color = MaterialTheme.colors.onSurface
             ) else null,
     ) {
-        Column(
+        Box(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp),
+                .background(
+                    Brush.verticalGradient(
+                        0.5f to Color.Transparent,
+                        1f to Color.Black,
+                    ),
+                )
+                .padding(8.dp)
         ) {
-            Text(text = "Id: ${person.id.value}")
-            Text(text = "${person.firstName.value} ${person.lastName.value}")
-            Text(text = "Last modified: ${person.lastModified}")
+            Text(text = note.text.toString())
+            Column(
+                modifier = Modifier.align(Alignment.BottomStart)
+            ) {
+                Text(
+                    modifier = Modifier
+                        .size(24.dp)
+                        .clip(CircleShape)
+                        .background(Color.Red),
+                    text = note.person.firstNameLetter.toString(),
+                    textAlign = TextAlign.Center,
+                    color = Color.White,
+                )
+                Text(
+                    text = note.person.fullName,
+                    color = Color.White,
+                )
+                Text(
+                    text = stringResource(id = R.string.edited, note.lastModified),
+                    color = Color.White,
+                )
+            }
         }
-        PersonDropDownMenu(
+        NoteDropDownMenu(
             selected = selected,
             onDismissRequest = { selected = false },
-            onDeletePerson = { person ->
+            onDelete = { note ->
                 selected = false
-                onDeletePerson(person)
+                onDelete(note)
             },
-            person = person
+            note = note
         )
     }
 }
 
 @Composable
-private fun PersonDropDownMenu(
+private fun NoteDropDownMenu(
     selected: Boolean,
     onDismissRequest: () -> Unit,
-    onDeletePerson: (Person) -> Unit,
-    person: Person,
+    onDelete: (Note) -> Unit,
+    note: Note,
 ) {
     DropdownMenu(
         expanded = selected,
         onDismissRequest = onDismissRequest,
     ) {
-        DropdownMenuItem(onClick = { onDeletePerson(person) }) {
+        DropdownMenuItem(onClick = { onDelete(note) }) {
             Text(
                 text = stringResource(id = R.string.delete),
                 style = MaterialTheme.typography.body1.copy(
@@ -285,8 +319,8 @@ private fun HomeContentPreview(
                 state = state,
                 onListStyleChanged = {},
                 onFilterChanged = {},
-                onPersonClick = {},
-                onDeletePerson = {},
+                onClick = {},
+                onDelete = {},
                 onSortByChanged = {},
                 onAddPersonManuallyClick = {},
                 onSettingsClick = {}
@@ -302,19 +336,23 @@ class HomePreviewParameterProvider : CollectionPreviewParameterProvider<HomeUiSt
             filter = "",
             listStyle = ListStyle.Rows,
             sortBy = SortBy.DEFAULT,
-            people = emptyList(),
+            notes = emptyList(),
         ),
         HomeUiState(
             isLoading = false,
             filter = "",
             listStyle = ListStyle.Rows,
             sortBy = SortBy.DEFAULT,
-            people = (0..10).map { i ->
-                Person(
-                    id = PersonId(i),
-                    firstName = FirstName("$i First Name".toNonEmptyString()),
-                    lastName = LastName("$i Last Name".toNonEmptyString()),
-                    lastModified = "$i Last Modified",
+            notes = (0..10).map { i ->
+                Note(
+                    id = NoteId(i),
+                    text = "Note $i".toNonEmptyString(),
+                    lastModified = "2012-10-03 12:45",
+                    person = Person(
+                        id = PersonId(i),
+                        firstName = FirstName("$i First Name".toNonEmptyString()),
+                        lastName = LastName("$i Last Name".toNonEmptyString()),
+                    ),
                 )
             },
         ),

@@ -7,8 +7,12 @@ data class Person(
     val id: PersonId,
     val firstName: FirstName,
     val lastName: LastName,
-    val lastModified: String, // TODO JD Date.
-)
+) {
+
+    val fullName: String = "${firstName.value} ${lastName.value}"
+
+    val firstNameLetter: Char = firstName.toString().first()
+}
 
 @JvmInline
 value class PersonId(val value: Int)

@@ -5,6 +5,7 @@
     <string name="sort_by">Sort by</string>
     <string name="sorted_by">Sorted by %1$s</string>
     <string name="last_modified">Last Modified</string>
+    <string name="edited">Edited %1$s</string>
     <string name="first_name">First Name</string>
     <string name="first_name_cannot_be_empty">First name cannot be empty.</string>
     <string name="last_name">Last Name</string>
@@ -19,7 +20,7 @@
     <string name="dark">Dark</string>
     <string name="system_default">System Default</string>
     <string name="delete">Delete</string>
-    <string name="person_deleted">Person deleted</string>
+    <string name="note_deleted">Note deleted</string>
     <string name="no_notes">No notes</string>
     <string name="grid_view">Grid view</string>
     <string name="rows">Rows</string>

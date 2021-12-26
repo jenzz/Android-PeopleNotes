@@ -1,17 +1,12 @@
 CREATE TABLE PersonEntity (
     id INTEGER AS Integer NOT NULL PRIMARY KEY AUTOINCREMENT,
     firstName TEXT NOT NULL,
-    lastName TEXT NOT NULL,
-    lastModified TEXT NOT NULL
+    lastName TEXT NOT NULL
 );
 
 selectAll:
 SELECT *
-FROM PersonEntity
-WHERE
-    CASE WHEN :filter IS NOT NULL
-    THEN firstName LIKE :filter OR lastName LIKE :filter OR (firstName || ' ' || lastName) LIKE :filter
-    ELSE 1 END;
+FROM PersonEntity;
 
 selectLastInsertRowId:
 SELECT last_insert_rowid();
@@ -22,8 +17,8 @@ FROM PersonEntity
 WHERE rowid = ?;
 
 insert:
-INSERT INTO PersonEntity(firstName, lastName, lastModified)
-VALUES (?, ?, datetime('now'));
+INSERT INTO PersonEntity(firstName, lastName)
+VALUES (?, ?);
 
 delete:
 DELETE

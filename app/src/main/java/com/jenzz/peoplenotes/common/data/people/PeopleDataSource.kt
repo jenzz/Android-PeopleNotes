@@ -4,16 +4,9 @@ import com.jenzz.peoplenotes.common.data.PersonQueries
 import com.jenzz.peoplenotes.common.data.people.di.FirstName
 import com.jenzz.peoplenotes.common.data.people.di.LastName
 import com.jenzz.peoplenotes.ext.toNonEmptyString
-import com.jenzz.peoplenotes.feature.home.ui.SortBy
-import com.squareup.sqldelight.runtime.coroutines.asFlow
-import com.squareup.sqldelight.runtime.coroutines.mapToList
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 interface PeopleDataSource {
-
-    fun getPeople(sortBy: SortBy, filter: String): Flow<List<Person>>
 
     suspend fun add(person: NewPerson): Person
 
@@ -25,27 +18,13 @@ class PeopleLocalDataSource @Inject constructor(
 ) : PeopleDataSource {
 
     private val toPerson =
-        { id: Int, firstName: String, lastName: String, lastModified: String ->
+        { id: Int, firstName: String, lastName: String ->
             Person(
                 id = PersonId(id),
                 firstName = FirstName(firstName.toNonEmptyString()),
                 lastName = LastName(lastName.toNonEmptyString()),
-                lastModified = lastModified,
             )
         }
-
-    override fun getPeople(sortBy: SortBy, filter: String): Flow<List<Person>> {
-        val orderBy = when (sortBy) {
-            SortBy.FirstName -> compareBy(Person::firstName)
-            SortBy.LastName -> compareBy(Person::lastName)
-            SortBy.LastModified -> compareByDescending(Person::lastModified)
-        }
-        val filterSql = if (filter.isNotEmpty()) "%$filter%" else null
-        return personQueries.selectAll(filterSql, toPerson)
-            .asFlow()
-            .mapToList()
-            .map { people -> people.sortedWith(orderBy) }
-    }
 
     override suspend fun add(person: NewPerson): Person =
         personQueries.transactionWithResult {

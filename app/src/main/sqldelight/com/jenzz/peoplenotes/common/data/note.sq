@@ -6,9 +6,14 @@ CREATE TABLE NoteEntity (
     FOREIGN KEY (personId) REFERENCES PersonEntity(id)
 );
 
-selectAll:
+selectAllWithPeople:
 SELECT *
-FROM NoteEntity;
+FROM NoteEntity
+INNER JOIN PersonEntity ON personId = PersonEntity.id
+WHERE
+    CASE WHEN :filter IS NOT NULL
+    THEN firstName LIKE :filter OR lastName LIKE :filter OR (firstName || ' ' || lastName) LIKE :filter
+    ELSE 1 END;
 
 insert:
 INSERT
@@ -19,8 +24,3 @@ delete:
 DELETE
 FROM NoteEntity
 WHERE id = ?;
-
-deleteAllNotesByPerson:
-DELETE
-FROM NoteEntity
-WHERE personId = ?;
