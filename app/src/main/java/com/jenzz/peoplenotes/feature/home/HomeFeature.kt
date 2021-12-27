@@ -1,6 +1,7 @@
 package com.jenzz.peoplenotes.feature.home
 
 import androidx.compose.runtime.Composable
+import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavHostController
 import com.jenzz.peoplenotes.feature.Feature
 import com.jenzz.peoplenotes.feature.add_person.AddPersonFeature
@@ -12,7 +13,10 @@ object HomeFeature : Feature {
     override val route: String = "home"
 
     @Composable
-    override fun Content(navController: NavHostController) {
+    override fun Content(
+        navController: NavHostController,
+        navBackStackEntry: NavBackStackEntry,
+    ) {
         HomeScreen(
             onAddPersonManuallyClick = {
                 navController.navigate(AddPersonFeature.route)

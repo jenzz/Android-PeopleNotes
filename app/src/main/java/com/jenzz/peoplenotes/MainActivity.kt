@@ -8,9 +8,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.jenzz.peoplenotes.common.ui.theme.PeopleNotesTheme
-import com.jenzz.peoplenotes.feature.add_person.AddPersonFeature
+import com.jenzz.peoplenotes.feature.Feature
 import com.jenzz.peoplenotes.feature.home.HomeFeature
-import com.jenzz.peoplenotes.feature.settings.SettingsFeature
 import com.jenzz.peoplenotes.feature.settings.data.SettingsRepository
 import com.jenzz.peoplenotes.feature.settings.data.ThemePreference
 import dagger.hilt.android.AndroidEntryPoint
@@ -54,19 +53,17 @@ class MainActivity : ComponentActivity() {
 @Composable
 private fun MainScreen() {
     val navController = rememberNavController()
-    val features = listOf(
-        HomeFeature,
-        AddPersonFeature,
-        SettingsFeature,
-    )
-
     NavHost(
         navController = navController,
-        startDestination = features.first().route,
+        startDestination = HomeFeature.route,
     ) {
-        features.forEach { feature ->
-            composable(route = feature.route) {
-                feature.Content(navController)
+        Feature.allFeatures.forEach { feature ->
+            composable(
+                route = feature.route,
+                arguments = feature.arguments,
+                deepLinks = feature.deepLinks,
+            ) { navBackStackEntry ->
+                feature.Content(navController, navBackStackEntry)
             }
         }
     }
