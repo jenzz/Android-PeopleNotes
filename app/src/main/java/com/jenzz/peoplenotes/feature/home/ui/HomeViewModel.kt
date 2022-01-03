@@ -3,7 +3,7 @@ package com.jenzz.peoplenotes.feature.home.ui
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.jenzz.peoplenotes.common.data.notes.Note
+import com.jenzz.peoplenotes.common.data.people.Person
 import com.jenzz.peoplenotes.ext.mutableStateOf
 import com.jenzz.peoplenotes.feature.home.data.HomeUseCases
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -23,7 +23,7 @@ class HomeViewModel @Inject constructor(
             filter = "",
             listStyle = ListStyle.DEFAULT,
             sortBy = SortBy.DEFAULT,
-            notes = emptyList(),
+            people = emptyList(),
         )
     )
         private set
@@ -31,14 +31,14 @@ class HomeViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             useCases
-                .getNotes(
+                .getPeople(
                     sortBy = state.sortBy,
                     filter = state.filter
                 )
-                .collect { notes ->
+                .collect { people ->
                     state = state.copy(
                         isLoading = false,
-                        notes = notes
+                        people = people
                     )
                 }
         }
@@ -52,31 +52,31 @@ class HomeViewModel @Inject constructor(
         state = state.copy(filter = filter)
         viewModelScope.launch {
             val sortBy = checkNotNull(state.sortBy) { "Missing required sort order." }
-            getNotes(sortBy = sortBy, filter = filter)
+            getPeople(sortBy = sortBy, filter = filter)
         }
     }
 
     fun onSortByChanged(sortBy: SortBy) {
         state = state.copy(sortBy = sortBy)
         viewModelScope.launch {
-            getNotes(sortBy = sortBy, filter = "")
+            getPeople(sortBy = sortBy, filter = "")
         }
     }
 
-    fun onDelete(note: Note) {
+    fun onDelete(person: Person) {
         viewModelScope.launch {
-            useCases.deleteNote(note.id)
+            useCases.deletePerson(person.id)
         }
     }
 
-    private suspend fun getNotes(sortBy: SortBy, filter: String) {
+    private suspend fun getPeople(sortBy: SortBy, filter: String) {
         state = state.copy(isLoading = true)
         useCases
-            .getNotes(sortBy, filter)
-            .collect { notes ->
+            .getPeople(sortBy, filter)
+            .collect { people ->
                 state = state.copy(
                     isLoading = false,
-                    notes = notes
+                    people = people
                 )
             }
     }

@@ -1,7 +1,6 @@
 package com.jenzz.peoplenotes.common.data.notes
 
 import com.jenzz.peoplenotes.common.data.people.PersonId
-import com.jenzz.peoplenotes.feature.home.ui.SortBy
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
@@ -9,8 +8,8 @@ class NotesRepository @Inject constructor(
     private val localDataSource: NotesDataSource,
 ) {
 
-    fun getAllNotes(sortBy: SortBy, filter: String): Flow<List<Note>> =
-        localDataSource.getAllNotes(sortBy, filter)
+    fun getNotes(personId: PersonId): Flow<List<Note>> =
+        localDataSource.getNotes(personId)
 
     suspend fun add(note: NewNote, personId: PersonId) {
         localDataSource.add(note, personId)

@@ -7,6 +7,7 @@ data class Person(
     val id: PersonId,
     val firstName: FirstName,
     val lastName: LastName,
+    val lastModified: String, // TODO JD Date.
 ) {
 
     val fullName: String = "${firstName.value} ${lastName.value}"

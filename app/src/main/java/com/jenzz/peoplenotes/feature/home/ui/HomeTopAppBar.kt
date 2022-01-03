@@ -80,7 +80,7 @@ private fun FilterTextField(
         singleLine = true,
         value = filter,
         onValueChange = onFilterChanged,
-        placeholder = { Text(text = stringResource(R.string.search_your_notes)) },
+        placeholder = { Text(text = stringResource(R.string.search_people)) },
         trailingIcon = {
             if (showActions) {
                 Row {

@@ -6,14 +6,11 @@ CREATE TABLE NoteEntity (
     FOREIGN KEY (personId) REFERENCES PersonEntity(id)
 );
 
-selectAllWithPeople:
+selectAll:
 SELECT *
 FROM NoteEntity
 INNER JOIN PersonEntity ON personId = PersonEntity.id
-WHERE
-    CASE WHEN :filter IS NOT NULL
-    THEN firstName LIKE :filter OR lastName LIKE :filter OR (firstName || ' ' || lastName) LIKE :filter
-    ELSE 1 END;
+WHERE personId = :personId;
 
 insert:
 INSERT
