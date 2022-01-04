@@ -11,8 +11,11 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -35,8 +38,8 @@ import com.jenzz.peoplenotes.common.data.people.PersonId
 import com.jenzz.peoplenotes.common.data.people.di.FirstName
 import com.jenzz.peoplenotes.common.data.people.di.LastName
 import com.jenzz.peoplenotes.common.ui.TextResource
-import com.jenzz.peoplenotes.common.ui.UserMessage
-import com.jenzz.peoplenotes.common.ui.UserMessageId
+import com.jenzz.peoplenotes.common.ui.ToastMessage
+import com.jenzz.peoplenotes.common.ui.showShortToast
 import com.jenzz.peoplenotes.common.ui.theme.PeopleNotesTheme
 import com.jenzz.peoplenotes.common.ui.widgets.StaggeredVerticalGrid
 import com.jenzz.peoplenotes.ext.toNonEmptyString
@@ -61,7 +64,7 @@ fun HomeScreen(
         onAddPersonManuallyClick = onAddPersonManuallyClick,
         onImportFromContactsClick = {  /* TODO JD */ },
         onSettingsClick = onSettingsClick,
-        onUserMessageShown = viewModel::onUserMessageShown,
+        onToastMessageShown = viewModel::onToastMessageShown,
     )
 }
 
@@ -80,7 +83,7 @@ private fun HomeContent(
     onAddPersonManuallyClick: () -> Unit,
     onImportFromContactsClick: () -> Unit,
     onSettingsClick: () -> Unit,
-    onUserMessageShown: (UserMessageId) -> Unit,
+    onToastMessageShown: () -> Unit,
 ) {
     val context = LocalContext.current
     val scaffoldState = rememberScaffoldState()
@@ -122,12 +125,10 @@ private fun HomeContent(
                 )
         }
     }
-    state.userMessages.firstOrNull()?.let { userMessage ->
-        LaunchedEffect(userMessage) {
-            val message = userMessage.text.asString(context.resources)
-            scaffoldState.snackbarHostState.showSnackbar(message)
-            onUserMessageShown(userMessage.id)
-        }
+    if (state.toastMessage != null) {
+        val message = state.toastMessage.text.asString(context.resources)
+        context.showShortToast(message)
+        onToastMessageShown()
     }
 }
 
@@ -534,7 +535,7 @@ private fun HomeContentPreview(
                 onAddPersonManuallyClick = {},
                 onImportFromContactsClick = {},
                 onSettingsClick = {},
-                onUserMessageShown = {},
+                onToastMessageShown = {},
             )
         }
     }
@@ -550,7 +551,7 @@ class HomePreviewParameterProvider : CollectionPreviewParameterProvider<HomeUiSt
             people = emptyList(),
             deleteConfirmation = null,
             deleteWithNotesConfirmation = null,
-            userMessages = emptyList(),
+            toastMessage = null,
         ),
         HomeUiState(
             isLoading = false,
@@ -567,7 +568,7 @@ class HomePreviewParameterProvider : CollectionPreviewParameterProvider<HomeUiSt
             },
             deleteConfirmation = null,
             deleteWithNotesConfirmation = null,
-            userMessages = emptyList(),
+            toastMessage = null,
         ),
         HomeUiState(
             isLoading = false,
@@ -577,12 +578,10 @@ class HomePreviewParameterProvider : CollectionPreviewParameterProvider<HomeUiSt
             people = emptyList(),
             deleteConfirmation = PersonId(1),
             deleteWithNotesConfirmation = null,
-            userMessages = listOf(
-                UserMessage(
-                    id = UserMessageId(1),
-                    text = TextResource.fromText("User Message 1")
-                ),
+            toastMessage =
+            ToastMessage(
+                text = TextResource.fromText("User Message 1")
             ),
         ),
-    )
+    ),
 )

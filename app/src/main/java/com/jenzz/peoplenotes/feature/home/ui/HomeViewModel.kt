@@ -7,8 +7,7 @@ import com.jenzz.peoplenotes.R
 import com.jenzz.peoplenotes.common.data.people.DeletePersonResult
 import com.jenzz.peoplenotes.common.data.people.Person
 import com.jenzz.peoplenotes.common.ui.TextResource
-import com.jenzz.peoplenotes.common.ui.UserMessage
-import com.jenzz.peoplenotes.common.ui.UserMessageId
+import com.jenzz.peoplenotes.common.ui.ToastMessage
 import com.jenzz.peoplenotes.ext.mutableStateOf
 import com.jenzz.peoplenotes.feature.home.data.HomeUseCases
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -31,7 +30,7 @@ class HomeViewModel @Inject constructor(
             people = emptyList(),
             deleteConfirmation = null,
             deleteWithNotesConfirmation = null,
-            userMessages = emptyList(),
+            toastMessage = null,
         )
     )
         private set
@@ -66,7 +65,7 @@ class HomeViewModel @Inject constructor(
     fun onSortByChanged(sortBy: SortBy) {
         state = state.copy(
             sortBy = sortBy,
-            userMessages = state.userMessages + UserMessage(
+            toastMessage = ToastMessage(
                 text = TextResource.fromId(R.string.sorted_by, sortBy.label)
             )
         )
@@ -98,7 +97,7 @@ class HomeViewModel @Inject constructor(
                 is DeletePersonResult.Success -> {
                     state.copy(
                         isLoading = false,
-                        userMessages = state.userMessages + UserMessage(
+                        toastMessage = ToastMessage(
                             text = TextResource.fromId(R.string.person_deleted, person.fullName)
                         )
                     )
@@ -119,9 +118,8 @@ class HomeViewModel @Inject constructor(
         state = state.copy(deleteWithNotesConfirmation = null)
     }
 
-    fun onUserMessageShown(messageId: UserMessageId) {
-        val messages = state.userMessages.filterNot { message -> message.id == messageId }
-        state = state.copy(userMessages = messages)
+    fun onToastMessageShown() {
+        state = state.copy(toastMessage = null)
     }
 
     private suspend fun getPeople(sortBy: SortBy, filter: String) {

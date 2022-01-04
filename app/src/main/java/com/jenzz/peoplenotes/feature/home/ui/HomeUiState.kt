@@ -3,7 +3,7 @@ package com.jenzz.peoplenotes.feature.home.ui
 import android.os.Parcelable
 import com.jenzz.peoplenotes.common.data.people.Person
 import com.jenzz.peoplenotes.common.data.people.PersonId
-import com.jenzz.peoplenotes.common.ui.UserMessage
+import com.jenzz.peoplenotes.common.ui.ToastMessage
 import com.jenzz.peoplenotes.ext.PartialSavedState
 import kotlinx.parcelize.Parcelize
 
@@ -15,7 +15,7 @@ data class HomeUiState(
     val people: List<Person>,
     val deleteConfirmation: PersonId?,
     val deleteWithNotesConfirmation: PersonId?,
-    val userMessages: List<UserMessage>,
+    val toastMessage: ToastMessage?,
 ) : PartialSavedState<HomeUiState, HomeSavedState> {
 
     val isEmpty: Boolean = people.isEmpty()
