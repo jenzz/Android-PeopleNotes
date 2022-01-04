@@ -37,17 +37,7 @@ class HomeViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            useCases
-                .getPeople(
-                    sortBy = state.sortBy,
-                    filter = state.filter
-                )
-                .collect { people ->
-                    state = state.copy(
-                        isLoading = false,
-                        people = people,
-                    )
-                }
+            getPeople(sortBy = state.sortBy, filter = state.filter)
         }
     }
 
