@@ -20,7 +20,7 @@ data class HomeUiState(
 
     val isEmpty: Boolean = people.isEmpty()
 
-    val showActions: Boolean = !isLoading
+    val showActions: Boolean = !isLoading && !isEmpty
 
     override val savedState: HomeSavedState =
         HomeSavedState(
