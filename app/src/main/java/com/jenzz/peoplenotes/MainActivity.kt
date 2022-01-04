@@ -3,18 +3,17 @@ package com.jenzz.peoplenotes
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.jenzz.peoplenotes.common.ui.theme.PeopleNotesTheme
 import com.jenzz.peoplenotes.feature.Feature
 import com.jenzz.peoplenotes.feature.home.HomeFeature
+import com.jenzz.peoplenotes.feature.settings.data.Settings
 import com.jenzz.peoplenotes.feature.settings.data.SettingsRepository
-import com.jenzz.peoplenotes.feature.settings.data.ThemePreference
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -33,17 +32,9 @@ class MainActivity : ComponentActivity() {
 
     @Composable
     private fun App() {
-        val coroutineScope = rememberCoroutineScope()
-        var theme by remember { mutableStateOf(ThemePreference.DEFAULT) }
-        LaunchedEffect(Unit) {
-            coroutineScope.launch {
-                settingsRepository.settings.collect { settings ->
-                    theme = settings.theme
-                }
-            }
-        }
+        val settingsState = settingsRepository.settings.collectAsState(initial = Settings.DEFAULT)
         PeopleNotesTheme(
-            theme = theme
+            theme = settingsState.value.theme
         ) {
             MainScreen()
         }
