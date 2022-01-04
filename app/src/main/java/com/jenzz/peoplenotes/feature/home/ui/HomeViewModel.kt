@@ -37,7 +37,7 @@ class HomeViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            getPeople(sortBy = state.sortBy, filter = state.filter)
+            getPeople()
         }
     }
 
@@ -48,7 +48,7 @@ class HomeViewModel @Inject constructor(
     fun onFilterChanged(filter: String) {
         state = state.copy(filter = filter)
         viewModelScope.launch {
-            getPeople(sortBy = state.sortBy, filter = filter)
+            getPeople(filter = filter)
         }
     }
 
@@ -60,7 +60,7 @@ class HomeViewModel @Inject constructor(
             )
         )
         viewModelScope.launch {
-            getPeople(sortBy = sortBy, filter = "")
+            getPeople(sortBy = sortBy)
         }
     }
 
@@ -112,7 +112,10 @@ class HomeViewModel @Inject constructor(
         state = state.copy(toastMessage = null)
     }
 
-    private suspend fun getPeople(sortBy: SortBy, filter: String) {
+    private suspend fun getPeople(
+        sortBy: SortBy = state.sortBy,
+        filter: String = state.filter,
+    ) {
         state = state.copy(isLoading = true)
         useCases
             .getPeople(sortBy, filter)
