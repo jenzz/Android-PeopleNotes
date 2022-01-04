@@ -1,7 +1,9 @@
 package com.jenzz.peoplenotes.common.data.people
 
 import com.jenzz.peoplenotes.common.data.notes.NewNote
+import com.jenzz.peoplenotes.common.data.notes.Note
 import com.jenzz.peoplenotes.common.data.notes.NotesRepository
+import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 
 class PeopleAndNotesRepository @Inject constructor(
@@ -15,4 +17,28 @@ class PeopleAndNotesRepository @Inject constructor(
             notesRepository.add(newNote, person.id)
         }
     }
+
+    suspend fun delete(personId: PersonId): DeletePersonResult {
+        val notes = notesRepository.getNotes(personId).first()
+        return if (notes.isEmpty()) {
+            peopleRepository.delete(personId)
+            DeletePersonResult.Success
+        } else {
+            DeletePersonResult.RemainingNotesForPerson(personId, notes)
+        }
+    }
+
+    suspend fun deleteWithNotes(personId: PersonId) {
+        notesRepository.deleteAllByPerson(personId)
+        peopleRepository.delete(personId)
+    }
+}
+
+sealed class DeletePersonResult {
+
+    object Success : DeletePersonResult()
+    data class RemainingNotesForPerson(
+        val personId: PersonId,
+        val notes: List<Note>,
+    ) : DeletePersonResult()
 }

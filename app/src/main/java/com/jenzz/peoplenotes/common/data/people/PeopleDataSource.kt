@@ -1,7 +1,6 @@
 package com.jenzz.peoplenotes.common.data.people
 
 import com.jenzz.peoplenotes.common.data.PersonQueries
-import com.jenzz.peoplenotes.common.data.notes.Note
 import com.jenzz.peoplenotes.common.data.people.di.FirstName
 import com.jenzz.peoplenotes.common.data.people.di.LastName
 import com.jenzz.peoplenotes.ext.toNonEmptyString

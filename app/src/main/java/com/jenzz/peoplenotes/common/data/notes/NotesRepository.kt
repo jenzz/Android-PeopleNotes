@@ -18,4 +18,8 @@ class NotesRepository @Inject constructor(
     suspend fun delete(id: NoteId) {
         localDataSource.delete(id)
     }
+
+    suspend fun deleteAllByPerson(personId: PersonId) {
+        localDataSource.deleteAllByPerson(personId)
+    }
 }

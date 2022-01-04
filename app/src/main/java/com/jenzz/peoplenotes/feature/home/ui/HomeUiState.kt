@@ -2,6 +2,8 @@ package com.jenzz.peoplenotes.feature.home.ui
 
 import android.os.Parcelable
 import com.jenzz.peoplenotes.common.data.people.Person
+import com.jenzz.peoplenotes.common.data.people.PersonId
+import com.jenzz.peoplenotes.common.ui.UserMessage
 import com.jenzz.peoplenotes.ext.PartialSavedState
 import kotlinx.parcelize.Parcelize
 
@@ -11,6 +13,9 @@ data class HomeUiState(
     val listStyle: ListStyle,
     val sortBy: SortBy,
     val people: List<Person>,
+    val showDeleteConfirmation: PersonId?,
+    val showDeleteWithNotesConfirmation: PersonId?,
+    val userMessages: List<UserMessage>,
 ) : PartialSavedState<HomeUiState, HomeSavedState> {
 
     val isEmpty: Boolean = people.isEmpty()
@@ -21,7 +26,9 @@ data class HomeUiState(
         HomeSavedState(
             filter = filter,
             listStyle = listStyle,
-            sortBy = sortBy
+            sortBy = sortBy,
+            showDeleteConfirmation = showDeleteConfirmation,
+            showDeleteWithNotesConfirmation = showDeleteWithNotesConfirmation,
         )
 
     override fun mergeWithSavedState(savedState: HomeSavedState): HomeUiState =
@@ -29,6 +36,8 @@ data class HomeUiState(
             filter = savedState.filter,
             listStyle = savedState.listStyle,
             sortBy = savedState.sortBy,
+            showDeleteConfirmation = savedState.showDeleteConfirmation,
+            showDeleteWithNotesConfirmation = savedState.showDeleteWithNotesConfirmation,
         )
 }
 
@@ -37,4 +46,6 @@ data class HomeSavedState(
     val filter: String,
     val listStyle: ListStyle,
     val sortBy: SortBy,
+    val showDeleteConfirmation: PersonId?,
+    val showDeleteWithNotesConfirmation: PersonId?,
 ) : Parcelable

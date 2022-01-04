@@ -1,6 +1,5 @@
 package com.jenzz.peoplenotes.feature.home.ui
 
-import androidx.annotation.StringRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -17,11 +16,13 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.jenzz.peoplenotes.R
+import com.jenzz.peoplenotes.common.ui.TextResource
 
 @Composable
 fun HomeTopAppBar(
@@ -177,10 +178,11 @@ private fun SortByAction(
 
 @Composable
 private fun SortByDropdownItem(
-    @StringRes text: Int,
+    text: TextResource,
     isSelected: Boolean,
     onClick: () -> Unit,
 ) {
+    val context = LocalContext.current
     val style = if (isSelected) {
         MaterialTheme.typography.body1.copy(
             fontWeight = FontWeight.Bold,
@@ -194,7 +196,7 @@ private fun SortByDropdownItem(
     }
     DropdownMenuItem(onClick = onClick) {
         Text(
-            text = stringResource(id = text),
+            text = text.asString(context.resources),
             style = style,
         )
     }

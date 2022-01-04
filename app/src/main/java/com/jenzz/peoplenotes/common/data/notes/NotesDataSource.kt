@@ -18,6 +18,8 @@ interface NotesDataSource {
     suspend fun add(note: NewNote, personId: PersonId)
 
     suspend fun delete(id: NoteId)
+
+    suspend fun deleteAllByPerson(personId: PersonId)
 }
 
 class NotesLocalDataSource @Inject constructor(
@@ -56,5 +58,9 @@ class NotesLocalDataSource @Inject constructor(
 
     override suspend fun delete(id: NoteId) {
         noteQueries.delete(id.value)
+    }
+
+    override suspend fun deleteAllByPerson(personId: PersonId) {
+        noteQueries.deleteAllByPerson(personId.value)
     }
 }

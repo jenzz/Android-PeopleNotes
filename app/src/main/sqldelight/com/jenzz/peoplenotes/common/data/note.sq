@@ -21,3 +21,8 @@ delete:
 DELETE
 FROM NoteEntity
 WHERE id = ?;
+
+deleteAllByPerson:
+DELETE
+FROM NoteEntity
+WHERE personId = ?;
