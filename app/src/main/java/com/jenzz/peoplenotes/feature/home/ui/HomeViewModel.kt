@@ -29,8 +29,8 @@ class HomeViewModel @Inject constructor(
             listStyle = ListStyle.DEFAULT,
             sortBy = SortBy.DEFAULT,
             people = emptyList(),
-            showDeleteConfirmation = null,
-            showDeleteWithNotesConfirmation = null,
+            deleteConfirmation = null,
+            deleteWithNotesConfirmation = null,
             userMessages = emptyList(),
         )
     )
@@ -77,24 +77,24 @@ class HomeViewModel @Inject constructor(
     }
 
     fun onDeleteRequested(person: Person) {
-        state = state.copy(showDeleteConfirmation = person.id)
+        state = state.copy(deleteConfirmation = person.id)
     }
 
     fun onDeleteCancelled() {
-        state = state.copy(showDeleteConfirmation = null)
+        state = state.copy(deleteConfirmation = null)
     }
 
     fun onDeleteConfirmed(person: Person) {
         state = state.copy(
             isLoading = true,
-            showDeleteConfirmation = null,
+            deleteConfirmation = null,
         )
         viewModelScope.launch {
             state = when (useCases.deletePerson(person.id)) {
                 is DeletePersonResult.RemainingNotesForPerson ->
                     state.copy(
                         isLoading = false,
-                        showDeleteWithNotesConfirmation = person.id,
+                        deleteWithNotesConfirmation = person.id,
                     )
                 is DeletePersonResult.Success -> {
                     state.copy(
@@ -117,7 +117,7 @@ class HomeViewModel @Inject constructor(
     }
 
     fun onDeleteWithNotesCancelled() {
-        state = state.copy(showDeleteWithNotesConfirmation = null)
+        state = state.copy(deleteWithNotesConfirmation = null)
     }
 
     fun onUserMessageShown(messageId: UserMessageId) {

@@ -13,8 +13,8 @@ data class HomeUiState(
     val listStyle: ListStyle,
     val sortBy: SortBy,
     val people: List<Person>,
-    val showDeleteConfirmation: PersonId?,
-    val showDeleteWithNotesConfirmation: PersonId?,
+    val deleteConfirmation: PersonId?,
+    val deleteWithNotesConfirmation: PersonId?,
     val userMessages: List<UserMessage>,
 ) : PartialSavedState<HomeUiState, HomeSavedState> {
 
@@ -27,8 +27,8 @@ data class HomeUiState(
             filter = filter,
             listStyle = listStyle,
             sortBy = sortBy,
-            showDeleteConfirmation = showDeleteConfirmation,
-            showDeleteWithNotesConfirmation = showDeleteWithNotesConfirmation,
+            deleteConfirmation = deleteConfirmation,
+            deleteWithNotesConfirmation = deleteWithNotesConfirmation,
         )
 
     override fun mergeWithSavedState(savedState: HomeSavedState): HomeUiState =
@@ -36,8 +36,8 @@ data class HomeUiState(
             filter = savedState.filter,
             listStyle = savedState.listStyle,
             sortBy = savedState.sortBy,
-            showDeleteConfirmation = savedState.showDeleteConfirmation,
-            showDeleteWithNotesConfirmation = savedState.showDeleteWithNotesConfirmation,
+            deleteConfirmation = savedState.deleteConfirmation,
+            deleteWithNotesConfirmation = savedState.deleteWithNotesConfirmation,
         )
 }
 
@@ -46,6 +46,6 @@ data class HomeSavedState(
     val filter: String,
     val listStyle: ListStyle,
     val sortBy: SortBy,
-    val showDeleteConfirmation: PersonId?,
-    val showDeleteWithNotesConfirmation: PersonId?,
+    val deleteConfirmation: PersonId?,
+    val deleteWithNotesConfirmation: PersonId?,
 ) : Parcelable

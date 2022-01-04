@@ -176,8 +176,8 @@ private fun HomeLoaded(
         ListStyle.Rows ->
             HomeLoadedRows(
                 people = state.people,
-                showDeleteConfirmation = state.showDeleteConfirmation,
-                showDeleteWithNotesConfirmation = state.showDeleteWithNotesConfirmation,
+                deleteConfirmation = state.deleteConfirmation,
+                deleteWithNotesConfirmation = state.deleteWithNotesConfirmation,
                 onClick = onClick,
                 onDeleteRequested = onDeleteRequested,
                 onDeleteConfirmed = onDeleteConfirmed,
@@ -188,8 +188,8 @@ private fun HomeLoaded(
         ListStyle.Grid ->
             HomeLoadedGrid(
                 people = state.people,
-                showDeleteConfirmation = state.showDeleteConfirmation,
-                showDeleteWithNotesConfirmation = state.showDeleteWithNotesConfirmation,
+                deleteConfirmation = state.deleteConfirmation,
+                deleteWithNotesConfirmation = state.deleteWithNotesConfirmation,
                 onClick = onClick,
                 onDeleteRequested = onDeleteRequested,
                 onDeleteConfirmed = onDeleteConfirmed,
@@ -203,8 +203,8 @@ private fun HomeLoaded(
 @Composable
 private fun HomeLoadedRows(
     people: List<Person>,
-    showDeleteConfirmation: PersonId?,
-    showDeleteWithNotesConfirmation: PersonId?,
+    deleteConfirmation: PersonId?,
+    deleteWithNotesConfirmation: PersonId?,
     onClick: (Person) -> Unit,
     onDeleteRequested: (Person) -> Unit,
     onDeleteConfirmed: (Person) -> Unit,
@@ -220,8 +220,8 @@ private fun HomeLoadedRows(
             PersonRow(
                 modifier = Modifier.padding(4.dp),
                 person = person,
-                showDeleteDialog = person.id == showDeleteConfirmation,
-                showDeleteWithNotesDialog = person.id == showDeleteWithNotesConfirmation,
+                showDeleteDialog = person.id == deleteConfirmation,
+                showDeleteWithNotesDialog = person.id == deleteWithNotesConfirmation,
                 onClick = onClick,
                 onDeleteRequested = onDeleteRequested,
                 onDeleteConfirmed = onDeleteConfirmed,
@@ -236,8 +236,8 @@ private fun HomeLoadedRows(
 @Composable
 private fun HomeLoadedGrid(
     people: List<Person>,
-    showDeleteConfirmation: PersonId?,
-    showDeleteWithNotesConfirmation: PersonId?,
+    deleteConfirmation: PersonId?,
+    deleteWithNotesConfirmation: PersonId?,
     onClick: (Person) -> Unit,
     onDeleteRequested: (Person) -> Unit,
     onDeleteConfirmed: (Person) -> Unit,
@@ -253,8 +253,8 @@ private fun HomeLoadedGrid(
             PersonGrid(
                 modifier = Modifier.padding(8.dp),
                 person = person,
-                showDeleteDialog = person.id == showDeleteConfirmation,
-                showDeleteWithNotesDialog = person.id == showDeleteWithNotesConfirmation,
+                showDeleteDialog = person.id == deleteConfirmation,
+                showDeleteWithNotesDialog = person.id == deleteWithNotesConfirmation,
                 onClick = onClick,
                 onDeleteRequested = onDeleteRequested,
                 onDeleteConfirmed = onDeleteConfirmed,
@@ -548,8 +548,8 @@ class HomePreviewParameterProvider : CollectionPreviewParameterProvider<HomeUiSt
             listStyle = ListStyle.Rows,
             sortBy = SortBy.DEFAULT,
             people = emptyList(),
-            showDeleteConfirmation = null,
-            showDeleteWithNotesConfirmation = null,
+            deleteConfirmation = null,
+            deleteWithNotesConfirmation = null,
             userMessages = emptyList(),
         ),
         HomeUiState(
@@ -565,8 +565,8 @@ class HomePreviewParameterProvider : CollectionPreviewParameterProvider<HomeUiSt
                     lastModified = "2012-10-03 12:45",
                 )
             },
-            showDeleteConfirmation = null,
-            showDeleteWithNotesConfirmation = null,
+            deleteConfirmation = null,
+            deleteWithNotesConfirmation = null,
             userMessages = emptyList(),
         ),
         HomeUiState(
@@ -575,8 +575,8 @@ class HomePreviewParameterProvider : CollectionPreviewParameterProvider<HomeUiSt
             listStyle = ListStyle.Rows,
             sortBy = SortBy.DEFAULT,
             people = emptyList(),
-            showDeleteConfirmation = PersonId(1),
-            showDeleteWithNotesConfirmation = null,
+            deleteConfirmation = PersonId(1),
+            deleteWithNotesConfirmation = null,
             userMessages = listOf(
                 UserMessage(
                     id = UserMessageId(1),
