@@ -59,8 +59,7 @@ class HomeViewModel @Inject constructor(
     fun onFilterChanged(filter: String) {
         state = state.copy(filter = filter)
         viewModelScope.launch {
-            val sortBy = checkNotNull(state.sortBy) { "Missing required sort order." }
-            getPeople(sortBy = sortBy, filter = filter)
+            getPeople(sortBy = state.sortBy, filter = filter)
         }
     }
 
