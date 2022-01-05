@@ -101,7 +101,12 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             useCases.deletePersonWithNotes(person.id)
         }
-        state = state.copy(isLoading = false)
+        state = state.copy(
+            isLoading = false,
+            toastMessage = ToastMessage(
+                text = TextResource.fromId(R.string.person_deleted, person.fullName)
+            ),
+        )
     }
 
     fun onDeleteWithNotesCancelled() {
