@@ -18,7 +18,7 @@ interface TextResource {
 }
 
 private data class SimpleTextResource(
-    private val text: String
+    private val text: String,
 ) : TextResource {
 
     override fun asString(res: Resources): String = text

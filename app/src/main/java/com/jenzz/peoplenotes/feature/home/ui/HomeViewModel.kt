@@ -57,7 +57,7 @@ class HomeViewModel @Inject constructor(
             sortBy = sortBy,
             toastMessage = ToastMessage(
                 text = TextResource.fromId(R.string.sorted_by, sortBy.label)
-            )
+            ),
         )
         viewModelScope.launch {
             getPeople(sortBy = sortBy)
@@ -89,7 +89,7 @@ class HomeViewModel @Inject constructor(
                         isLoading = false,
                         toastMessage = ToastMessage(
                             text = TextResource.fromId(R.string.person_deleted, person.fullName)
-                        )
+                        ),
                     )
                 }
             }

@@ -414,7 +414,7 @@ private fun PersonCard(
 private fun DeletePersonDialog(
     person: Person,
     onDeleteConfirmed: (Person) -> Unit,
-    onDeleteCancelled: () -> Unit
+    onDeleteCancelled: () -> Unit,
 ) {
     AlertDialog(
         text = {
@@ -443,7 +443,7 @@ private fun DeletePersonDialog(
 private fun DeletePersonWithNotesDialog(
     person: Person,
     onDeleteWithNotes: (Person) -> Unit,
-    onDeleteWithNotesCancelled: () -> Unit
+    onDeleteWithNotesCancelled: () -> Unit,
 ) {
     AlertDialog(
         text = {
