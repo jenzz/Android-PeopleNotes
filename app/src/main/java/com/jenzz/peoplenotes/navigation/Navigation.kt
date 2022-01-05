@@ -2,8 +2,8 @@ package com.jenzz.peoplenotes.navigation
 
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.navigation
+import com.google.accompanist.navigation.animation.composable
+import com.google.accompanist.navigation.animation.navigation
 import com.jenzz.peoplenotes.NavGraph
 import com.jenzz.peoplenotes.ScreenRoute
 import com.jenzz.peoplenotes.ext.checkNoDuplicates

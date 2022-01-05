@@ -5,8 +5,8 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.rememberNavController
+import com.google.accompanist.navigation.animation.AnimatedNavHost
+import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 import com.jenzz.peoplenotes.common.ui.theme.PeopleNotesTheme
 import com.jenzz.peoplenotes.feature.settings.data.Settings
 import com.jenzz.peoplenotes.feature.settings.data.SettingsRepository
@@ -41,8 +41,8 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 private fun MainScreen() {
-    val navController = rememberNavController()
-    NavHost(
+    val navController = rememberAnimatedNavController()
+    AnimatedNavHost(
         navController = navController,
         startDestination = Navigation.root.value,
     ) {
