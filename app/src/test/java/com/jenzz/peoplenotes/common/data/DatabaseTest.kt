@@ -1,4 +1,4 @@
-package com.jenzz.peoplenotes.common.data.di
+package com.jenzz.peoplenotes.common.data
 
 import com.jenzz.peoplenotes.Database
 import com.squareup.sqldelight.sqlite.driver.JdbcSqliteDriver
