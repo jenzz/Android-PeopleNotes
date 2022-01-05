@@ -33,6 +33,7 @@ import androidx.compose.ui.tooling.preview.datasource.CollectionPreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.jenzz.peoplenotes.R
+import com.jenzz.peoplenotes.common.data.people.People
 import com.jenzz.peoplenotes.common.data.people.Person
 import com.jenzz.peoplenotes.common.data.people.PersonId
 import com.jenzz.peoplenotes.common.data.people.di.FirstName
@@ -91,6 +92,7 @@ private fun HomeContent(
         scaffoldState = scaffoldState,
         topBar = {
             HomeTopAppBar(
+                peopleCount = state.people.persons.size,
                 filter = state.filter,
                 showActions = state.showActions,
                 onFilterChanged = onFilterChanged,
@@ -111,15 +113,15 @@ private fun HomeContent(
         when {
             state.isLoading ->
                 HomeLoading()
-            state.isEmpty ->
-                HomeEmpty(
-                    text = R.string.empty_people,
-                    icon = R.drawable.ic_people,
-                )
             state.isEmptyFiltered ->
                 HomeEmpty(
                     text = R.string.empty_people_filtered,
                     icon = R.drawable.ic_sentiment_very_dissatisfied,
+                )
+            state.isEmpty ->
+                HomeEmpty(
+                    text = R.string.empty_people,
+                    icon = R.drawable.ic_people,
                 )
             else ->
                 HomeLoaded(
@@ -187,7 +189,7 @@ private fun HomeLoaded(
     when (state.listStyle) {
         ListStyle.Rows ->
             HomeLoadedRows(
-                people = state.people,
+                people = state.people.persons,
                 deleteConfirmation = state.deleteConfirmation,
                 deleteWithNotesConfirmation = state.deleteWithNotesConfirmation,
                 onClick = onClick,
@@ -199,7 +201,7 @@ private fun HomeLoaded(
             )
         ListStyle.Grid ->
             HomeLoadedGrid(
-                people = state.people,
+                people = state.people.persons,
                 deleteConfirmation = state.deleteConfirmation,
                 deleteWithNotesConfirmation = state.deleteWithNotesConfirmation,
                 onClick = onClick,
@@ -561,7 +563,10 @@ class HomePreviewParameterProvider : CollectionPreviewParameterProvider<HomeUiSt
             filter = "",
             listStyle = ListStyle.Rows,
             sortBy = SortBy.DEFAULT,
-            people = emptyList(),
+            people = People(
+                persons = emptyList(),
+                totalCount = 0
+            ),
             deleteConfirmation = null,
             deleteWithNotesConfirmation = null,
             toastMessage = null,
@@ -571,14 +576,17 @@ class HomePreviewParameterProvider : CollectionPreviewParameterProvider<HomeUiSt
             filter = "",
             listStyle = ListStyle.Rows,
             sortBy = SortBy.DEFAULT,
-            people = (0..10).map { i ->
-                Person(
-                    id = PersonId(i),
-                    firstName = FirstName("$i First Name".toNonEmptyString()),
-                    lastName = LastName("$i Last Name".toNonEmptyString()),
-                    lastModified = "2012-10-03 12:45",
-                )
-            },
+            people = People(
+                persons = (1..10).map { i ->
+                    Person(
+                        id = PersonId(i),
+                        firstName = FirstName("$i First Name".toNonEmptyString()),
+                        lastName = LastName("Last Name".toNonEmptyString()),
+                        lastModified = "2012-10-03 12:45",
+                    )
+                },
+                totalCount = 10
+            ),
             deleteConfirmation = null,
             deleteWithNotesConfirmation = null,
             toastMessage = null,
@@ -588,7 +596,10 @@ class HomePreviewParameterProvider : CollectionPreviewParameterProvider<HomeUiSt
             filter = "",
             listStyle = ListStyle.Rows,
             sortBy = SortBy.DEFAULT,
-            people = emptyList(),
+            people = People(
+                persons = emptyList(),
+                totalCount = 0
+            ),
             deleteConfirmation = PersonId(1),
             deleteWithNotesConfirmation = null,
             toastMessage =

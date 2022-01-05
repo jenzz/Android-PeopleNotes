@@ -19,13 +19,18 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.OffsetMapping
+import androidx.compose.ui.text.input.TransformedText
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import com.jenzz.peoplenotes.R
 import com.jenzz.peoplenotes.common.ui.TextResource
 
 @Composable
 fun HomeTopAppBar(
+    peopleCount: Int,
     showActions: Boolean,
     filter: String,
     onFilterChanged: (String) -> Unit,
@@ -41,6 +46,7 @@ fun HomeTopAppBar(
     ) {
         FilterTextField(
             modifier = Modifier.weight(1f),
+            peopleCount = peopleCount,
             showActions = showActions,
             filter = filter,
             onFilterChanged = onFilterChanged,
@@ -59,6 +65,7 @@ fun HomeTopAppBar(
 @Composable
 private fun FilterTextField(
     modifier: Modifier = Modifier,
+    peopleCount: Int,
     showActions: Boolean,
     filter: String,
     onFilterChanged: (String) -> Unit,
@@ -81,7 +88,17 @@ private fun FilterTextField(
         singleLine = true,
         value = filter,
         onValueChange = onFilterChanged,
-        placeholder = { Text(text = stringResource(R.string.search_people)) },
+        placeholder = { Text(text = stringResource(R.string.search_people, peopleCount)) },
+        visualTransformation =
+        if (filter.isEmpty())
+            VisualTransformation.None
+        else
+            VisualTransformation { text ->
+                TransformedText(
+                    text = AnnotatedString(text.text + " ($peopleCount)"),
+                    offsetMapping = OffsetMapping.Identity,
+                )
+            },
         trailingIcon = {
             if (showActions) {
                 Row {

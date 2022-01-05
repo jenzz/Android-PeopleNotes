@@ -5,6 +5,10 @@ CREATE TABLE PersonEntity (
     lastModified TEXT NOT NULL
 );
 
+count:
+SELECT COUNT(*)
+FROM PersonEntity;
+
 selectAll:
 SELECT *
 FROM PersonEntity

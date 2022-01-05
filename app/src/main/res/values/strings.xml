@@ -1,7 +1,7 @@
 <resources>
 
     <string name="app_name">People Notes</string>
-    <string name="search_people">Search people</string>
+    <string name="search_people">Search people (%1$d)</string>
     <string name="sort_by">Sort by</string>
     <string name="sorted_by">Sorted by %1$s</string>
     <string name="last_modified">Last Modified</string>

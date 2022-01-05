@@ -15,7 +15,7 @@ import javax.inject.Inject
 
 interface PeopleDataSource {
 
-    fun getAllPeople(sortBy: SortBy, filter: String): Flow<List<Person>>
+    fun getAllPeople(sortBy: SortBy, filter: String): Flow<People>
 
     suspend fun add(person: NewPerson): Person
 
@@ -37,8 +37,8 @@ class PeopleLocalDataSource @Inject constructor(
             )
         }
 
-    override fun getAllPeople(sortBy: SortBy, filter: String): Flow<List<Person>> {
-        val orderBy = when (sortBy) {
+    override fun getAllPeople(sortBy: SortBy, filter: String): Flow<People> {
+        val comparator = when (sortBy) {
             SortBy.FirstName -> compareBy { person: Person -> person.firstName }
             SortBy.LastName -> compareBy { person: Person -> person.lastName }
             SortBy.LastModified -> compareByDescending { person: Person -> person.lastModified }
@@ -48,7 +48,12 @@ class PeopleLocalDataSource @Inject constructor(
             .selectAll(filterSql, toPerson)
             .asFlow()
             .mapToList()
-            .map { notes -> notes.sortedWith(orderBy) }
+            .map { persons ->
+                People(
+                    persons = persons.sortedWith(comparator),
+                    totalCount = personQueries.count().executeAsOne().toInt(),
+                )
+            }
     }
 
     override suspend fun add(person: NewPerson): Person =
