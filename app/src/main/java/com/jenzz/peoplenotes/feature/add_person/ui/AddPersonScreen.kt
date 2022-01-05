@@ -64,7 +64,7 @@ private fun AddPersonContent(
         }
     ) {
         Column(
-            modifier = Modifier.padding(8.dp),
+            modifier = Modifier.padding(12.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             val (firstNameInput, lastNameInput, notesInput) = remember { FocusRequester.createRefs() }
@@ -98,6 +98,7 @@ private fun AddPersonContent(
                 onValueChanged = onNoteChanged,
             )
             SubmitButton(
+                modifier = Modifier.padding(top = 8.dp),
                 enabled = state.inputsEnabled,
                 onClick = onSubmit,
             )
@@ -205,10 +206,12 @@ private fun PersonInputField(
 
 @Composable
 private fun SubmitButton(
+    modifier: Modifier = Modifier,
     enabled: Boolean,
     onClick: () -> Unit,
 ) {
     Button(
+        modifier = modifier,
         enabled = enabled,
         onClick = onClick,
     ) {
