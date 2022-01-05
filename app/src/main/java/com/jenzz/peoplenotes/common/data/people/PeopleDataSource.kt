@@ -49,10 +49,12 @@ class PeopleLocalDataSource @Inject constructor(
             .asFlow()
             .mapToList()
             .map { persons ->
-                People(
-                    persons = persons.sortedWith(comparator),
-                    totalCount = personQueries.count().executeAsOne().toInt(),
-                )
+                withContext(dispatchers.Default) {
+                    People(
+                        persons = persons.sortedWith(comparator),
+                        totalCount = personQueries.count().executeAsOne().toInt(),
+                    )
+                }
             }
     }
 
