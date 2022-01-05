@@ -1,5 +1,6 @@
 package com.jenzz.peoplenotes.common.data.notes
 
+import com.jenzz.peoplenotes.common.data.CoroutineDispatchers
 import com.jenzz.peoplenotes.common.data.NoteQueries
 import com.jenzz.peoplenotes.common.data.people.Person
 import com.jenzz.peoplenotes.common.data.people.PersonId
@@ -9,6 +10,7 @@ import com.jenzz.peoplenotes.ext.toNonEmptyString
 import com.squareup.sqldelight.runtime.coroutines.asFlow
 import com.squareup.sqldelight.runtime.coroutines.mapToList
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 interface NotesDataSource {
@@ -24,6 +26,7 @@ interface NotesDataSource {
 
 class NotesLocalDataSource @Inject constructor(
     private val noteQueries: NoteQueries,
+    private val dispatchers: CoroutineDispatchers,
 ) : NotesDataSource {
 
     private val toNote = {
@@ -53,14 +56,20 @@ class NotesLocalDataSource @Inject constructor(
         noteQueries.selectAll(personId.value, toNote).asFlow().mapToList()
 
     override suspend fun add(note: NewNote, personId: PersonId) {
-        noteQueries.insert(note.text.toString(), personId.value)
+        withContext(dispatchers.Default) {
+            noteQueries.insert(note.text.toString(), personId.value)
+        }
     }
 
     override suspend fun delete(id: NoteId) {
-        noteQueries.delete(id.value)
+        withContext(dispatchers.Default) {
+            noteQueries.delete(id.value)
+        }
     }
 
     override suspend fun deleteAllByPerson(personId: PersonId) {
-        noteQueries.deleteAllByPerson(personId.value)
+        withContext(dispatchers.Default) {
+            noteQueries.deleteAllByPerson(personId.value)
+        }
     }
 }

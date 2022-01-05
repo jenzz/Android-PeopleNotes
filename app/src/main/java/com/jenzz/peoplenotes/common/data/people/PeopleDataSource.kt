@@ -1,5 +1,6 @@
 package com.jenzz.peoplenotes.common.data.people
 
+import com.jenzz.peoplenotes.common.data.CoroutineDispatchers
 import com.jenzz.peoplenotes.common.data.PersonQueries
 import com.jenzz.peoplenotes.common.data.people.di.FirstName
 import com.jenzz.peoplenotes.common.data.people.di.LastName
@@ -9,6 +10,7 @@ import com.squareup.sqldelight.runtime.coroutines.asFlow
 import com.squareup.sqldelight.runtime.coroutines.mapToList
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 interface PeopleDataSource {
@@ -22,6 +24,7 @@ interface PeopleDataSource {
 
 class PeopleLocalDataSource @Inject constructor(
     private val personQueries: PersonQueries,
+    private val dispatchers: CoroutineDispatchers,
 ) : PeopleDataSource {
 
     private val toPerson =
@@ -49,18 +52,22 @@ class PeopleLocalDataSource @Inject constructor(
     }
 
     override suspend fun add(person: NewPerson): Person =
-        personQueries.transactionWithResult {
-            personQueries.insert(
-                firstName = person.firstName.value.toString(),
-                lastName = person.lastName.value.toString(),
-            )
-            val rowId = personQueries.selectLastInsertRowId().executeAsOne()
-            personQueries
-                .selectByRowId(rowId, toPerson)
-                .executeAsOne()
+        withContext(dispatchers.Default) {
+            personQueries.transactionWithResult {
+                personQueries.insert(
+                    firstName = person.firstName.value.toString(),
+                    lastName = person.lastName.value.toString(),
+                )
+                val rowId = personQueries.selectLastInsertRowId().executeAsOne()
+                personQueries
+                    .selectByRowId(rowId, toPerson)
+                    .executeAsOne()
+            }
         }
 
     override suspend fun delete(personId: PersonId) {
-        personQueries.delete(personId.value)
+        withContext(dispatchers.Default) {
+            personQueries.delete(personId.value)
+        }
     }
 }
