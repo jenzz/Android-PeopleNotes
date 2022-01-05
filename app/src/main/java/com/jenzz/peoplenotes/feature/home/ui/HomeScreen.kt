@@ -4,9 +4,7 @@ import android.content.res.Configuration.UI_MODE_NIGHT_NO
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -260,7 +258,9 @@ private fun HomeLoadedGrid(
     onDeleteWithNotesCancelled: () -> Unit,
 ) {
     StaggeredVerticalGrid(
-        modifier = Modifier.padding(4.dp),
+        modifier = Modifier
+            .verticalScroll(rememberScrollState())
+            .padding(4.dp),
         maxColumnWidth = 220.dp,
     ) {
         people.forEach { person ->
