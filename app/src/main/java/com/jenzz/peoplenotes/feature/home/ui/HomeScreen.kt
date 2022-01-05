@@ -2,6 +2,8 @@ package com.jenzz.peoplenotes.feature.home.ui
 
 import android.content.res.Configuration.UI_MODE_NIGHT_NO
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
+import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.combinedClickable
@@ -112,7 +114,15 @@ private fun HomeContent(
             state.isLoading ->
                 HomeLoading()
             state.isEmpty ->
-                HomeEmpty()
+                HomeEmpty(
+                    text = R.string.empty_people,
+                    icon = R.drawable.ic_people,
+                )
+            state.isEmptyFiltered ->
+                HomeEmpty(
+                    text = R.string.empty_people_filtered,
+                    icon = R.drawable.ic_sentiment_very_dissatisfied,
+                )
             else ->
                 HomeLoaded(
                     state = state,
@@ -143,7 +153,10 @@ private fun HomeLoading() {
 }
 
 @Composable
-private fun HomeEmpty() {
+private fun HomeEmpty(
+    @StringRes text: Int,
+    @DrawableRes icon: Int,
+) {
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
@@ -151,12 +164,12 @@ private fun HomeEmpty() {
     ) {
         Icon(
             modifier = Modifier.size(48.dp),
-            painter = painterResource(id = R.drawable.ic_people),
+            painter = painterResource(id = icon),
             contentDescription = stringResource(id = R.string.empty_people),
         )
         Spacer(modifier = Modifier.height(4.dp))
         Text(
-            text = stringResource(id = R.string.empty_people),
+            text = stringResource(id = text),
             textAlign = TextAlign.Center,
             style = MaterialTheme.typography.caption,
         )

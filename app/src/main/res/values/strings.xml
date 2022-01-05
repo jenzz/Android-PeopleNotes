@@ -22,6 +22,7 @@
     <string name="delete">Delete</string>
     <string name="person_deleted">%1$s deleted.</string>
     <string name="empty_people">Wow, such empty.\nAdd a person to get started.</string>
+    <string name="empty_people_filtered">Oops.\nNobody found with that name.</string>
     <string name="grid_view">Grid view</string>
     <string name="rows">Rows</string>
     <string name="app_version">App Version</string>

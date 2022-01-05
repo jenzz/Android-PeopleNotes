@@ -20,6 +20,8 @@ data class HomeUiState(
 
     val isEmpty: Boolean = people.isEmpty()
 
+    val isEmptyFiltered: Boolean = !isEmpty && filter.isNotEmpty()
+
     val showActions: Boolean = !isLoading && !isEmpty
 
     override val savedState: HomeSavedState =
