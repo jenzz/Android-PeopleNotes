@@ -1,5 +1,9 @@
 package com.jenzz.peoplenotes.feature.home.ui
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -100,7 +104,11 @@ private fun FilterTextField(
                 )
             },
         trailingIcon = {
-            if (showActions) {
+            AnimatedVisibility(
+                visible = showActions,
+                enter = fadeIn(animationSpec = tween(700)),
+                exit = fadeOut(animationSpec = tween(700)),
+            ) {
                 Row {
                     ListStyleAction(
                         listStyle = listStyle,
