@@ -15,7 +15,7 @@ class GetPeopleUseCase @Inject constructor(
     private val peopleRepository: PeopleRepository,
 ) {
 
-    operator fun invoke(sortBy: SortBy, filter: String): Flow<List<Person>> =
+    operator fun invoke(sortBy: SortBy, filter: String): Flow<People> =
         peopleRepository.getAllPeople(sortBy, filter)
 }
 

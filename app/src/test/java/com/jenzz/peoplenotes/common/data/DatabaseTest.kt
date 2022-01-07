@@ -1,4 +1,4 @@
-package com.jenzz.peoplenotes.common.data.di
+package com.jenzz.peoplenotes.common.data
 
 import com.jenzz.peoplenotes.Database
 import com.squareup.sqldelight.sqlite.driver.JdbcSqliteDriver
@@ -26,7 +26,7 @@ class DatabaseTest {
         }
 
         val people = personQueries
-            .selectAll()
+            .selectAll(null)
             .executeAsList()
 
         assertEquals(1, people[0].id)
@@ -42,7 +42,7 @@ class DatabaseTest {
         }
 
         val notes = noteQueries
-            .selectAllWithPeople(null)
+            .selectAll(1)
             .executeAsList()
 
         assertEquals(1, notes[0].id)

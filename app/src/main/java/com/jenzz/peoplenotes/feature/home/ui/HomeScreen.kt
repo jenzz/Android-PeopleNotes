@@ -2,9 +2,9 @@ package com.jenzz.peoplenotes.feature.home.ui
 
 import android.content.res.Configuration.UI_MODE_NIGHT_NO
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.combinedClickable
+import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -33,6 +33,7 @@ import androidx.compose.ui.tooling.preview.datasource.CollectionPreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.jenzz.peoplenotes.R
+import com.jenzz.peoplenotes.common.data.people.People
 import com.jenzz.peoplenotes.common.data.people.Person
 import com.jenzz.peoplenotes.common.data.people.PersonId
 import com.jenzz.peoplenotes.common.data.people.di.FirstName
@@ -41,6 +42,8 @@ import com.jenzz.peoplenotes.common.ui.TextResource
 import com.jenzz.peoplenotes.common.ui.ToastMessage
 import com.jenzz.peoplenotes.common.ui.showShortToast
 import com.jenzz.peoplenotes.common.ui.theme.PeopleNotesTheme
+import com.jenzz.peoplenotes.common.ui.widgets.MultiFloatingActionButtonContentOverlay
+import com.jenzz.peoplenotes.common.ui.widgets.MultiFloatingActionButtonState.Collapsed
 import com.jenzz.peoplenotes.common.ui.widgets.StaggeredVerticalGrid
 import com.jenzz.peoplenotes.ext.toNonEmptyString
 
@@ -87,10 +90,22 @@ private fun HomeContent(
 ) {
     val context = LocalContext.current
     val scaffoldState = rememberScaffoldState()
+    val floatingActionButtonState = rememberSaveable { mutableStateOf(Collapsed) }
     Scaffold(
         scaffoldState = scaffoldState,
-        topBar = {
+        floatingActionButton = {
+            HomeFloatingActionButton(
+                state = floatingActionButtonState.value,
+                onStateChange = { state -> floatingActionButtonState.value = state },
+                onAddPersonManuallyClick = onAddPersonManuallyClick,
+                onImportFromContactsClick = onImportFromContactsClick,
+            )
+        }
+    ) {
+        Column {
             HomeTopAppBar(
+                modifier = Modifier.padding(start = 8.dp, top = 8.dp, end = 8.dp),
+                peopleCount = state.people.persons.size,
                 filter = state.filter,
                 showActions = state.showActions,
                 onFilterChanged = onFilterChanged,
@@ -100,30 +115,35 @@ private fun HomeContent(
                 onSortByChanged = onSortByChanged,
                 onSettingsClick = onSettingsClick,
             )
-        },
-        floatingActionButton = {
-            HomeFloatingActionButton(
-                onAddPersonManuallyClick = onAddPersonManuallyClick,
-                onImportFromContactsClick = onImportFromContactsClick,
-            )
+            when {
+                state.isLoading ->
+                    HomeLoading()
+                state.isEmptyFiltered ->
+                    HomeEmpty(
+                        text = R.string.empty_people_filtered,
+                        icon = R.drawable.ic_sentiment_very_dissatisfied,
+                    )
+                state.isEmpty ->
+                    HomeEmpty(
+                        text = R.string.empty_people,
+                        icon = R.drawable.ic_people,
+                    )
+                else ->
+                    HomeLoaded(
+                        state = state,
+                        onClick = onClick,
+                        onDeleteRequested = onDeleteRequested,
+                        onDeleteConfirmed = onDeleteConfirmed,
+                        onDeleteCancelled = onDeleteCancelled,
+                        onDeleteWithNotes = onDeleteWithNotes,
+                        onDeleteWithNotesCancelled = onDeleteWithNotesCancelled,
+                    )
+            }
         }
-    ) {
-        when {
-            state.isLoading ->
-                HomeLoading()
-            state.isEmpty ->
-                HomeEmpty()
-            else ->
-                HomeLoaded(
-                    state = state,
-                    onClick = onClick,
-                    onDeleteRequested = onDeleteRequested,
-                    onDeleteConfirmed = onDeleteConfirmed,
-                    onDeleteCancelled = onDeleteCancelled,
-                    onDeleteWithNotes = onDeleteWithNotes,
-                    onDeleteWithNotesCancelled = onDeleteWithNotesCancelled,
-                )
-        }
+        MultiFloatingActionButtonContentOverlay(
+            modifier = Modifier.fillMaxSize(),
+            state = floatingActionButtonState,
+        )
     }
     if (state.toastMessage != null) {
         val message = state.toastMessage.text.asString(context.resources)
@@ -143,7 +163,10 @@ private fun HomeLoading() {
 }
 
 @Composable
-private fun HomeEmpty() {
+private fun HomeEmpty(
+    @StringRes text: Int,
+    @DrawableRes icon: Int,
+) {
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
@@ -151,12 +174,12 @@ private fun HomeEmpty() {
     ) {
         Icon(
             modifier = Modifier.size(48.dp),
-            painter = painterResource(id = R.drawable.ic_people),
+            painter = painterResource(id = icon),
             contentDescription = stringResource(id = R.string.empty_people),
         )
         Spacer(modifier = Modifier.height(4.dp))
         Text(
-            text = stringResource(id = R.string.empty_people),
+            text = stringResource(id = text),
             textAlign = TextAlign.Center,
             style = MaterialTheme.typography.caption,
         )
@@ -176,7 +199,7 @@ private fun HomeLoaded(
     when (state.listStyle) {
         ListStyle.Rows ->
             HomeLoadedRows(
-                people = state.people,
+                people = state.people.persons,
                 deleteConfirmation = state.deleteConfirmation,
                 deleteWithNotesConfirmation = state.deleteWithNotesConfirmation,
                 onClick = onClick,
@@ -188,7 +211,7 @@ private fun HomeLoaded(
             )
         ListStyle.Grid ->
             HomeLoadedGrid(
-                people = state.people,
+                people = state.people.persons,
                 deleteConfirmation = state.deleteConfirmation,
                 deleteWithNotesConfirmation = state.deleteWithNotesConfirmation,
                 onClick = onClick,
@@ -219,7 +242,6 @@ private fun HomeLoadedRows(
     ) {
         items(people) { person ->
             PersonRow(
-                modifier = Modifier.padding(4.dp),
                 person = person,
                 showDeleteDialog = person.id == deleteConfirmation,
                 showDeleteWithNotesDialog = person.id == deleteWithNotesConfirmation,
@@ -247,12 +269,14 @@ private fun HomeLoadedGrid(
     onDeleteWithNotesCancelled: () -> Unit,
 ) {
     StaggeredVerticalGrid(
-        modifier = Modifier.padding(4.dp),
+        modifier = Modifier
+            .verticalScroll(rememberScrollState())
+            .padding(4.dp),
         maxColumnWidth = 220.dp,
     ) {
         people.forEach { person ->
             PersonGrid(
-                modifier = Modifier.padding(8.dp),
+                modifier = Modifier.padding(4.dp),
                 person = person,
                 showDeleteDialog = person.id == deleteConfirmation,
                 showDeleteWithNotesDialog = person.id == deleteWithNotesConfirmation,
@@ -269,7 +293,6 @@ private fun HomeLoadedGrid(
 
 @Composable
 private fun PersonRow(
-    modifier: Modifier = Modifier,
     person: Person,
     showDeleteDialog: Boolean,
     showDeleteWithNotesDialog: Boolean,
@@ -281,7 +304,6 @@ private fun PersonRow(
     onDeleteWithNotesCancelled: () -> Unit,
 ) {
     PersonCard(
-        modifier = modifier,
         person = person,
         showDeleteDialog = showDeleteDialog,
         showDeleteWithNotesDialog = showDeleteWithNotesDialog,
@@ -548,7 +570,10 @@ class HomePreviewParameterProvider : CollectionPreviewParameterProvider<HomeUiSt
             filter = "",
             listStyle = ListStyle.Rows,
             sortBy = SortBy.DEFAULT,
-            people = emptyList(),
+            people = People(
+                persons = emptyList(),
+                totalCount = 0
+            ),
             deleteConfirmation = null,
             deleteWithNotesConfirmation = null,
             toastMessage = null,
@@ -558,14 +583,17 @@ class HomePreviewParameterProvider : CollectionPreviewParameterProvider<HomeUiSt
             filter = "",
             listStyle = ListStyle.Rows,
             sortBy = SortBy.DEFAULT,
-            people = (0..10).map { i ->
-                Person(
-                    id = PersonId(i),
-                    firstName = FirstName("$i First Name".toNonEmptyString()),
-                    lastName = LastName("$i Last Name".toNonEmptyString()),
-                    lastModified = "2012-10-03 12:45",
-                )
-            },
+            people = People(
+                persons = (1..10).map { i ->
+                    Person(
+                        id = PersonId(i),
+                        firstName = FirstName("$i First Name".toNonEmptyString()),
+                        lastName = LastName("Last Name".toNonEmptyString()),
+                        lastModified = "2012-10-03 12:45",
+                    )
+                },
+                totalCount = 10
+            ),
             deleteConfirmation = null,
             deleteWithNotesConfirmation = null,
             toastMessage = null,
@@ -575,7 +603,10 @@ class HomePreviewParameterProvider : CollectionPreviewParameterProvider<HomeUiSt
             filter = "",
             listStyle = ListStyle.Rows,
             sortBy = SortBy.DEFAULT,
-            people = emptyList(),
+            people = People(
+                persons = emptyList(),
+                totalCount = 0
+            ),
             deleteConfirmation = PersonId(1),
             deleteWithNotesConfirmation = null,
             toastMessage =
