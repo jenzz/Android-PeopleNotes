@@ -37,11 +37,11 @@ fun HomeTopAppBar(
     peopleCount: Int,
     showActions: Boolean,
     filter: String,
-    onFilterChanged: (String) -> Unit,
+    onFilterChange: (String) -> Unit,
     listStyle: ListStyle,
-    onListStyleChanged: (ListStyle) -> Unit,
+    onListStyleChange: (ListStyle) -> Unit,
     sortBy: SortBy,
-    onSortByChanged: (SortBy) -> Unit,
+    onSortByChange: (SortBy) -> Unit,
     onSettingsClick: () -> Unit,
 ) {
     Row(modifier = modifier) {
@@ -50,11 +50,11 @@ fun HomeTopAppBar(
             peopleCount = peopleCount,
             showActions = showActions,
             filter = filter,
-            onFilterChanged = onFilterChanged,
+            onFilterChang = onFilterChange,
             listStyle = listStyle,
-            onListStyleChanged = onListStyleChanged,
+            onListStyleChang = onListStyleChange,
             sortBy = sortBy,
-            onSortByChanged = onSortByChanged,
+            onSortByChang = onSortByChange,
         )
         SettingsIcon(
             modifier = Modifier.size(TextFieldDefaults.MinHeight),
@@ -69,11 +69,11 @@ private fun FilterTextField(
     peopleCount: Int,
     showActions: Boolean,
     filter: String,
-    onFilterChanged: (String) -> Unit,
+    onFilterChang: (String) -> Unit,
     listStyle: ListStyle,
-    onListStyleChanged: (ListStyle) -> Unit,
+    onListStyleChang: (ListStyle) -> Unit,
     sortBy: SortBy,
-    onSortByChanged: (SortBy) -> Unit,
+    onSortByChang: (SortBy) -> Unit,
 ) {
     TextField(
         modifier = modifier
@@ -88,7 +88,7 @@ private fun FilterTextField(
         ),
         singleLine = true,
         value = filter,
-        onValueChange = onFilterChanged,
+        onValueChange = onFilterChang,
         placeholder = { Text(text = stringResource(R.string.search_people, peopleCount)) },
         visualTransformation =
         if (filter.isEmpty())
@@ -110,12 +110,12 @@ private fun FilterTextField(
                     ListStyleAction(
                         modifier = Modifier.size(TextFieldDefaults.MinHeight),
                         listStyle = listStyle,
-                        onListStyleChanged = onListStyleChanged
+                        onListStyleChange = onListStyleChang
                     )
                     SortByAction(
                         modifier = Modifier.size(TextFieldDefaults.MinHeight),
                         sortBy = sortBy,
-                        onSortByChanged = onSortByChanged
+                        onSortByChang = onSortByChang
                     )
                 }
             }
@@ -146,13 +146,13 @@ private fun SettingsIcon(
 private fun ListStyleAction(
     modifier: Modifier = Modifier,
     listStyle: ListStyle,
-    onListStyleChanged: (ListStyle) -> Unit,
+    onListStyleChange: (ListStyle) -> Unit,
 ) {
     when (listStyle) {
         ListStyle.Rows -> {
             IconButton(
                 modifier = modifier,
-                onClick = { onListStyleChanged(ListStyle.Grid) },
+                onClick = { onListStyleChange(ListStyle.Grid) },
             ) {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_grid),
@@ -163,7 +163,7 @@ private fun ListStyleAction(
         ListStyle.Grid -> {
             IconButton(
                 modifier = modifier,
-                onClick = { onListStyleChanged(ListStyle.Rows) },
+                onClick = { onListStyleChange(ListStyle.Rows) },
             ) {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_rows),
@@ -178,7 +178,7 @@ private fun ListStyleAction(
 private fun SortByAction(
     modifier: Modifier = Modifier,
     sortBy: SortBy,
-    onSortByChanged: (SortBy) -> Unit,
+    onSortByChang: (SortBy) -> Unit,
 ) {
     Box(modifier = modifier) {
         var expanded by rememberSaveable { mutableStateOf(false) }
@@ -201,7 +201,7 @@ private fun SortByAction(
                     isSelected = sortBy == sortByItem,
                     onClick = {
                         expanded = false
-                        onSortByChanged(sortByItem)
+                        onSortByChang(sortByItem)
                     },
                 )
             }

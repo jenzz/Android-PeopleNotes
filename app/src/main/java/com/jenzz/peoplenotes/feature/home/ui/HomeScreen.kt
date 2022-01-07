@@ -55,15 +55,15 @@ fun HomeScreen(
 ) {
     HomeContent(
         state = viewModel.state,
-        onListStyleChanged = viewModel::onListStyleChanged,
-        onFilterChanged = viewModel::onFilterChanged,
+        onListStyleChange = viewModel::onListStyleChange,
+        onFilterChange = viewModel::onFilterChange,
         onClick = { /* TODO JD */ },
-        onDeleteRequested = viewModel::onDeleteRequested,
-        onDeleteConfirmed = viewModel::onDeleteConfirmed,
-        onDeleteCancelled = viewModel::onDeleteCancelled,
+        onDeleteRequest = viewModel::onDeleteRequest,
+        onDeleteConfirm = viewModel::onDeleteConfirm,
+        onDeleteCancel = viewModel::onDeleteCancel,
         onDeleteWithNotes = viewModel::onDeleteWithNotes,
-        onDeleteWithNotesCancelled = viewModel::onDeleteWithNotesCancelled,
-        onSortByChanged = viewModel::onSortByChanged,
+        onDeleteWithNotesCancel = viewModel::onDeleteWithNotesCancel,
+        onSortByChange = viewModel::onSortByChange,
         onAddPersonManuallyClick = onAddPersonManuallyClick,
         onImportFromContactsClick = {  /* TODO JD */ },
         onSettingsClick = onSettingsClick,
@@ -74,15 +74,15 @@ fun HomeScreen(
 @Composable
 private fun HomeContent(
     state: HomeUiState,
-    onListStyleChanged: (ListStyle) -> Unit,
-    onFilterChanged: (String) -> Unit,
+    onListStyleChange: (ListStyle) -> Unit,
+    onFilterChange: (String) -> Unit,
     onClick: (Person) -> Unit,
-    onDeleteRequested: (Person) -> Unit,
-    onDeleteConfirmed: (Person) -> Unit,
-    onDeleteCancelled: () -> Unit,
+    onDeleteRequest: (Person) -> Unit,
+    onDeleteConfirm: (Person) -> Unit,
+    onDeleteCancel: () -> Unit,
     onDeleteWithNotes: (Person) -> Unit,
-    onDeleteWithNotesCancelled: () -> Unit,
-    onSortByChanged: (SortBy) -> Unit,
+    onDeleteWithNotesCancel: () -> Unit,
+    onSortByChange: (SortBy) -> Unit,
     onAddPersonManuallyClick: () -> Unit,
     onImportFromContactsClick: () -> Unit,
     onSettingsClick: () -> Unit,
@@ -108,11 +108,11 @@ private fun HomeContent(
                 peopleCount = state.people.persons.size,
                 filter = state.filter,
                 showActions = state.showActions,
-                onFilterChanged = onFilterChanged,
+                onFilterChange = onFilterChange,
                 listStyle = state.listStyle,
-                onListStyleChanged = onListStyleChanged,
+                onListStyleChange = onListStyleChange,
                 sortBy = state.sortBy,
-                onSortByChanged = onSortByChanged,
+                onSortByChange = onSortByChange,
                 onSettingsClick = onSettingsClick,
             )
             when {
@@ -132,11 +132,11 @@ private fun HomeContent(
                     HomeLoaded(
                         state = state,
                         onClick = onClick,
-                        onDeleteRequested = onDeleteRequested,
-                        onDeleteConfirmed = onDeleteConfirmed,
-                        onDeleteCancelled = onDeleteCancelled,
+                        onDeleteRequest = onDeleteRequest,
+                        onDeleteConfirm = onDeleteConfirm,
+                        onDeleteCancel = onDeleteCancel,
                         onDeleteWithNotes = onDeleteWithNotes,
-                        onDeleteWithNotesCancelled = onDeleteWithNotesCancelled,
+                        onDeleteWithNotesCancel = onDeleteWithNotesCancel,
                     )
             }
         }
@@ -190,11 +190,11 @@ private fun HomeEmpty(
 private fun HomeLoaded(
     state: HomeUiState,
     onClick: (Person) -> Unit,
-    onDeleteRequested: (Person) -> Unit,
-    onDeleteConfirmed: (Person) -> Unit,
-    onDeleteCancelled: () -> Unit,
+    onDeleteRequest: (Person) -> Unit,
+    onDeleteConfirm: (Person) -> Unit,
+    onDeleteCancel: () -> Unit,
     onDeleteWithNotes: (Person) -> Unit,
-    onDeleteWithNotesCancelled: () -> Unit,
+    onDeleteWithNotesCancel: () -> Unit,
 ) {
     when (state.listStyle) {
         ListStyle.Rows ->
@@ -203,11 +203,11 @@ private fun HomeLoaded(
                 deleteConfirmation = state.deleteConfirmation,
                 deleteWithNotesConfirmation = state.deleteWithNotesConfirmation,
                 onClick = onClick,
-                onDeleteRequested = onDeleteRequested,
-                onDeleteConfirmed = onDeleteConfirmed,
-                onDeleteCancelled = onDeleteCancelled,
+                onDeleteRequest = onDeleteRequest,
+                onDeleteConfirm = onDeleteConfirm,
+                onDeleteCancel = onDeleteCancel,
                 onDeleteWithNotes = onDeleteWithNotes,
-                onDeleteWithNotesCancelled = onDeleteWithNotesCancelled,
+                onDeleteWithNotesCancel = onDeleteWithNotesCancel,
             )
         ListStyle.Grid ->
             HomeLoadedGrid(
@@ -215,11 +215,11 @@ private fun HomeLoaded(
                 deleteConfirmation = state.deleteConfirmation,
                 deleteWithNotesConfirmation = state.deleteWithNotesConfirmation,
                 onClick = onClick,
-                onDeleteRequested = onDeleteRequested,
-                onDeleteConfirmed = onDeleteConfirmed,
-                onDeleteCancelled = onDeleteCancelled,
+                onDeleteRequest = onDeleteRequest,
+                onDeleteConfirm = onDeleteConfirm,
+                onDeleteCancel = onDeleteCancel,
                 onDeleteWithNotes = onDeleteWithNotes,
-                onDeleteWithNotesCancelled = onDeleteWithNotesCancelled,
+                onDeleteWithNotesCancel = onDeleteWithNotesCancel,
             )
     }
 }
@@ -230,11 +230,11 @@ private fun HomeLoadedRows(
     deleteConfirmation: PersonId?,
     deleteWithNotesConfirmation: PersonId?,
     onClick: (Person) -> Unit,
-    onDeleteRequested: (Person) -> Unit,
-    onDeleteConfirmed: (Person) -> Unit,
-    onDeleteCancelled: () -> Unit,
+    onDeleteRequest: (Person) -> Unit,
+    onDeleteConfirm: (Person) -> Unit,
+    onDeleteCancel: () -> Unit,
     onDeleteWithNotes: (Person) -> Unit,
-    onDeleteWithNotesCancelled: () -> Unit,
+    onDeleteWithNotesCancel: () -> Unit,
 ) {
     LazyColumn(
         contentPadding = PaddingValues(8.dp),
@@ -246,11 +246,11 @@ private fun HomeLoadedRows(
                 showDeleteDialog = person.id == deleteConfirmation,
                 showDeleteWithNotesDialog = person.id == deleteWithNotesConfirmation,
                 onClick = onClick,
-                onDeleteRequested = onDeleteRequested,
-                onDeleteConfirmed = onDeleteConfirmed,
-                onDeleteCancelled = onDeleteCancelled,
+                onDeleteRequest = onDeleteRequest,
+                onDeleteConfirm = onDeleteConfirm,
+                onDeleteCancel = onDeleteCancel,
                 onDeleteWithNotes = onDeleteWithNotes,
-                onDeleteWithNotesCancelled = onDeleteWithNotesCancelled,
+                onDeleteWithNotesCancel = onDeleteWithNotesCancel,
             )
         }
     }
@@ -262,11 +262,11 @@ private fun HomeLoadedGrid(
     deleteConfirmation: PersonId?,
     deleteWithNotesConfirmation: PersonId?,
     onClick: (Person) -> Unit,
-    onDeleteRequested: (Person) -> Unit,
-    onDeleteConfirmed: (Person) -> Unit,
-    onDeleteCancelled: () -> Unit,
+    onDeleteRequest: (Person) -> Unit,
+    onDeleteConfirm: (Person) -> Unit,
+    onDeleteCancel: () -> Unit,
     onDeleteWithNotes: (Person) -> Unit,
-    onDeleteWithNotesCancelled: () -> Unit,
+    onDeleteWithNotesCancel: () -> Unit,
 ) {
     StaggeredVerticalGrid(
         modifier = Modifier
@@ -281,11 +281,11 @@ private fun HomeLoadedGrid(
                 showDeleteDialog = person.id == deleteConfirmation,
                 showDeleteWithNotesDialog = person.id == deleteWithNotesConfirmation,
                 onClick = onClick,
-                onDeleteRequested = onDeleteRequested,
-                onDeleteConfirmed = onDeleteConfirmed,
-                onDeleteCancelled = onDeleteCancelled,
+                onDeleteRequest = onDeleteRequest,
+                onDeleteConfirm = onDeleteConfirm,
+                onDeleteCancel = onDeleteCancel,
                 onDeleteWithNotes = onDeleteWithNotes,
-                onDeleteWithNotesCancelled = onDeleteWithNotesCancelled,
+                onDeleteWithNotesCancel = onDeleteWithNotesCancel,
             )
         }
     }
@@ -297,22 +297,22 @@ private fun PersonRow(
     showDeleteDialog: Boolean,
     showDeleteWithNotesDialog: Boolean,
     onClick: (Person) -> Unit,
-    onDeleteRequested: (Person) -> Unit,
-    onDeleteConfirmed: (Person) -> Unit,
-    onDeleteCancelled: () -> Unit,
+    onDeleteRequest: (Person) -> Unit,
+    onDeleteConfirm: (Person) -> Unit,
+    onDeleteCancel: () -> Unit,
     onDeleteWithNotes: (Person) -> Unit,
-    onDeleteWithNotesCancelled: () -> Unit,
+    onDeleteWithNotesCancel: () -> Unit,
 ) {
     PersonCard(
         person = person,
         showDeleteDialog = showDeleteDialog,
         showDeleteWithNotesDialog = showDeleteWithNotesDialog,
         onClick = onClick,
-        onDeleteRequested = onDeleteRequested,
-        onDeleteConfirmed = onDeleteConfirmed,
-        onDeleteCancelled = onDeleteCancelled,
+        onDeleteRequest = onDeleteRequest,
+        onDeleteConfirm = onDeleteConfirm,
+        onDeleteCancel = onDeleteCancel,
         onDeleteWithNotes = onDeleteWithNotes,
-        onDeleteWithNotesCancelled = onDeleteWithNotesCancelled,
+        onDeleteWithNotesCancel = onDeleteWithNotesCancel,
     ) {
         Row {
             PersonImage(
@@ -339,11 +339,11 @@ private fun PersonGrid(
     showDeleteDialog: Boolean,
     showDeleteWithNotesDialog: Boolean,
     onClick: (Person) -> Unit,
-    onDeleteRequested: (Person) -> Unit,
-    onDeleteConfirmed: (Person) -> Unit,
-    onDeleteCancelled: () -> Unit,
+    onDeleteRequest: (Person) -> Unit,
+    onDeleteConfirm: (Person) -> Unit,
+    onDeleteCancel: () -> Unit,
     onDeleteWithNotes: (Person) -> Unit,
-    onDeleteWithNotesCancelled: () -> Unit,
+    onDeleteWithNotesCancel: () -> Unit,
 ) {
     PersonCard(
         modifier = modifier,
@@ -351,11 +351,11 @@ private fun PersonGrid(
         showDeleteDialog = showDeleteDialog,
         showDeleteWithNotesDialog = showDeleteWithNotesDialog,
         onClick = onClick,
-        onDeleteRequested = onDeleteRequested,
-        onDeleteConfirmed = onDeleteConfirmed,
-        onDeleteCancelled = onDeleteCancelled,
+        onDeleteRequest = onDeleteRequest,
+        onDeleteConfirm = onDeleteConfirm,
+        onDeleteCancel = onDeleteCancel,
         onDeleteWithNotes = onDeleteWithNotes,
-        onDeleteWithNotesCancelled = onDeleteWithNotesCancelled,
+        onDeleteWithNotesCancel = onDeleteWithNotesCancel,
     ) {
         Column {
             PersonImage(
@@ -381,11 +381,11 @@ private fun PersonCard(
     showDeleteDialog: Boolean,
     showDeleteWithNotesDialog: Boolean,
     onClick: (Person) -> Unit,
-    onDeleteRequested: (Person) -> Unit,
-    onDeleteConfirmed: (Person) -> Unit,
-    onDeleteCancelled: () -> Unit,
+    onDeleteRequest: (Person) -> Unit,
+    onDeleteConfirm: (Person) -> Unit,
+    onDeleteCancel: () -> Unit,
     onDeleteWithNotes: (Person) -> Unit,
-    onDeleteWithNotesCancelled: () -> Unit,
+    onDeleteWithNotesCancel: () -> Unit,
     content: @Composable () -> Unit,
 ) {
     var selected by rememberSaveable { mutableStateOf(false) }
@@ -412,22 +412,22 @@ private fun PersonCard(
                 onDismissRequest = { selected = false },
             ) { person ->
                 selected = false
-                onDeleteRequested(person)
+                onDeleteRequest(person)
             }
         }
     }
     if (showDeleteDialog) {
         DeletePersonDialog(
             person = person,
-            onDeleteConfirmed = onDeleteConfirmed,
-            onDeleteCancelled = onDeleteCancelled,
+            onDeleteConfirm = onDeleteConfirm,
+            onDeleteCancel = onDeleteCancel,
         )
     }
     if (showDeleteWithNotesDialog) {
         DeletePersonWithNotesDialog(
             person = person,
             onDeleteWithNotes = onDeleteWithNotes,
-            onDeleteWithNotesCancelled = onDeleteWithNotesCancelled,
+            onDeleteWithNotesCancel = onDeleteWithNotesCancel,
         )
     }
 }
@@ -435,8 +435,8 @@ private fun PersonCard(
 @Composable
 private fun DeletePersonDialog(
     person: Person,
-    onDeleteConfirmed: (Person) -> Unit,
-    onDeleteCancelled: () -> Unit,
+    onDeleteConfirm: (Person) -> Unit,
+    onDeleteCancel: () -> Unit,
 ) {
     AlertDialog(
         text = {
@@ -448,16 +448,16 @@ private fun DeletePersonDialog(
             )
         },
         confirmButton = {
-            TextButton(onClick = { onDeleteConfirmed(person) }) {
+            TextButton(onClick = { onDeleteConfirm(person) }) {
                 Text(text = stringResource(id = R.string.yes))
             }
         },
         dismissButton = {
-            TextButton(onClick = onDeleteCancelled) {
+            TextButton(onClick = onDeleteCancel) {
                 Text(text = stringResource(id = R.string.cancel))
             }
         },
-        onDismissRequest = onDeleteCancelled,
+        onDismissRequest = onDeleteCancel,
     )
 }
 
@@ -465,7 +465,7 @@ private fun DeletePersonDialog(
 private fun DeletePersonWithNotesDialog(
     person: Person,
     onDeleteWithNotes: (Person) -> Unit,
-    onDeleteWithNotesCancelled: () -> Unit,
+    onDeleteWithNotesCancel: () -> Unit,
 ) {
     AlertDialog(
         text = {
@@ -482,11 +482,11 @@ private fun DeletePersonWithNotesDialog(
             }
         },
         dismissButton = {
-            TextButton(onClick = onDeleteWithNotesCancelled) {
+            TextButton(onClick = onDeleteWithNotesCancel) {
                 Text(text = stringResource(id = R.string.cancel))
             }
         },
-        onDismissRequest = onDeleteWithNotesCancelled,
+        onDismissRequest = onDeleteWithNotesCancel,
     )
 }
 
@@ -545,15 +545,15 @@ private fun HomeContentPreview(
         Surface {
             HomeContent(
                 state = state,
-                onListStyleChanged = {},
-                onFilterChanged = {},
+                onListStyleChange = {},
+                onFilterChange = {},
                 onClick = {},
-                onDeleteRequested = {},
-                onDeleteConfirmed = {},
-                onDeleteCancelled = {},
+                onDeleteRequest = {},
+                onDeleteConfirm = {},
+                onDeleteCancel = {},
                 onDeleteWithNotes = {},
-                onDeleteWithNotesCancelled = {},
-                onSortByChanged = {},
+                onDeleteWithNotesCancel = {},
+                onSortByChange = {},
                 onAddPersonManuallyClick = {},
                 onImportFromContactsClick = {},
                 onSettingsClick = {},

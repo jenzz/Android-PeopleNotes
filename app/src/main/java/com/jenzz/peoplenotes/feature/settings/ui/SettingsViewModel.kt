@@ -30,7 +30,7 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
-    fun onThemeSelected(theme: ThemePreference) {
+    fun onThemeChange(theme: ThemePreference) {
         viewModelScope.launch {
             useCases.setTheme(theme)
         }

@@ -45,18 +45,18 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    fun onListStyleChanged(listStyle: ListStyle) {
+    fun onListStyleChange(listStyle: ListStyle) {
         state = state.copy(listStyle = listStyle)
     }
 
-    fun onFilterChanged(filter: String) {
+    fun onFilterChange(filter: String) {
         state = state.copy(filter = filter)
         viewModelScope.launch {
             getPeople(filter = filter)
         }
     }
 
-    fun onSortByChanged(sortBy: SortBy) {
+    fun onSortByChange(sortBy: SortBy) {
         state = state.copy(
             sortBy = sortBy,
             toastMessage = ToastMessage(
@@ -68,15 +68,15 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    fun onDeleteRequested(person: Person) {
+    fun onDeleteRequest(person: Person) {
         state = state.copy(deleteConfirmation = person.id)
     }
 
-    fun onDeleteCancelled() {
+    fun onDeleteCancel() {
         state = state.copy(deleteConfirmation = null)
     }
 
-    fun onDeleteConfirmed(person: Person) {
+    fun onDeleteConfirm(person: Person) {
         state = state.copy(
             isLoading = true,
             deleteConfirmation = null,
@@ -113,7 +113,7 @@ class HomeViewModel @Inject constructor(
         )
     }
 
-    fun onDeleteWithNotesCancelled() {
+    fun onDeleteWithNotesCancel() {
         state = state.copy(deleteWithNotesConfirmation = null)
     }
 

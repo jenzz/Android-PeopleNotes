@@ -33,14 +33,14 @@ fun SettingsScreen(
     val state = viewModel.state.value
     SettingsContent(
         state = state,
-        onThemeSelected = viewModel::onThemeSelected,
+        onThemeChange = viewModel::onThemeChange,
     )
 }
 
 @Composable
 private fun SettingsContent(
     state: SettingsUiState,
-    onThemeSelected: (ThemePreference) -> Unit,
+    onThemeChange: (ThemePreference) -> Unit,
 ) {
     Scaffold(
         topBar = {
@@ -57,7 +57,7 @@ private fun SettingsContent(
             is SettingsUiState.Loaded ->
                 SettingsLoaded(
                     settings = state.settings,
-                    onThemeSelected = onThemeSelected,
+                    onThemeChange = onThemeChange,
                 )
         }
     }
@@ -76,12 +76,12 @@ private fun SettingsLoading() {
 @Composable
 private fun SettingsLoaded(
     settings: Settings,
-    onThemeSelected: (ThemePreference) -> Unit,
+    onThemeChange: (ThemePreference) -> Unit,
 ) {
     Column {
         SettingsThemeItem(
             selectedTheme = settings.theme,
-            onThemeSelected = onThemeSelected,
+            onThemeChange = onThemeChange,
         )
         SettingsDivider()
         SettingsAppVersionItem()
@@ -91,7 +91,7 @@ private fun SettingsLoaded(
 @Composable
 private fun SettingsThemeItem(
     selectedTheme: ThemePreference,
-    onThemeSelected: (ThemePreference) -> Unit,
+    onThemeChange: (ThemePreference) -> Unit,
 ) {
     var showDropDown by rememberSaveable { mutableStateOf(false) }
     Box {
@@ -105,9 +105,9 @@ private fun SettingsThemeItem(
             visible = showDropDown,
             onDismissRequest = { showDropDown = false },
             selectedTheme = selectedTheme,
-            onThemeSelected = { theme ->
+            onThemeChange = { theme ->
                 showDropDown = false
-                onThemeSelected(theme)
+                onThemeChange(theme)
             }
         )
     }
@@ -142,7 +142,7 @@ private fun SettingsThemeDropDownMenu(
     visible: Boolean,
     onDismissRequest: () -> Unit,
     selectedTheme: ThemePreference,
-    onThemeSelected: (ThemePreference) -> Unit,
+    onThemeChange: (ThemePreference) -> Unit,
 ) {
     DropdownMenu(
         expanded = visible,
@@ -152,7 +152,7 @@ private fun SettingsThemeDropDownMenu(
             SettingsThemeDropDownItem(
                 theme = theme,
                 isSelected = theme == selectedTheme,
-                onClick = { onThemeSelected(theme) },
+                onClick = { onThemeChange(theme) },
             )
         }
     }
@@ -208,7 +208,7 @@ private fun SettingsContentPreview(
         Surface {
             SettingsContent(
                 state = state,
-                onThemeSelected = {},
+                onThemeChange = {},
             )
         }
     }

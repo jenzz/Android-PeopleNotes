@@ -30,9 +30,9 @@ fun AddPersonScreen(
 ) {
     AddPersonContent(
         state = viewModel.state,
-        onFirstNameChanged = viewModel::onFirstNameChanged,
-        onLastNameChanged = viewModel::onLastNameChanged,
-        onNoteChanged = viewModel::onNoteChanged,
+        onFirstNameChange = viewModel::onFirstNameChange,
+        onLastNameChange = viewModel::onLastNameChange,
+        onNoteChange = viewModel::onNoteChange,
         onAddPersonClick = viewModel::onAddPerson,
         onPersonAdded = onPersonAdded,
     )
@@ -41,9 +41,9 @@ fun AddPersonScreen(
 @Composable
 private fun AddPersonContent(
     state: AddPersonUiState,
-    onFirstNameChanged: (String) -> Unit,
-    onLastNameChanged: (String) -> Unit,
-    onNoteChanged: (String) -> Unit,
+    onFirstNameChange: (String) -> Unit,
+    onLastNameChange: (String) -> Unit,
+    onNoteChange: (String) -> Unit,
     onAddPersonClick: () -> Unit,
     onPersonAdded: () -> Unit,
 ) {
@@ -79,7 +79,7 @@ private fun AddPersonContent(
                 imeAction = ImeAction.Next,
                 keyboardActions = KeyboardActions(onNext = { lastNameInput.requestFocus() }),
                 state = state.firstName,
-                onValueChanged = onFirstNameChanged,
+                onValueChange = onFirstNameChange,
             )
             LastNameInputField(
                 modifier = Modifier.focusRequester(lastNameInput),
@@ -87,7 +87,7 @@ private fun AddPersonContent(
                 imeAction = ImeAction.Next,
                 keyboardActions = KeyboardActions(onNext = { notesInput.requestFocus() }),
                 state = state.lastName,
-                onValueChanged = onLastNameChanged,
+                onValueChange = onLastNameChange,
             )
             NotesInputField(
                 modifier = Modifier.focusRequester(notesInput),
@@ -95,7 +95,7 @@ private fun AddPersonContent(
                 imeAction = ImeAction.Done,
                 keyboardActions = KeyboardActions(onDone = { onSubmit() }),
                 state = TextFieldUiState(state.note),
-                onValueChanged = onNoteChanged,
+                onValueChange = onNoteChange,
             )
             SubmitButton(
                 modifier = Modifier.padding(top = 8.dp),
@@ -116,7 +116,7 @@ private fun FirstNameInputField(
     imeAction: ImeAction,
     keyboardActions: KeyboardActions,
     state: TextFieldUiState,
-    onValueChanged: (String) -> Unit,
+    onValueChange: (String) -> Unit,
 ) {
     PersonInputField(
         modifier = modifier,
@@ -126,7 +126,7 @@ private fun FirstNameInputField(
         imeAction = imeAction,
         keyboardActions = keyboardActions,
         state = state,
-        onValueChanged = onValueChanged,
+        onValueChange = onValueChange,
     )
 }
 
@@ -137,7 +137,7 @@ private fun LastNameInputField(
     imeAction: ImeAction,
     keyboardActions: KeyboardActions,
     state: TextFieldUiState,
-    onValueChanged: (String) -> Unit,
+    onValueChange: (String) -> Unit,
 ) {
     PersonInputField(
         modifier = modifier,
@@ -147,7 +147,7 @@ private fun LastNameInputField(
         imeAction = imeAction,
         keyboardActions = keyboardActions,
         state = state,
-        onValueChanged = onValueChanged,
+        onValueChange = onValueChange,
     )
 }
 
@@ -158,7 +158,7 @@ private fun NotesInputField(
     imeAction: ImeAction,
     keyboardActions: KeyboardActions,
     state: TextFieldUiState,
-    onValueChanged: (String) -> Unit,
+    onValueChange: (String) -> Unit,
 ) {
     PersonInputField(
         modifier = modifier.heightIn(min = 112.dp),
@@ -168,7 +168,7 @@ private fun NotesInputField(
         imeAction = imeAction,
         keyboardActions = keyboardActions,
         state = state,
-        onValueChanged = onValueChanged,
+        onValueChange = onValueChange,
     )
 }
 
@@ -181,7 +181,7 @@ private fun PersonInputField(
     imeAction: ImeAction,
     keyboardActions: KeyboardActions,
     state: TextFieldUiState,
-    onValueChanged: (String) -> Unit,
+    onValueChange: (String) -> Unit,
 ) {
     Column {
         OutlinedTextField(
@@ -193,7 +193,7 @@ private fun PersonInputField(
             keyboardActions = keyboardActions,
             value = state.value,
             isError = state.isError,
-            onValueChange = onValueChanged,
+            onValueChange = onValueChange,
         )
         if (state.isError) {
             Text(
@@ -236,9 +236,9 @@ private fun AddPersonContentPreview(
         Surface {
             AddPersonContent(
                 state = state,
-                onFirstNameChanged = {},
-                onLastNameChanged = {},
-                onNoteChanged = {},
+                onFirstNameChange = {},
+                onLastNameChange = {},
+                onNoteChange = {},
                 onAddPersonClick = {},
                 onPersonAdded = {},
             )

@@ -28,15 +28,15 @@ class AddPersonViewModel @Inject constructor(
     )
         private set
 
-    fun onFirstNameChanged(name: String) {
+    fun onFirstNameChange(name: String) {
         state = state.copy(firstName = state.firstName.copy(value = name, error = null))
     }
 
-    fun onLastNameChanged(name: String) {
+    fun onLastNameChange(name: String) {
         state = state.copy(lastName = state.lastName.copy(value = name, error = null))
     }
 
-    fun onNoteChanged(note: String) {
+    fun onNoteChange(note: String) {
         state = state.copy(note = note)
     }
 
