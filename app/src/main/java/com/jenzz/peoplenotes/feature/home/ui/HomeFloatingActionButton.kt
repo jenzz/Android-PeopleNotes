@@ -8,9 +8,12 @@ import androidx.compose.ui.res.stringResource
 import com.jenzz.peoplenotes.R
 import com.jenzz.peoplenotes.common.ui.widgets.MultiFloatingActionButton
 import com.jenzz.peoplenotes.common.ui.widgets.MultiFloatingActionButtonItem
+import com.jenzz.peoplenotes.common.ui.widgets.MultiFloatingActionButtonState
 
 @Composable
 fun HomeFloatingActionButton(
+    state: MultiFloatingActionButtonState,
+    onStateChange: (MultiFloatingActionButtonState) -> Unit,
     onAddPersonManuallyClick: () -> Unit,
     onImportFromContactsClick: () -> Unit,
 ) {
@@ -25,6 +28,8 @@ fun HomeFloatingActionButton(
         icon = Icons.Default.Person,
     )
     MultiFloatingActionButton(
+        state = state,
+        onStateChange = onStateChange,
         items = listOf(
             addPersonManuallyItem,
             importFromContactsItem,

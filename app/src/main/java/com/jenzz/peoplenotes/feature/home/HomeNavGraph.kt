@@ -16,7 +16,7 @@ object HomeNavGraph : NavGraph {
             },
             onSettingsClick = {
                 navController.navigate(SettingsNavGraph.route.value)
-            }
+            },
         )
     }
 

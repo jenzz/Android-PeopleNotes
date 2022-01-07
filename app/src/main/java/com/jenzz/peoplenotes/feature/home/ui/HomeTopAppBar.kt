@@ -7,7 +7,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
@@ -28,12 +28,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.OffsetMapping
 import androidx.compose.ui.text.input.TransformedText
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.unit.dp
 import com.jenzz.peoplenotes.R
 import com.jenzz.peoplenotes.common.ui.TextResource
 
 @Composable
 fun HomeTopAppBar(
+    modifier: Modifier = Modifier,
     peopleCount: Int,
     showActions: Boolean,
     filter: String,
@@ -44,10 +44,7 @@ fun HomeTopAppBar(
     onSortByChanged: (SortBy) -> Unit,
     onSettingsClick: () -> Unit,
 ) {
-    Row(
-        modifier = Modifier
-            .padding(start = 8.dp, top = 8.dp, end = 8.dp)
-    ) {
+    Row(modifier = modifier) {
         FilterTextField(
             modifier = Modifier.weight(1f),
             peopleCount = peopleCount,
@@ -111,10 +108,12 @@ private fun FilterTextField(
             ) {
                 Row {
                     ListStyleAction(
+                        modifier = Modifier.size(TextFieldDefaults.MinHeight),
                         listStyle = listStyle,
                         onListStyleChanged = onListStyleChanged
                     )
                     SortByAction(
+                        modifier = Modifier.size(TextFieldDefaults.MinHeight),
                         sortBy = sortBy,
                         onSortByChanged = onSortByChanged
                     )
@@ -145,12 +144,16 @@ private fun SettingsIcon(
 
 @Composable
 private fun ListStyleAction(
+    modifier: Modifier = Modifier,
     listStyle: ListStyle,
     onListStyleChanged: (ListStyle) -> Unit,
 ) {
     when (listStyle) {
         ListStyle.Rows -> {
-            IconButton(onClick = { onListStyleChanged(ListStyle.Grid) }) {
+            IconButton(
+                modifier = modifier,
+                onClick = { onListStyleChanged(ListStyle.Grid) },
+            ) {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_grid),
                     contentDescription = stringResource(id = R.string.grid_view),
@@ -158,7 +161,10 @@ private fun ListStyleAction(
             }
         }
         ListStyle.Grid -> {
-            IconButton(onClick = { onListStyleChanged(ListStyle.Rows) }) {
+            IconButton(
+                modifier = modifier,
+                onClick = { onListStyleChanged(ListStyle.Rows) },
+            ) {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_rows),
                     contentDescription = stringResource(id = R.string.rows),
@@ -170,12 +176,14 @@ private fun ListStyleAction(
 
 @Composable
 private fun SortByAction(
+    modifier: Modifier = Modifier,
     sortBy: SortBy,
     onSortByChanged: (SortBy) -> Unit,
 ) {
-    Box {
+    Box(modifier = modifier) {
         var expanded by rememberSaveable { mutableStateOf(false) }
         IconButton(
+            modifier = Modifier.fillMaxSize(),
             onClick = { expanded = !expanded },
         ) {
             Icon(

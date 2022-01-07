@@ -42,6 +42,8 @@ import com.jenzz.peoplenotes.common.ui.TextResource
 import com.jenzz.peoplenotes.common.ui.ToastMessage
 import com.jenzz.peoplenotes.common.ui.showShortToast
 import com.jenzz.peoplenotes.common.ui.theme.PeopleNotesTheme
+import com.jenzz.peoplenotes.common.ui.widgets.MultiFloatingActionButtonContentOverlay
+import com.jenzz.peoplenotes.common.ui.widgets.MultiFloatingActionButtonState.Collapsed
 import com.jenzz.peoplenotes.common.ui.widgets.StaggeredVerticalGrid
 import com.jenzz.peoplenotes.ext.toNonEmptyString
 
@@ -88,10 +90,21 @@ private fun HomeContent(
 ) {
     val context = LocalContext.current
     val scaffoldState = rememberScaffoldState()
+    val floatingActionButtonState = rememberSaveable { mutableStateOf(Collapsed) }
     Scaffold(
         scaffoldState = scaffoldState,
-        topBar = {
+        floatingActionButton = {
+            HomeFloatingActionButton(
+                state = floatingActionButtonState.value,
+                onStateChange = { state -> floatingActionButtonState.value = state },
+                onAddPersonManuallyClick = onAddPersonManuallyClick,
+                onImportFromContactsClick = onImportFromContactsClick,
+            )
+        }
+    ) {
+        Column {
             HomeTopAppBar(
+                modifier = Modifier.padding(start = 8.dp, top = 8.dp, end = 8.dp),
                 peopleCount = state.people.persons.size,
                 filter = state.filter,
                 showActions = state.showActions,
@@ -102,38 +115,35 @@ private fun HomeContent(
                 onSortByChanged = onSortByChanged,
                 onSettingsClick = onSettingsClick,
             )
-        },
-        floatingActionButton = {
-            HomeFloatingActionButton(
-                onAddPersonManuallyClick = onAddPersonManuallyClick,
-                onImportFromContactsClick = onImportFromContactsClick,
-            )
+            when {
+                state.isLoading ->
+                    HomeLoading()
+                state.isEmptyFiltered ->
+                    HomeEmpty(
+                        text = R.string.empty_people_filtered,
+                        icon = R.drawable.ic_sentiment_very_dissatisfied,
+                    )
+                state.isEmpty ->
+                    HomeEmpty(
+                        text = R.string.empty_people,
+                        icon = R.drawable.ic_people,
+                    )
+                else ->
+                    HomeLoaded(
+                        state = state,
+                        onClick = onClick,
+                        onDeleteRequested = onDeleteRequested,
+                        onDeleteConfirmed = onDeleteConfirmed,
+                        onDeleteCancelled = onDeleteCancelled,
+                        onDeleteWithNotes = onDeleteWithNotes,
+                        onDeleteWithNotesCancelled = onDeleteWithNotesCancelled,
+                    )
+            }
         }
-    ) {
-        when {
-            state.isLoading ->
-                HomeLoading()
-            state.isEmptyFiltered ->
-                HomeEmpty(
-                    text = R.string.empty_people_filtered,
-                    icon = R.drawable.ic_sentiment_very_dissatisfied,
-                )
-            state.isEmpty ->
-                HomeEmpty(
-                    text = R.string.empty_people,
-                    icon = R.drawable.ic_people,
-                )
-            else ->
-                HomeLoaded(
-                    state = state,
-                    onClick = onClick,
-                    onDeleteRequested = onDeleteRequested,
-                    onDeleteConfirmed = onDeleteConfirmed,
-                    onDeleteCancelled = onDeleteCancelled,
-                    onDeleteWithNotes = onDeleteWithNotes,
-                    onDeleteWithNotesCancelled = onDeleteWithNotesCancelled,
-                )
-        }
+        MultiFloatingActionButtonContentOverlay(
+            modifier = Modifier.fillMaxSize(),
+            state = floatingActionButtonState,
+        )
     }
     if (state.toastMessage != null) {
         val message = state.toastMessage.text.asString(context.resources)
@@ -232,7 +242,6 @@ private fun HomeLoadedRows(
     ) {
         items(people) { person ->
             PersonRow(
-                modifier = Modifier.padding(4.dp),
                 person = person,
                 showDeleteDialog = person.id == deleteConfirmation,
                 showDeleteWithNotesDialog = person.id == deleteWithNotesConfirmation,
@@ -267,7 +276,7 @@ private fun HomeLoadedGrid(
     ) {
         people.forEach { person ->
             PersonGrid(
-                modifier = Modifier.padding(8.dp),
+                modifier = Modifier.padding(4.dp),
                 person = person,
                 showDeleteDialog = person.id == deleteConfirmation,
                 showDeleteWithNotesDialog = person.id == deleteWithNotesConfirmation,
@@ -284,7 +293,6 @@ private fun HomeLoadedGrid(
 
 @Composable
 private fun PersonRow(
-    modifier: Modifier = Modifier,
     person: Person,
     showDeleteDialog: Boolean,
     showDeleteWithNotesDialog: Boolean,
@@ -296,7 +304,6 @@ private fun PersonRow(
     onDeleteWithNotesCancelled: () -> Unit,
 ) {
     PersonCard(
-        modifier = modifier,
         person = person,
         showDeleteDialog = showDeleteDialog,
         showDeleteWithNotesDialog = showDeleteWithNotesDialog,
