@@ -1,7 +1,7 @@
 package com.jenzz.peoplenotes.feature.home.ui
 
 import android.os.Parcelable
-import com.jenzz.peoplenotes.common.data.people.Person
+import com.jenzz.peoplenotes.common.data.people.People
 import com.jenzz.peoplenotes.common.data.people.PersonId
 import com.jenzz.peoplenotes.common.ui.ToastMessage
 import com.jenzz.peoplenotes.ext.PartialSavedState
@@ -12,15 +12,20 @@ data class HomeUiState(
     val filter: String,
     val listStyle: ListStyle,
     val sortBy: SortBy,
-    val people: List<Person>,
+    val people: People,
     val deleteConfirmation: PersonId?,
     val deleteWithNotesConfirmation: PersonId?,
     val toastMessage: ToastMessage?,
 ) : PartialSavedState<HomeUiState, HomeSavedState> {
 
-    val isEmpty: Boolean = people.isEmpty()
+    val isEmpty: Boolean =
+        people.isEmpty
 
-    val showActions: Boolean = !isLoading && !isEmpty
+    val isEmptyFiltered: Boolean =
+        isEmpty && filter.isNotEmpty() && people.totalCount > 0
+
+    val showActions: Boolean =
+        !isLoading && !isEmpty
 
     override val savedState: HomeSavedState =
         HomeSavedState(

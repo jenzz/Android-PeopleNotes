@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.jenzz.peoplenotes.R
 import com.jenzz.peoplenotes.common.data.people.DeletePersonResult
+import com.jenzz.peoplenotes.common.data.people.People
 import com.jenzz.peoplenotes.common.data.people.Person
 import com.jenzz.peoplenotes.common.ui.TextResource
 import com.jenzz.peoplenotes.common.ui.ToastMessage
@@ -27,7 +28,10 @@ class HomeViewModel @Inject constructor(
             filter = "",
             listStyle = ListStyle.DEFAULT,
             sortBy = SortBy.DEFAULT,
-            people = emptyList(),
+            people = People(
+                persons = emptyList(),
+                totalCount = 0
+            ),
             deleteConfirmation = null,
             deleteWithNotesConfirmation = null,
             toastMessage = null,
