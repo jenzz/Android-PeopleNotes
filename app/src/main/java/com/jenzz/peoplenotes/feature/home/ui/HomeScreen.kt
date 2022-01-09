@@ -42,6 +42,8 @@ import com.jenzz.peoplenotes.common.ui.TextResource
 import com.jenzz.peoplenotes.common.ui.ToastMessage
 import com.jenzz.peoplenotes.common.ui.showShortToast
 import com.jenzz.peoplenotes.common.ui.theme.PeopleNotesTheme
+import com.jenzz.peoplenotes.common.ui.theme.elevation
+import com.jenzz.peoplenotes.common.ui.theme.spacing
 import com.jenzz.peoplenotes.common.ui.widgets.MultiFloatingActionButtonContentOverlay
 import com.jenzz.peoplenotes.common.ui.widgets.MultiFloatingActionButtonState.Collapsed
 import com.jenzz.peoplenotes.common.ui.widgets.StaggeredVerticalGrid
@@ -104,7 +106,11 @@ private fun HomeContent(
     ) {
         Column {
             HomeTopAppBar(
-                modifier = Modifier.padding(start = 8.dp, top = 8.dp, end = 8.dp),
+                modifier = Modifier.padding(
+                    start = MaterialTheme.spacing.medium,
+                    top = MaterialTheme.spacing.medium,
+                    end = MaterialTheme.spacing.medium,
+                ),
                 peopleCount = state.people.persons.size,
                 filter = state.filter,
                 showActions = state.showActions,
@@ -177,7 +183,7 @@ private fun HomeEmpty(
             painter = painterResource(id = icon),
             contentDescription = stringResource(id = R.string.empty_people),
         )
-        Spacer(modifier = Modifier.height(4.dp))
+        Spacer(modifier = Modifier.height(MaterialTheme.spacing.small))
         Text(
             text = stringResource(id = text),
             textAlign = TextAlign.Center,
@@ -237,8 +243,8 @@ private fun HomeLoadedRows(
     onDeleteWithNotesCancel: () -> Unit,
 ) {
     LazyColumn(
-        contentPadding = PaddingValues(8.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
+        contentPadding = PaddingValues(all = MaterialTheme.spacing.medium),
+        verticalArrangement = Arrangement.spacedBy(space = MaterialTheme.spacing.medium),
     ) {
         items(people) { person ->
             PersonRow(
@@ -271,12 +277,12 @@ private fun HomeLoadedGrid(
     StaggeredVerticalGrid(
         modifier = Modifier
             .verticalScroll(rememberScrollState())
-            .padding(4.dp),
+            .padding(all = MaterialTheme.spacing.small),
         maxColumnWidth = 220.dp,
     ) {
         people.forEach { person ->
             PersonGrid(
-                modifier = Modifier.padding(4.dp),
+                modifier = Modifier.padding(all = MaterialTheme.spacing.small),
                 person = person,
                 showDeleteDialog = person.id == deleteConfirmation,
                 showDeleteWithNotesDialog = person.id == deleteWithNotesConfirmation,
@@ -316,12 +322,12 @@ private fun PersonRow(
     ) {
         Row {
             PersonImage(
-                modifier = Modifier.padding(8.dp),
+                modifier = Modifier.padding(all = MaterialTheme.spacing.medium),
                 person = person
             )
             Column(
                 modifier = Modifier
-                    .padding(16.dp)
+                    .padding(all = MaterialTheme.spacing.extraLarge)
                     .fillMaxWidth()
                     .align(Alignment.CenterVertically)
             ) {
@@ -359,12 +365,16 @@ private fun PersonGrid(
     ) {
         Column {
             PersonImage(
-                modifier = Modifier.padding(8.dp),
+                modifier = Modifier.padding(all = MaterialTheme.spacing.medium),
                 person = person
             )
             Column(
                 modifier = Modifier
-                    .padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
+                    .padding(
+                        start = MaterialTheme.spacing.extraLarge,
+                        end = MaterialTheme.spacing.extraLarge,
+                        bottom = MaterialTheme.spacing.extraLarge,
+                    )
                     .fillMaxWidth()
             ) {
                 Text(text = person.fullName, style = MaterialTheme.typography.h6)
@@ -391,7 +401,7 @@ private fun PersonCard(
     var selected by rememberSaveable { mutableStateOf(false) }
     Card(
         modifier = modifier.fillMaxWidth(),
-        elevation = 2.dp,
+        elevation = MaterialTheme.elevation.small,
         shape = RoundedCornerShape(corner = CornerSize(16.dp)),
         border = if (selected)
             BorderStroke(

@@ -23,6 +23,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.jenzz.peoplenotes.BuildConfig
 import com.jenzz.peoplenotes.R
 import com.jenzz.peoplenotes.common.ui.theme.PeopleNotesTheme
+import com.jenzz.peoplenotes.common.ui.theme.spacing
 import com.jenzz.peoplenotes.feature.settings.data.Settings
 import com.jenzz.peoplenotes.feature.settings.data.ThemePreference
 
@@ -125,7 +126,7 @@ fun SettingsItem(
             .fillMaxWidth()
             .height(48.dp)
             .clickable(enabled = enabled, onClick = onClick)
-            .padding(horizontal = 12.dp),
+            .padding(horizontal = MaterialTheme.spacing.large),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -185,7 +186,7 @@ private fun SettingsThemeDropDownItem(
             onClick = onClick,
         )
         Text(
-            modifier = Modifier.padding(start = 8.dp),
+            modifier = Modifier.padding(start = MaterialTheme.spacing.medium),
             text = stringResource(id = theme.label),
         )
     }

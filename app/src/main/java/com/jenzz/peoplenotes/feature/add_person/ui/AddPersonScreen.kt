@@ -22,6 +22,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.jenzz.peoplenotes.R
 import com.jenzz.peoplenotes.common.ui.TextFieldUiState
 import com.jenzz.peoplenotes.common.ui.theme.PeopleNotesTheme
+import com.jenzz.peoplenotes.common.ui.theme.spacing
 
 @Composable
 fun AddPersonScreen(
@@ -64,8 +65,8 @@ private fun AddPersonContent(
         }
     ) {
         Column(
-            modifier = Modifier.padding(12.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
+            modifier = Modifier.padding(all = MaterialTheme.spacing.large),
+            verticalArrangement = Arrangement.spacedBy(space = MaterialTheme.spacing.medium),
         ) {
             val (firstNameInput, lastNameInput, notesInput) = remember { FocusRequester.createRefs() }
             val focusManager = LocalFocusManager.current
@@ -98,7 +99,7 @@ private fun AddPersonContent(
                 onValueChange = onNoteChange,
             )
             SubmitButton(
-                modifier = Modifier.padding(top = 8.dp),
+                modifier = Modifier.padding(top = MaterialTheme.spacing.medium),
                 enabled = state.inputsEnabled,
                 onClick = onSubmit,
             )

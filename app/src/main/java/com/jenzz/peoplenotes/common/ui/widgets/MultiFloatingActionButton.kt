@@ -6,6 +6,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
@@ -19,8 +20,8 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import com.jenzz.peoplenotes.R
+import com.jenzz.peoplenotes.common.ui.theme.spacing
 import com.jenzz.peoplenotes.common.ui.widgets.MultiFloatingActionButtonState.Collapsed
 import com.jenzz.peoplenotes.common.ui.widgets.MultiFloatingActionButtonState.Expanded
 import com.jenzz.peoplenotes.ext.noRippleClickable
@@ -50,8 +51,8 @@ fun MultiFloatingActionButton(
             exit = fadeOut() + shrinkVertically(),
         ) {
             Column(
-                modifier = Modifier.padding(bottom = 12.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp),
+                modifier = Modifier.padding(bottom = MaterialTheme.spacing.large),
+                verticalArrangement = Arrangement.spacedBy(space = MaterialTheme.spacing.large),
             ) {
                 items.forEach { item ->
                     FloatingActionButton(
@@ -61,8 +62,8 @@ fun MultiFloatingActionButton(
                         },
                     ) {
                         Row(
-                            modifier = Modifier.padding(8.dp),
-                            horizontalArrangement = Arrangement.spacedBy(4.dp),
+                            modifier = Modifier.padding(all = MaterialTheme.spacing.medium),
+                            horizontalArrangement = Arrangement.spacedBy(space = MaterialTheme.spacing.small),
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
                             Icon(
@@ -88,7 +89,7 @@ fun MultiFloatingActionButton(
 @Composable
 fun MultiFloatingActionButtonContentOverlay(
     modifier: Modifier = Modifier,
-    state: MutableState<MultiFloatingActionButtonState>
+    state: MutableState<MultiFloatingActionButtonState>,
 ) {
     val alpha = if (state.value == Expanded) 0.20f else 0f
     Box(

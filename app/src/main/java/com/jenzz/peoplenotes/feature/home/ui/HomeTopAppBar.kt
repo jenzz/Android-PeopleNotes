@@ -79,7 +79,7 @@ private fun FilterTextField(
         modifier = modifier
             .background(
                 color = MaterialTheme.colors.onBackground.copy(alpha = 0.05f),
-                shape = RoundedCornerShape(50),
+                shape = RoundedCornerShape(percent = 50),
             ),
         colors = TextFieldDefaults.textFieldColors(
             backgroundColor = Color.Transparent,
