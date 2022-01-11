@@ -6,6 +6,9 @@ import com.jenzz.peoplenotes.common.data.people.Person
 import com.jenzz.peoplenotes.common.data.people.PersonId
 import com.jenzz.peoplenotes.common.data.people.di.FirstName
 import com.jenzz.peoplenotes.common.data.people.di.LastName
+import com.jenzz.peoplenotes.common.data.time.Clock
+import com.jenzz.peoplenotes.common.data.time.toEntity
+import com.jenzz.peoplenotes.common.data.time.toLocalDateTime
 import com.jenzz.peoplenotes.ext.toNonEmptyString
 import com.squareup.sqldelight.runtime.coroutines.asFlow
 import com.squareup.sqldelight.runtime.coroutines.mapToList
@@ -27,6 +30,7 @@ interface NotesDataSource {
 class NotesLocalDataSource @Inject constructor(
     private val noteQueries: NoteQueries,
     private val dispatchers: CoroutineDispatchers,
+    private val clock: Clock,
 ) : NotesDataSource {
 
     private val toNote = {
@@ -42,12 +46,12 @@ class NotesLocalDataSource @Inject constructor(
         Note(
             id = NoteId(id),
             text = text.toNonEmptyString(),
-            lastModified = noteLastModified,
+            lastModified = noteLastModified.toLocalDateTime(),
             person = Person(
                 id = PersonId(personId),
                 firstName = FirstName(firstName.toNonEmptyString()),
                 lastName = LastName(lastName.toNonEmptyString()),
-                lastModified = personLastModified,
+                lastModified = personLastModified.toLocalDateTime(),
             ),
         )
     }
@@ -57,7 +61,11 @@ class NotesLocalDataSource @Inject constructor(
 
     override suspend fun add(note: NewNote, personId: PersonId) {
         withContext(dispatchers.Default) {
-            noteQueries.insert(note.text.toString(), personId.value)
+            noteQueries.insert(
+                text = note.text.toString(),
+                personId = personId.value,
+                lastModified = clock.now().toEntity(),
+            )
         }
     }
 

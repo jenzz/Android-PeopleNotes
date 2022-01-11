@@ -5,6 +5,7 @@
     <string name="sort_by">Sort by</string>
     <string name="sorted_by">Sorted by %1$s</string>
     <string name="last_modified">Last Modified</string>
+    <string name="last_modified_at">Last Modified: %1$s</string>
     <string name="edited">Edited %1$s</string>
     <string name="first_name">First Name</string>
     <string name="first_name_cannot_be_empty">First name cannot be empty.</string>

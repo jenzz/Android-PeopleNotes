@@ -4,6 +4,9 @@ import com.jenzz.peoplenotes.common.data.CoroutineDispatchers
 import com.jenzz.peoplenotes.common.data.PersonQueries
 import com.jenzz.peoplenotes.common.data.people.di.FirstName
 import com.jenzz.peoplenotes.common.data.people.di.LastName
+import com.jenzz.peoplenotes.common.data.time.Clock
+import com.jenzz.peoplenotes.common.data.time.toEntity
+import com.jenzz.peoplenotes.common.data.time.toLocalDateTime
 import com.jenzz.peoplenotes.ext.toNonEmptyString
 import com.jenzz.peoplenotes.feature.home.ui.SortBy
 import com.squareup.sqldelight.runtime.coroutines.asFlow
@@ -25,6 +28,7 @@ interface PeopleDataSource {
 class PeopleLocalDataSource @Inject constructor(
     private val personQueries: PersonQueries,
     private val dispatchers: CoroutineDispatchers,
+    private val clock: Clock,
 ) : PeopleDataSource {
 
     private val toPerson =
@@ -33,7 +37,7 @@ class PeopleLocalDataSource @Inject constructor(
                 id = PersonId(id),
                 firstName = FirstName(firstName.toNonEmptyString()),
                 lastName = LastName(lastName.toNonEmptyString()),
-                lastModified = lastModified,
+                lastModified = lastModified.toLocalDateTime(),
             )
         }
 
@@ -64,6 +68,7 @@ class PeopleLocalDataSource @Inject constructor(
                 personQueries.insert(
                     firstName = person.firstName.value.toString(),
                     lastName = person.lastName.value.toString(),
+                    lastModified = clock.now().toEntity(),
                 )
                 val rowId = personQueries.selectLastInsertRowId().executeAsOne()
                 personQueries

@@ -27,7 +27,7 @@ WHERE rowid = ?;
 
 insert:
 INSERT INTO PersonEntity(firstName, lastName, lastModified)
-VALUES (?, ?, datetime('now'));
+VALUES (?, ?, ?);
 
 delete:
 DELETE

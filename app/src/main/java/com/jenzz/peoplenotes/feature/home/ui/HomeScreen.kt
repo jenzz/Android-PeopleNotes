@@ -38,6 +38,7 @@ import com.jenzz.peoplenotes.common.data.people.Person
 import com.jenzz.peoplenotes.common.data.people.PersonId
 import com.jenzz.peoplenotes.common.data.people.di.FirstName
 import com.jenzz.peoplenotes.common.data.people.di.LastName
+import com.jenzz.peoplenotes.common.data.time.formatFullDateTime
 import com.jenzz.peoplenotes.common.ui.TextResource
 import com.jenzz.peoplenotes.common.ui.ToastMessage
 import com.jenzz.peoplenotes.common.ui.showShortToast
@@ -48,6 +49,7 @@ import com.jenzz.peoplenotes.common.ui.widgets.MultiFloatingActionButtonContentO
 import com.jenzz.peoplenotes.common.ui.widgets.MultiFloatingActionButtonState.Collapsed
 import com.jenzz.peoplenotes.common.ui.widgets.StaggeredVerticalGrid
 import com.jenzz.peoplenotes.ext.toNonEmptyString
+import java.time.LocalDateTime
 
 @Composable
 fun HomeScreen(
@@ -332,7 +334,13 @@ private fun PersonRow(
                     .align(Alignment.CenterVertically)
             ) {
                 Text(text = person.fullName, style = MaterialTheme.typography.h6)
-                Text(text = person.lastModified, style = MaterialTheme.typography.caption)
+                Text(
+                    text = stringResource(
+                        id = R.string.last_modified_at,
+                        person.lastModified.formatFullDateTime(),
+                    ),
+                    style = MaterialTheme.typography.caption
+                )
             }
         }
     }
@@ -378,7 +386,13 @@ private fun PersonGrid(
                     .fillMaxWidth()
             ) {
                 Text(text = person.fullName, style = MaterialTheme.typography.h6)
-                Text(text = person.lastModified, style = MaterialTheme.typography.caption)
+                Text(
+                    text = stringResource(
+                        id = R.string.last_modified_at,
+                        person.lastModified.formatFullDateTime(),
+                    ),
+                    style = MaterialTheme.typography.caption
+                )
             }
         }
     }
@@ -599,7 +613,7 @@ class HomePreviewParameterProvider : CollectionPreviewParameterProvider<HomeUiSt
                         id = PersonId(i),
                         firstName = FirstName("$i First Name".toNonEmptyString()),
                         lastName = LastName("Last Name".toNonEmptyString()),
-                        lastModified = "2012-10-03 12:45",
+                        lastModified = LocalDateTime.now(),
                     )
                 },
                 totalCount = 10

@@ -15,7 +15,7 @@ WHERE personId = :personId;
 insert:
 INSERT
 INTO NoteEntity(text, personId, lastModified)
-VALUES (?, ?, datetime('now'));
+VALUES (?, ?, ?);
 
 delete:
 DELETE
