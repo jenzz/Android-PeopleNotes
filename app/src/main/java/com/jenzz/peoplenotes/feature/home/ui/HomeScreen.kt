@@ -54,6 +54,7 @@ import java.time.LocalDateTime
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel(),
+    onClick: (Person) -> Unit,
     onAddPersonManuallyClick: () -> Unit,
     onSettingsClick: () -> Unit,
 ) {
@@ -61,7 +62,7 @@ fun HomeScreen(
         state = viewModel.state,
         onListStyleChange = viewModel::onListStyleChange,
         onFilterChange = viewModel::onFilterChange,
-        onClick = { /* TODO JD */ },
+        onClick = onClick,
         onDeleteRequest = viewModel::onDeleteRequest,
         onDeleteConfirm = viewModel::onDeleteConfirm,
         onDeleteCancel = viewModel::onDeleteCancel,
