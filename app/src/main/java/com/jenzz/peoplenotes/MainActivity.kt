@@ -5,12 +5,11 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import com.google.accompanist.navigation.animation.AnimatedNavHost
-import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 import com.jenzz.peoplenotes.common.ui.theme.PeopleNotesTheme
+import com.jenzz.peoplenotes.feature.NavGraphs
 import com.jenzz.peoplenotes.feature.settings.data.Settings
 import com.jenzz.peoplenotes.feature.settings.data.SettingsRepository
-import com.jenzz.peoplenotes.navigation.Navigation
+import com.ramcosta.composedestinations.DestinationsNavHost
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -34,18 +33,7 @@ class MainActivity : ComponentActivity() {
         PeopleNotesTheme(
             theme = settingsState.value.theme
         ) {
-            MainScreen()
+            DestinationsNavHost(navGraph = NavGraphs.root)
         }
-    }
-}
-
-@Composable
-private fun MainScreen() {
-    val navController = rememberAnimatedNavController()
-    AnimatedNavHost(
-        navController = navController,
-        startDestination = Navigation.root.value,
-    ) {
-        Navigation.install(this, navController)
     }
 }

@@ -26,7 +26,9 @@ import com.jenzz.peoplenotes.common.ui.theme.PeopleNotesTheme
 import com.jenzz.peoplenotes.common.ui.theme.spacing
 import com.jenzz.peoplenotes.feature.settings.data.Settings
 import com.jenzz.peoplenotes.feature.settings.data.ThemePreference
+import com.ramcosta.composedestinations.annotation.Destination
 
+@Destination(start = true, navGraph = "settings")
 @Composable
 fun SettingsScreen(
     viewModel: SettingsViewModel = hiltViewModel(),

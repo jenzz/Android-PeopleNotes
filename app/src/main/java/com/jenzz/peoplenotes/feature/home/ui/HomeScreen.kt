@@ -49,29 +49,39 @@ import com.jenzz.peoplenotes.common.ui.widgets.MultiFloatingActionButtonContentO
 import com.jenzz.peoplenotes.common.ui.widgets.MultiFloatingActionButtonState.Collapsed
 import com.jenzz.peoplenotes.common.ui.widgets.StaggeredVerticalGrid
 import com.jenzz.peoplenotes.ext.toNonEmptyString
+import com.jenzz.peoplenotes.feature.destinations.AddPersonScreenDestination
+import com.jenzz.peoplenotes.feature.destinations.PersonDetailsScreenDestination
+import com.jenzz.peoplenotes.feature.destinations.SettingsScreenDestination
+import com.ramcosta.composedestinations.annotation.Destination
+import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import java.time.LocalDateTime
 
+@Destination(start = true)
 @Composable
 fun HomeScreen(
+    navigator: DestinationsNavigator,
     viewModel: HomeViewModel = hiltViewModel(),
-    onClick: (Person) -> Unit,
-    onAddPersonManuallyClick: () -> Unit,
-    onSettingsClick: () -> Unit,
 ) {
     HomeContent(
         state = viewModel.state,
         onListStyleChange = viewModel::onListStyleChange,
         onFilterChange = viewModel::onFilterChange,
-        onClick = onClick,
+        onClick = { person ->
+            navigator.navigate(PersonDetailsScreenDestination(person.id))
+        },
         onDeleteRequest = viewModel::onDeleteRequest,
         onDeleteConfirm = viewModel::onDeleteConfirm,
         onDeleteCancel = viewModel::onDeleteCancel,
         onDeleteWithNotes = viewModel::onDeleteWithNotes,
         onDeleteWithNotesCancel = viewModel::onDeleteWithNotesCancel,
         onSortByChange = viewModel::onSortByChange,
-        onAddPersonManuallyClick = onAddPersonManuallyClick,
+        onAddPersonManuallyClick = {
+            navigator.navigate(AddPersonScreenDestination)
+        },
         onImportFromContactsClick = {  /* TODO JD */ },
-        onSettingsClick = onSettingsClick,
+        onSettingsClick = {
+            navigator.navigate(SettingsScreenDestination)
+        },
         onToastMessageShown = viewModel::onToastMessageShown,
     )
 }

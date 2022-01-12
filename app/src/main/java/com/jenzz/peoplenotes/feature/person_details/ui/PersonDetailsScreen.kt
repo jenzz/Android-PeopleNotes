@@ -6,7 +6,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.jenzz.peoplenotes.common.data.people.PersonId
+import com.ramcosta.composedestinations.annotation.Destination
 
+data class PersonDetailsScreenNavArgs(
+    val personId: PersonId
+)
+
+@Destination(navArgsDelegate = PersonDetailsScreenNavArgs::class)
 @Composable
 fun PersonDetailsScreen(
     viewModel: PersonDetailsViewModel = hiltViewModel()
