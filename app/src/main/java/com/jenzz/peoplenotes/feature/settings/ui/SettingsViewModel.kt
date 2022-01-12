@@ -1,7 +1,8 @@
 package com.jenzz.peoplenotes.feature.settings.ui
 
-import androidx.compose.runtime.State
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.jenzz.peoplenotes.feature.settings.data.SettingsUseCases
@@ -17,15 +18,17 @@ class SettingsViewModel @Inject constructor(
     private val useCases: SettingsUseCases,
 ) : ViewModel() {
 
-    private val _state = mutableStateOf<SettingsUiState>(Loading)
-    val state: State<SettingsUiState> = _state
+    var state by mutableStateOf<SettingsUiState>(Loading)
+        private set
 
     init {
         viewModelScope.launch {
             useCases
                 .getSettings()
                 .collect { settings ->
-                    _state.value = SettingsUiState.Loaded(settings)
+                    state = SettingsUiState.Loaded(
+                        settings = settings
+                    )
                 }
         }
     }

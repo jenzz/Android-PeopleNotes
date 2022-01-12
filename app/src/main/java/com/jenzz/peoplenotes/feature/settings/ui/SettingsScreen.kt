@@ -33,9 +33,8 @@ import com.ramcosta.composedestinations.annotation.Destination
 fun SettingsScreen(
     viewModel: SettingsViewModel = hiltViewModel(),
 ) {
-    val state = viewModel.state.value
     SettingsContent(
-        state = state,
+        state = viewModel.state,
         onThemeChange = viewModel::onThemeChange,
     )
 }
