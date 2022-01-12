@@ -10,6 +10,8 @@ import com.jenzz.peoplenotes.feature.NavGraphs
 import com.jenzz.peoplenotes.feature.settings.data.Settings
 import com.jenzz.peoplenotes.feature.settings.data.SettingsRepository
 import com.ramcosta.composedestinations.DestinationsNavHost
+import com.ramcosta.composedestinations.animations.defaults.RootNavGraphDefaultAnimations
+import com.ramcosta.composedestinations.animations.rememberAnimatedNavHostEngine
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -33,7 +35,12 @@ class MainActivity : ComponentActivity() {
         PeopleNotesTheme(
             theme = settingsState.value.theme
         ) {
-            DestinationsNavHost(navGraph = NavGraphs.root)
+            DestinationsNavHost(
+                navGraph = NavGraphs.root,
+                engine = rememberAnimatedNavHostEngine(
+                    rootDefaultAnimations = RootNavGraphDefaultAnimations.ACCOMPANIST_FADING,
+                ),
+            )
         }
     }
 }
