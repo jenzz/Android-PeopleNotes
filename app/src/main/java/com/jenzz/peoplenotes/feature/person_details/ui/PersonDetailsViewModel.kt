@@ -7,7 +7,6 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.jenzz.peoplenotes.feature.destinations.PersonDetailsScreenDestination
-import com.jenzz.peoplenotes.feature.person_details.data.PersonDetails
 import com.jenzz.peoplenotes.feature.person_details.data.PersonDetailsUseCases
 import com.jenzz.peoplenotes.feature.person_details.ui.PersonDetailsUiState.Loading
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -28,13 +27,9 @@ class PersonDetailsViewModel @Inject constructor(
         val personId = PersonDetailsScreenDestination.argsFrom(savedStateHandle).personId
         viewModelScope.launch {
             useCases
-                .getNotesUseCase(personId)
-                .collect { notes ->
-                    state = PersonDetailsUiState.Loaded(
-                        personDetails = PersonDetails(
-                            notes = notes,
-                        )
-                    )
+                .getPersonDetails(personId)
+                .collect { personDetails ->
+                    state = PersonDetailsUiState.Loaded(personDetails)
                 }
         }
     }

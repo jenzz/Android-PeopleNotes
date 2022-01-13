@@ -8,6 +8,9 @@ class PeopleRepository @Inject constructor(
     private val localDataSource: PeopleDataSource,
 ) {
 
+    fun getPerson(personId: PersonId): Flow<Person> =
+        localDataSource.getPerson(personId)
+
     fun getAllPeople(sortBy: SortBy, filter: String): Flow<People> =
         localDataSource.getAllPeople(sortBy, filter)
 

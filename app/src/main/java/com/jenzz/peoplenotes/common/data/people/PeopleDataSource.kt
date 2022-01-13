@@ -11,12 +11,15 @@ import com.jenzz.peoplenotes.ext.toNonEmptyString
 import com.jenzz.peoplenotes.feature.home.ui.SortBy
 import com.squareup.sqldelight.runtime.coroutines.asFlow
 import com.squareup.sqldelight.runtime.coroutines.mapToList
+import com.squareup.sqldelight.runtime.coroutines.mapToOne
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 interface PeopleDataSource {
+
+    fun getPerson(personId: PersonId): Flow<Person>
 
     fun getAllPeople(sortBy: SortBy, filter: String): Flow<People>
 
@@ -40,6 +43,12 @@ class PeopleLocalDataSource @Inject constructor(
                 lastModified = lastModified.toLocalDateTime(),
             )
         }
+
+    override fun getPerson(personId: PersonId): Flow<Person> =
+        personQueries
+            .selectById(personId.value, toPerson)
+            .asFlow()
+            .mapToOne()
 
     override fun getAllPeople(sortBy: SortBy, filter: String): Flow<People> {
         val comparator = when (sortBy) {

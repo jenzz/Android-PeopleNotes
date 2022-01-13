@@ -2,8 +2,6 @@ package com.jenzz.peoplenotes.feature.home.ui
 
 import android.content.res.Configuration.UI_MODE_NIGHT_NO
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
-import androidx.annotation.DrawableRes
-import androidx.annotation.StringRes
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -23,10 +21,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.datasource.CollectionPreviewParameterProvider
@@ -45,6 +41,7 @@ import com.jenzz.peoplenotes.common.ui.showShortToast
 import com.jenzz.peoplenotes.common.ui.theme.PeopleNotesTheme
 import com.jenzz.peoplenotes.common.ui.theme.elevation
 import com.jenzz.peoplenotes.common.ui.theme.spacing
+import com.jenzz.peoplenotes.common.ui.widgets.EmptyView
 import com.jenzz.peoplenotes.common.ui.widgets.MultiFloatingActionButtonContentOverlay
 import com.jenzz.peoplenotes.common.ui.widgets.MultiFloatingActionButtonState.Collapsed
 import com.jenzz.peoplenotes.common.ui.widgets.StaggeredVerticalGrid
@@ -138,13 +135,15 @@ private fun HomeContent(
                 state.isLoading ->
                     HomeLoading()
                 state.isEmptyFiltered ->
-                    HomeEmpty(
-                        text = R.string.empty_people_filtered,
+                    EmptyView(
+                        modifier = Modifier.fillMaxSize(),
+                        text = stringResource(id = R.string.empty_people_filtered),
                         icon = R.drawable.ic_sentiment_very_dissatisfied,
                     )
                 state.isEmpty ->
-                    HomeEmpty(
-                        text = R.string.empty_people,
+                    EmptyView(
+                        modifier = Modifier.fillMaxSize(),
+                        text = stringResource(id = R.string.empty_people),
                         icon = R.drawable.ic_people,
                     )
                 else ->
@@ -178,30 +177,6 @@ private fun HomeLoading() {
         contentAlignment = Alignment.Center,
     ) {
         CircularProgressIndicator()
-    }
-}
-
-@Composable
-private fun HomeEmpty(
-    @StringRes text: Int,
-    @DrawableRes icon: Int,
-) {
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        Icon(
-            modifier = Modifier.size(48.dp),
-            painter = painterResource(id = icon),
-            contentDescription = stringResource(id = R.string.empty_people),
-        )
-        Spacer(modifier = Modifier.height(MaterialTheme.spacing.small))
-        Text(
-            text = stringResource(id = text),
-            textAlign = TextAlign.Center,
-            style = MaterialTheme.typography.caption,
-        )
     }
 }
 

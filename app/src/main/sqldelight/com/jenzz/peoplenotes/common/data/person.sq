@@ -17,6 +17,11 @@ WHERE
     THEN firstName LIKE :filter OR lastName LIKE :filter OR (firstName || ' ' || lastName) LIKE :filter
     ELSE 1 END;
 
+selectById:
+SELECT *
+FROM PersonEntity
+WHERE id = :personId;
+
 selectLastInsertRowId:
 SELECT last_insert_rowid();
 
