@@ -4,8 +4,10 @@ import android.content.res.Configuration
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
@@ -33,10 +35,7 @@ import com.jenzz.peoplenotes.common.ui.showShortToast
 import com.jenzz.peoplenotes.common.ui.theme.PeopleNotesTheme
 import com.jenzz.peoplenotes.common.ui.theme.elevation
 import com.jenzz.peoplenotes.common.ui.theme.spacing
-import com.jenzz.peoplenotes.common.ui.widgets.EmptyView
-import com.jenzz.peoplenotes.common.ui.widgets.LoadingView
-import com.jenzz.peoplenotes.common.ui.widgets.SearchBar
-import com.jenzz.peoplenotes.common.ui.widgets.SearchBarUiState
+import com.jenzz.peoplenotes.common.ui.widgets.*
 import com.jenzz.peoplenotes.ext.stringResourceWithStyledPlaceholders
 import com.jenzz.peoplenotes.ext.toNonEmptyString
 import com.jenzz.peoplenotes.feature.destinations.SettingsScreenDestination
@@ -141,9 +140,7 @@ fun PersonDetailsContent(
                             icon = R.drawable.ic_note,
                         )
                     else ->
-                        PersonDetailsNotes(
-                            notes = state.personDetails.notes,
-                        )
+                        PersonDetailsLoaded(state = state)
                 }
             }
         }
@@ -156,7 +153,23 @@ fun PersonDetailsContent(
 }
 
 @Composable
-private fun PersonDetailsNotes(
+private fun PersonDetailsLoaded(
+    state: PersonDetailsUiState.Loaded,
+) {
+    when (state.searchBarState.listStyle) {
+        ListStyle.Rows ->
+            PersonDetailsLoadedRows(
+                notes = state.personDetails.notes,
+            )
+        ListStyle.Grid ->
+            PersonDetailsLoadedGrid(
+                notes = state.personDetails.notes,
+            )
+    }
+}
+
+@Composable
+private fun PersonDetailsLoadedRows(
     notes: Notes,
 ) {
     LazyColumn(
@@ -170,11 +183,47 @@ private fun PersonDetailsNotes(
 }
 
 @Composable
+private fun PersonDetailsLoadedGrid(
+    notes: Notes,
+) {
+    StaggeredVerticalGrid(
+        modifier = Modifier
+            .verticalScroll(rememberScrollState())
+            .padding(all = MaterialTheme.spacing.small),
+        maxColumnWidth = 220.dp,
+    ) {
+        notes.notes.forEach { note ->
+            NoteGrid(
+                modifier = Modifier.padding(all = MaterialTheme.spacing.small),
+                note = note,
+            )
+        }
+    }
+}
+
+@Composable
 private fun NoteRow(
     note: Note,
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
+        elevation = MaterialTheme.elevation.small,
+        shape = RoundedCornerShape(corner = CornerSize(16.dp)),
+    ) {
+        Text(
+            modifier = Modifier.padding(all = MaterialTheme.spacing.medium),
+            text = note.text.value,
+        )
+    }
+}
+
+@Composable
+fun NoteGrid(
+    modifier: Modifier = Modifier,
+    note: Note,
+) {
+    Card(
+        modifier = modifier.fillMaxWidth(),
         elevation = MaterialTheme.elevation.small,
         shape = RoundedCornerShape(corner = CornerSize(16.dp)),
     ) {
