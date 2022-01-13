@@ -2,6 +2,7 @@
 
     <string name="app_name">People Notes</string>
     <string name="search_people">Search people (%1$d)</string>
+    <string name="search_notes">Search notes (%1$d)</string>
     <string name="sort_by">Sort by</string>
     <string name="sorted_by">Sorted by %1$s</string>
     <string name="last_modified">Last Modified</string>
@@ -23,8 +24,9 @@
     <string name="delete">Delete</string>
     <string name="person_deleted">%1$s deleted.</string>
     <string name="empty_people">Wow, such empty.\nAdd a person to get started.</string>
-    <string name="empty_notes">Wow, such empty.\nNotes for %1$s will show up here.</string>
     <string name="empty_people_filtered">Oops.\nNobody found with that name.</string>
+    <string name="empty_notes">Wow, such empty.\nNotes for %1$s will show up here.</string>
+    <string name="empty_notes_filtered">Oops.\nNo notes are matching your search.</string>
     <string name="grid_view">Grid view</string>
     <string name="rows">Rows</string>
     <string name="app_version">App Version</string>

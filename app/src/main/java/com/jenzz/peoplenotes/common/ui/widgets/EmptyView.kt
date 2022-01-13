@@ -9,11 +9,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.jenzz.peoplenotes.R
 import com.jenzz.peoplenotes.common.ui.theme.spacing
 
 @Composable
@@ -49,7 +47,7 @@ fun EmptyView(
         Icon(
             modifier = Modifier.size(48.dp),
             painter = painterResource(id = icon),
-            contentDescription = stringResource(id = R.string.empty_people),
+            contentDescription = text.text,
         )
         Spacer(modifier = Modifier.height(MaterialTheme.spacing.small))
         Text(

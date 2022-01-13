@@ -9,6 +9,7 @@ import com.jenzz.peoplenotes.common.data.people.People
 import com.jenzz.peoplenotes.common.data.people.Person
 import com.jenzz.peoplenotes.common.ui.TextResource
 import com.jenzz.peoplenotes.common.ui.ToastMessage
+import com.jenzz.peoplenotes.common.ui.widgets.SearchBarState
 import com.jenzz.peoplenotes.ext.mutableStateOf
 import com.jenzz.peoplenotes.feature.home.data.HomeUseCases
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -20,18 +21,14 @@ import javax.inject.Inject
 class HomeViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val useCases: HomeUseCases,
+    private val searchBarState: SearchBarState,
 ) : ViewModel() {
 
     var state by savedStateHandle.mutableStateOf(
         defaultValue = HomeUiState(
             isLoading = true,
-            filter = "",
-            listStyle = ListStyle.DEFAULT,
-            sortBy = SortBy.DEFAULT,
-            people = People(
-                persons = emptyList(),
-                totalCount = 0
-            ),
+            searchBarState = searchBarState.state,
+            people = People.DEFAULT,
             deleteConfirmation = null,
             deleteWithNotesConfirmation = null,
             toastMessage = null,
@@ -45,20 +42,20 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    fun onListStyleChange(listStyle: ListStyle) {
-        state = state.copy(listStyle = listStyle)
+    fun onSearchTermChange(searchTerm: String) {
+        state = state.copy(searchBarState = searchBarState.onSearchTermChange(searchTerm))
+        viewModelScope.launch {
+            getPeople(filter = searchTerm)
+        }
     }
 
-    fun onFilterChange(filter: String) {
-        state = state.copy(filter = filter)
-        viewModelScope.launch {
-            getPeople(filter = filter)
-        }
+    fun onListStyleChange(listStyle: ListStyle) {
+        state = state.copy(searchBarState = searchBarState.onListStyleChange(listStyle))
     }
 
     fun onSortByChange(sortBy: SortBy) {
         state = state.copy(
-            sortBy = sortBy,
+            searchBarState = searchBarState.onSortByChange(sortBy),
             toastMessage = ToastMessage(
                 text = TextResource.fromId(R.string.sorted_by, sortBy.label)
             ),
@@ -122,8 +119,8 @@ class HomeViewModel @Inject constructor(
     }
 
     private suspend fun getPeople(
-        sortBy: SortBy = state.sortBy,
-        filter: String = state.filter,
+        sortBy: SortBy = state.searchBarState.sortBy,
+        filter: String = state.searchBarState.searchTerm,
     ) {
         state = state.copy(isLoading = true)
         useCases

@@ -35,16 +35,15 @@ import com.jenzz.peoplenotes.common.data.people.PersonId
 import com.jenzz.peoplenotes.common.data.people.di.FirstName
 import com.jenzz.peoplenotes.common.data.people.di.LastName
 import com.jenzz.peoplenotes.common.data.time.formatFullDateTime
+import com.jenzz.peoplenotes.common.ui.SuffixVisualTransformation
 import com.jenzz.peoplenotes.common.ui.TextResource
 import com.jenzz.peoplenotes.common.ui.ToastMessage
 import com.jenzz.peoplenotes.common.ui.showShortToast
 import com.jenzz.peoplenotes.common.ui.theme.PeopleNotesTheme
 import com.jenzz.peoplenotes.common.ui.theme.elevation
 import com.jenzz.peoplenotes.common.ui.theme.spacing
-import com.jenzz.peoplenotes.common.ui.widgets.EmptyView
-import com.jenzz.peoplenotes.common.ui.widgets.MultiFloatingActionButtonContentOverlay
+import com.jenzz.peoplenotes.common.ui.widgets.*
 import com.jenzz.peoplenotes.common.ui.widgets.MultiFloatingActionButtonState.Collapsed
-import com.jenzz.peoplenotes.common.ui.widgets.StaggeredVerticalGrid
 import com.jenzz.peoplenotes.ext.toNonEmptyString
 import com.jenzz.peoplenotes.feature.destinations.AddPersonScreenDestination
 import com.jenzz.peoplenotes.feature.destinations.PersonDetailsScreenDestination
@@ -62,7 +61,7 @@ fun HomeScreen(
     HomeContent(
         state = viewModel.state,
         onListStyleChange = viewModel::onListStyleChange,
-        onFilterChange = viewModel::onFilterChange,
+        onSearchTermChange = viewModel::onSearchTermChange,
         onClick = { person ->
             navigator.navigate(PersonDetailsScreenDestination(person.id))
         },
@@ -87,7 +86,7 @@ fun HomeScreen(
 private fun HomeContent(
     state: HomeUiState,
     onListStyleChange: (ListStyle) -> Unit,
-    onFilterChange: (String) -> Unit,
+    onSearchTermChange: (String) -> Unit,
     onClick: (Person) -> Unit,
     onDeleteRequest: (Person) -> Unit,
     onDeleteConfirm: (Person) -> Unit,
@@ -115,19 +114,20 @@ private fun HomeContent(
         }
     ) {
         Column {
-            HomeTopAppBar(
+            SearchBar(
                 modifier = Modifier.padding(
                     start = MaterialTheme.spacing.medium,
                     top = MaterialTheme.spacing.medium,
                     end = MaterialTheme.spacing.medium,
                 ),
-                peopleCount = state.people.persons.size,
-                filter = state.filter,
-                showActions = state.showActions,
-                onFilterChange = onFilterChange,
-                listStyle = state.listStyle,
+                state = state.searchBarState,
+                placeholder = stringResource(R.string.search_people, state.people.persons.size),
+                visualTransformation = SuffixVisualTransformation(
+                    text = state.searchBarState.searchTerm,
+                    suffix = " (${state.people.persons.size})",
+                ),
+                onSearchTermChange = onSearchTermChange,
                 onListStyleChange = onListStyleChange,
-                sortBy = state.sortBy,
                 onSortByChange = onSortByChange,
                 onSettingsClick = onSettingsClick,
             )
@@ -190,7 +190,7 @@ private fun HomeLoaded(
     onDeleteWithNotes: (Person) -> Unit,
     onDeleteWithNotesCancel: () -> Unit,
 ) {
-    when (state.listStyle) {
+    when (state.searchBarState.listStyle) {
         ListStyle.Rows ->
             HomeLoadedRows(
                 people = state.people.persons,
@@ -556,7 +556,7 @@ private fun HomeContentPreview(
             HomeContent(
                 state = state,
                 onListStyleChange = {},
-                onFilterChange = {},
+                onSearchTermChange = {},
                 onClick = {},
                 onDeleteRequest = {},
                 onDeleteConfirm = {},
@@ -577,9 +577,7 @@ class HomePreviewParameterProvider : CollectionPreviewParameterProvider<HomeUiSt
     listOf(
         HomeUiState(
             isLoading = true,
-            filter = "",
-            listStyle = ListStyle.Rows,
-            sortBy = SortBy.DEFAULT,
+            searchBarState = SearchBarUiState.DEFAULT,
             people = People(
                 persons = emptyList(),
                 totalCount = 0
@@ -590,9 +588,7 @@ class HomePreviewParameterProvider : CollectionPreviewParameterProvider<HomeUiSt
         ),
         HomeUiState(
             isLoading = false,
-            filter = "",
-            listStyle = ListStyle.Rows,
-            sortBy = SortBy.DEFAULT,
+            searchBarState = SearchBarUiState.DEFAULT,
             people = People(
                 persons = (1..10).map { i ->
                     Person(
@@ -602,7 +598,7 @@ class HomePreviewParameterProvider : CollectionPreviewParameterProvider<HomeUiSt
                         lastModified = LocalDateTime.now(),
                     )
                 },
-                totalCount = 10
+                totalCount = 10,
             ),
             deleteConfirmation = null,
             deleteWithNotesConfirmation = null,
@@ -610,17 +606,14 @@ class HomePreviewParameterProvider : CollectionPreviewParameterProvider<HomeUiSt
         ),
         HomeUiState(
             isLoading = false,
-            filter = "",
-            listStyle = ListStyle.Rows,
-            sortBy = SortBy.DEFAULT,
+            searchBarState = SearchBarUiState.DEFAULT,
             people = People(
                 persons = emptyList(),
                 totalCount = 0
             ),
             deleteConfirmation = PersonId(1),
             deleteWithNotesConfirmation = null,
-            toastMessage =
-            ToastMessage(
+            toastMessage = ToastMessage(
                 text = TextResource.fromText("User Message 1")
             ),
         ),

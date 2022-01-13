@@ -1,19 +1,19 @@
 package com.jenzz.peoplenotes.feature.person_details.data
 
-import com.jenzz.peoplenotes.common.data.notes.Note
+import com.jenzz.peoplenotes.common.data.notes.Notes
 import com.jenzz.peoplenotes.common.data.people.Person
 
 data class PersonDetails(
     val person: Person,
-    val notes: List<Note>,
+    val notes: Notes,
 ) {
 
     init {
-        check(notes.all { note -> note.person == person }) {
+        check(notes.notes.all { note -> note.person == person }) {
             "Notes must have same author."
         }
     }
 
     val isEmpty: Boolean =
-        notes.isEmpty()
+        notes.isEmpty
 }

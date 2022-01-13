@@ -10,15 +10,19 @@ import com.jenzz.peoplenotes.common.data.time.Clock
 import com.jenzz.peoplenotes.common.data.time.toEntity
 import com.jenzz.peoplenotes.common.data.time.toLocalDateTime
 import com.jenzz.peoplenotes.ext.toNonEmptyString
+import com.jenzz.peoplenotes.feature.home.ui.SortBy
 import com.squareup.sqldelight.runtime.coroutines.asFlow
 import com.squareup.sqldelight.runtime.coroutines.mapToList
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 interface NotesDataSource {
 
-    fun getNotes(personId: PersonId): Flow<List<Note>>
+    fun getNotes(personId: PersonId): Flow<Notes>
+
+    fun getNotes(personId: PersonId, sortBy: SortBy, filter: String): Flow<Notes>
 
     suspend fun add(note: NewNote, personId: PersonId)
 
@@ -56,8 +60,40 @@ class NotesLocalDataSource @Inject constructor(
         )
     }
 
-    override fun getNotes(personId: PersonId): Flow<List<Note>> =
-        noteQueries.selectAll(personId.value, toNote).asFlow().mapToList()
+    override fun getNotes(personId: PersonId): Flow<Notes> =
+        noteQueries
+            .selectAll(personId.value, toNote)
+            .asFlow()
+            .mapToList()
+            .map { notes ->
+                withContext(dispatchers.Default) {
+                    Notes(
+                        notes = notes,
+                        totalCount = noteQueries.count().executeAsOne().toInt(),
+                    )
+                }
+            }
+
+    override fun getNotes(personId: PersonId, sortBy: SortBy, filter: String): Flow<Notes> {
+        val comparator = when (sortBy) {
+            SortBy.FirstName -> compareBy { note: Note -> note.person.firstName }
+            SortBy.LastName -> compareBy { note: Note -> note.person.lastName }
+            SortBy.LastModified -> compareByDescending { note: Note -> note.lastModified }
+        }
+        val filterSql = if (filter.isNotEmpty()) "%$filter%" else null
+        return noteQueries
+            .selectAllFilteredByText(personId.value, filterSql, toNote)
+            .asFlow()
+            .mapToList()
+            .map { notes ->
+                withContext(dispatchers.Default) {
+                    Notes(
+                        notes = notes.sortedWith(comparator),
+                        totalCount = noteQueries.count().executeAsOne().toInt(),
+                    )
+                }
+            }
+    }
 
     override suspend fun add(note: NewNote, personId: PersonId) {
         withContext(dispatchers.Default) {

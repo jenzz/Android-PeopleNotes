@@ -6,8 +6,16 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.jenzz.peoplenotes.R
+import com.jenzz.peoplenotes.common.ui.TextResource
+import com.jenzz.peoplenotes.common.ui.ToastMessage
+import com.jenzz.peoplenotes.common.ui.widgets.SearchBarState
+import com.jenzz.peoplenotes.common.ui.widgets.SearchBarUiState
 import com.jenzz.peoplenotes.feature.destinations.PersonDetailsScreenDestination
+import com.jenzz.peoplenotes.feature.home.ui.ListStyle
+import com.jenzz.peoplenotes.feature.home.ui.SortBy
 import com.jenzz.peoplenotes.feature.person_details.data.PersonDetailsUseCases
+import com.jenzz.peoplenotes.feature.person_details.ui.PersonDetailsUiState.Loaded
 import com.jenzz.peoplenotes.feature.person_details.ui.PersonDetailsUiState.Loading
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.collect
@@ -17,20 +25,77 @@ import javax.inject.Inject
 @HiltViewModel
 class PersonDetailsViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
-    useCases: PersonDetailsUseCases,
+    private val useCases: PersonDetailsUseCases,
+    private val searchBarState: SearchBarState,
 ) : ViewModel() {
 
-    var state by mutableStateOf<PersonDetailsUiState>(Loading)
+    private val personId = PersonDetailsScreenDestination.argsFrom(savedStateHandle).personId
+
+    var state by mutableStateOf<PersonDetailsUiState>(
+        Loading(
+            searchBarState = SearchBarUiState.DEFAULT,
+            toastMessage = null,
+        )
+    )
         private set
 
     init {
-        val personId = PersonDetailsScreenDestination.argsFrom(savedStateHandle).personId
         viewModelScope.launch {
             useCases
                 .getPersonDetails(personId)
                 .collect { personDetails ->
-                    state = PersonDetailsUiState.Loaded(personDetails)
+                    state = Loaded(
+                        isLoading = false,
+                        searchBarState = state.searchBarState,
+                        personDetails = personDetails,
+                        toastMessage = null,
+                    )
                 }
         }
+    }
+
+    fun onSearchTermChange(searchTerm: String) {
+        // TODO JD Clean up this mess!
+        val loadedState = state as Loaded
+        state = loadedState.copy(searchBarState = searchBarState.onSearchTermChange(searchTerm))
+        viewModelScope.launch {
+            getPersonDetails(filter = searchTerm)
+        }
+    }
+
+    fun onListStyleChange(listStyle: ListStyle) {
+        val loadedState = state as Loaded
+        state = loadedState.copy(searchBarState = searchBarState.onListStyleChange(listStyle))
+    }
+
+    fun onSortByChange(sortBy: SortBy) {
+        val loadedState = state as Loaded
+        state = loadedState.copy(
+            searchBarState = searchBarState.onSortByChange(sortBy),
+            toastMessage = ToastMessage(
+                text = TextResource.fromId(R.string.sorted_by, sortBy.label)
+            ),
+        )
+        viewModelScope.launch {
+            getPersonDetails(sortBy = sortBy)
+        }
+    }
+
+    private suspend fun getPersonDetails(
+        sortBy: SortBy = state.searchBarState.sortBy,
+        filter: String = state.searchBarState.searchTerm,
+    ) {
+        val loadedState = state as Loaded
+        state = loadedState.copy(
+            isLoading = true
+        )
+        useCases
+            .getPersonDetails(personId, sortBy, filter)
+            .collect { personDetails ->
+                state = loadedState.copy(
+                    isLoading = false,
+                    personDetails = personDetails,
+                )
+            }
     }
 }

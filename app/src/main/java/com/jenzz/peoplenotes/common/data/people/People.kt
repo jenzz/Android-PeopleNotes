@@ -5,5 +5,13 @@ data class People(
     val totalCount: Int,
 ) {
 
+    companion object {
+
+        val DEFAULT = People(
+            persons = emptyList(),
+            totalCount = 0,
+        )
+    }
+
     val isEmpty: Boolean = persons.isEmpty()
 }

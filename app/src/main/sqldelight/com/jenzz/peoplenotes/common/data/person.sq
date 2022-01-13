@@ -13,9 +13,10 @@ selectAll:
 SELECT *
 FROM PersonEntity
 WHERE
-    CASE WHEN :filter IS NOT NULL
+CASE WHEN :filter IS NOT NULL
     THEN firstName LIKE :filter OR lastName LIKE :filter OR (firstName || ' ' || lastName) LIKE :filter
-    ELSE 1 END;
+    ELSE 1
+END;
 
 selectById:
 SELECT *

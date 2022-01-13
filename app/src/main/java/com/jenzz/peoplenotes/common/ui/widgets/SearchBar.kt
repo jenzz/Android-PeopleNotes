@@ -1,5 +1,6 @@
-package com.jenzz.peoplenotes.feature.home.ui
+package com.jenzz.peoplenotes.common.ui.widgets
 
+import android.os.Parcelable
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
@@ -23,38 +24,38 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.OffsetMapping
-import androidx.compose.ui.text.input.TransformedText
 import androidx.compose.ui.text.input.VisualTransformation
 import com.jenzz.peoplenotes.R
 import com.jenzz.peoplenotes.common.ui.TextResource
+import com.jenzz.peoplenotes.feature.home.ui.ListStyle
+import com.jenzz.peoplenotes.feature.home.ui.SortBy
+import kotlinx.parcelize.Parcelize
+import javax.inject.Inject
 
 @Composable
-fun HomeTopAppBar(
+fun SearchBar(
     modifier: Modifier = Modifier,
-    peopleCount: Int,
-    showActions: Boolean,
-    filter: String,
-    onFilterChange: (String) -> Unit,
-    listStyle: ListStyle,
+    state: SearchBarUiState,
+    placeholder: String,
+    visualTransformation: () -> VisualTransformation,
+    onSearchTermChange: (String) -> Unit,
     onListStyleChange: (ListStyle) -> Unit,
-    sortBy: SortBy,
     onSortByChange: (SortBy) -> Unit,
     onSettingsClick: () -> Unit,
 ) {
     Row(modifier = modifier) {
-        FilterTextField(
+        SearchTextField(
             modifier = Modifier.weight(1f),
-            peopleCount = peopleCount,
-            showActions = showActions,
-            filter = filter,
-            onFilterChang = onFilterChange,
-            listStyle = listStyle,
-            onListStyleChang = onListStyleChange,
-            sortBy = sortBy,
-            onSortByChang = onSortByChange,
+            placeholder = placeholder,
+            visualTransformation = visualTransformation,
+            showActions = state.showActions,
+            searchTerm = state.searchTerm,
+            onSearchTermChange = onSearchTermChange,
+            listStyle = state.listStyle,
+            onListStyleChange = onListStyleChange,
+            sortBy = state.sortBy,
+            onSortByChange = onSortByChange,
         )
         SettingsIcon(
             modifier = Modifier.size(TextFieldDefaults.MinHeight),
@@ -64,16 +65,17 @@ fun HomeTopAppBar(
 }
 
 @Composable
-private fun FilterTextField(
+private fun SearchTextField(
     modifier: Modifier = Modifier,
-    peopleCount: Int,
+    placeholder: String,
+    visualTransformation: () -> VisualTransformation,
     showActions: Boolean,
-    filter: String,
-    onFilterChang: (String) -> Unit,
+    searchTerm: String,
+    onSearchTermChange: (String) -> Unit,
     listStyle: ListStyle,
-    onListStyleChang: (ListStyle) -> Unit,
+    onListStyleChange: (ListStyle) -> Unit,
     sortBy: SortBy,
-    onSortByChang: (SortBy) -> Unit,
+    onSortByChange: (SortBy) -> Unit,
 ) {
     TextField(
         modifier = modifier
@@ -87,19 +89,10 @@ private fun FilterTextField(
             unfocusedIndicatorColor = Color.Transparent,
         ),
         singleLine = true,
-        value = filter,
-        onValueChange = onFilterChang,
-        placeholder = { Text(text = stringResource(R.string.search_people, peopleCount)) },
-        visualTransformation =
-        if (filter.isEmpty())
-            VisualTransformation.None
-        else
-            VisualTransformation { text ->
-                TransformedText(
-                    text = AnnotatedString(text.text + " ($peopleCount)"),
-                    offsetMapping = OffsetMapping.Identity,
-                )
-            },
+        value = searchTerm,
+        onValueChange = onSearchTermChange,
+        placeholder = { Text(text = placeholder) },
+        visualTransformation = visualTransformation(),
         trailingIcon = {
             AnimatedVisibility(
                 visible = showActions,
@@ -110,12 +103,12 @@ private fun FilterTextField(
                     ListStyleAction(
                         modifier = Modifier.size(TextFieldDefaults.MinHeight),
                         listStyle = listStyle,
-                        onListStyleChange = onListStyleChang
+                        onListStyleChange = onListStyleChange
                     )
                     SortByAction(
                         modifier = Modifier.size(TextFieldDefaults.MinHeight),
                         sortBy = sortBy,
-                        onSortByChang = onSortByChang
+                        onSortByChang = onSortByChange
                     )
                 }
             }
@@ -232,5 +225,45 @@ private fun SortByDropdownItem(
             text = text.asString(context.resources),
             style = style,
         )
+    }
+}
+
+@Parcelize
+data class SearchBarUiState(
+    val searchTerm: String,
+    val listStyle: ListStyle,
+    val sortBy: SortBy,
+    val showActions: Boolean,
+) : Parcelable {
+
+    companion object {
+
+        val DEFAULT = SearchBarUiState(
+            searchTerm = "",
+            listStyle = ListStyle.DEFAULT,
+            sortBy = SortBy.DEFAULT,
+            showActions = false,
+        )
+    }
+}
+
+class SearchBarState @Inject constructor() {
+
+    var state by mutableStateOf(SearchBarUiState.DEFAULT)
+        private set
+
+    fun onSearchTermChange(searchTerm: String): SearchBarUiState {
+        state = state.copy(searchTerm = searchTerm)
+        return state
+    }
+
+    fun onListStyleChange(listStyle: ListStyle): SearchBarUiState {
+        state = state.copy(listStyle = listStyle)
+        return state
+    }
+
+    fun onSortByChange(sortBy: SortBy): SearchBarUiState {
+        state = state.copy(sortBy = sortBy)
+        return state
     }
 }
