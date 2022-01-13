@@ -22,7 +22,11 @@ class DatabaseTest {
     @Test
     fun autoIncrementsPersonIds() {
         (1..3).forEach { i ->
-            personQueries.insert("first name $i", "last name $i")
+            personQueries.insert(
+                firstName = "first name $i",
+                lastName = "last name $i",
+                lastModified = "last modified",
+            )
         }
 
         val people = personQueries
@@ -36,9 +40,17 @@ class DatabaseTest {
 
     @Test
     fun autoIncrementsNoteIds() {
-        personQueries.insert("first name", "last name")
+        personQueries.insert(
+            firstName = "first name",
+            lastName = "last name",
+            lastModified = "last modified",
+        )
         (1..3).forEach { i ->
-            noteQueries.insert("note $i", 1)
+            noteQueries.insert(
+                text = "note $i",
+                personId = 1,
+                lastModified = "last modified",
+            )
         }
 
         val notes = noteQueries
@@ -52,8 +64,16 @@ class DatabaseTest {
 
     @Test
     fun doesNotAllowDeletingAPersonWithNotes() {
-        personQueries.insert("first name", "last name")
-        noteQueries.insert("note", 1)
+        personQueries.insert(
+            firstName = "first name",
+            lastName = "last name",
+            lastModified = "last modified",
+        )
+        noteQueries.insert(
+            text = "note",
+            personId = 1,
+            lastModified = "last modified",
+        )
 
         val exception = assertThrows<Exception> {
             personQueries.delete(1)
