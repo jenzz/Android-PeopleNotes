@@ -24,6 +24,7 @@ import com.jenzz.peoplenotes.BuildConfig
 import com.jenzz.peoplenotes.R
 import com.jenzz.peoplenotes.common.ui.theme.PeopleNotesTheme
 import com.jenzz.peoplenotes.common.ui.theme.spacing
+import com.jenzz.peoplenotes.common.ui.widgets.LoadingView
 import com.jenzz.peoplenotes.feature.settings.data.Settings
 import com.jenzz.peoplenotes.feature.settings.data.ThemePreference
 import com.ramcosta.composedestinations.annotation.Destination
@@ -55,23 +56,13 @@ private fun SettingsContent(
     ) {
         when (state) {
             is SettingsUiState.Loading ->
-                SettingsLoading()
+                LoadingView()
             is SettingsUiState.Loaded ->
                 SettingsLoaded(
                     settings = state.settings,
                     onThemeChange = onThemeChange,
                 )
         }
-    }
-}
-
-@Composable
-private fun SettingsLoading() {
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center,
-    ) {
-        CircularProgressIndicator()
     }
 }
 

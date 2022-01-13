@@ -133,7 +133,7 @@ private fun HomeContent(
             )
             when {
                 state.isLoading ->
-                    HomeLoading()
+                    LoadingView()
                 state.isEmptyFiltered ->
                     EmptyView(
                         modifier = Modifier.fillMaxSize(),
@@ -167,16 +167,6 @@ private fun HomeContent(
         val message = state.toastMessage.text.asString(context.resources)
         context.showShortToast(message)
         onToastMessageShown()
-    }
-}
-
-@Composable
-private fun HomeLoading() {
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center,
-    ) {
-        CircularProgressIndicator()
     }
 }
 

@@ -10,7 +10,6 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
@@ -33,6 +32,7 @@ import com.jenzz.peoplenotes.common.ui.theme.PeopleNotesTheme
 import com.jenzz.peoplenotes.common.ui.theme.elevation
 import com.jenzz.peoplenotes.common.ui.theme.spacing
 import com.jenzz.peoplenotes.common.ui.widgets.EmptyView
+import com.jenzz.peoplenotes.common.ui.widgets.LoadingView
 import com.jenzz.peoplenotes.common.ui.widgets.SearchBar
 import com.jenzz.peoplenotes.common.ui.widgets.SearchBarUiState
 import com.jenzz.peoplenotes.ext.stringResourceWithStyledPlaceholders
@@ -109,10 +109,10 @@ fun PersonDetailsContent(
             }
         }
     ) {
-        when (state) {
-            is PersonDetailsUiState.Loading ->
-                PersonDetailsLoading()
-            is PersonDetailsUiState.Loaded -> {
+        when {
+            state.isLoading ->
+                LoadingView()
+            state is PersonDetailsUiState.Loaded -> {
                 when {
                     state.isEmptyFiltered ->
                         EmptyView(
@@ -139,16 +139,6 @@ fun PersonDetailsContent(
                 }
             }
         }
-    }
-}
-
-@Composable
-private fun PersonDetailsLoading() {
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center,
-    ) {
-        CircularProgressIndicator()
     }
 }
 
