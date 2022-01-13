@@ -7,18 +7,20 @@ import com.jenzz.peoplenotes.feature.person_details.data.PersonDetails
 sealed class PersonDetailsUiState {
 
     abstract val searchBarState: SearchBarUiState
-    abstract val toastMessage: ToastMessage?
+    abstract val showActions: Boolean
 
     data class InitialLoad(
         override val searchBarState: SearchBarUiState,
-        override val toastMessage: ToastMessage?,
-    ) : PersonDetailsUiState()
+    ) : PersonDetailsUiState() {
+
+        override val showActions: Boolean = false
+    }
 
     data class Loaded(
         override val searchBarState: SearchBarUiState,
-        override val toastMessage: ToastMessage?,
         val isLoading: Boolean,
         val personDetails: PersonDetails,
+        val toastMessage: ToastMessage?,
     ) : PersonDetailsUiState() {
 
         val isEmpty: Boolean =
@@ -28,6 +30,9 @@ sealed class PersonDetailsUiState {
             isEmpty
                     && searchBarState.searchTerm.isNotEmpty()
                     && personDetails.notes.totalCount > 0
+
+        override val showActions: Boolean =
+            !isLoading && !isEmpty
     }
 }
 

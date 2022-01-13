@@ -121,6 +121,7 @@ private fun HomeContent(
                     end = MaterialTheme.spacing.medium,
                 ),
                 state = state.searchBarState,
+                showActions = state.showActions,
                 placeholder = stringResource(R.string.search_people, state.people.persons.size),
                 visualTransformation = SuffixVisualTransformation(
                     text = state.searchBarState.searchTerm,
@@ -163,8 +164,8 @@ private fun HomeContent(
             state = floatingActionButtonState,
         )
     }
-    if (state.toastMessage != null) {
-        val message = state.toastMessage.text.asString(context.resources)
+    state.toastMessage?.let { toastMessage ->
+        val message = toastMessage.text.asString(context.resources)
         context.showShortToast(message)
         onToastMessageShown()
     }

@@ -11,6 +11,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -28,6 +29,7 @@ import com.jenzz.peoplenotes.common.data.people.PersonId
 import com.jenzz.peoplenotes.common.data.people.di.FirstName
 import com.jenzz.peoplenotes.common.data.people.di.LastName
 import com.jenzz.peoplenotes.common.ui.SuffixVisualTransformation
+import com.jenzz.peoplenotes.common.ui.showShortToast
 import com.jenzz.peoplenotes.common.ui.theme.PeopleNotesTheme
 import com.jenzz.peoplenotes.common.ui.theme.elevation
 import com.jenzz.peoplenotes.common.ui.theme.spacing
@@ -65,7 +67,8 @@ fun PersonDetailsScreen(
         },
         onAddNoteClick = {
             TODO("Implement add note screen.")
-        }
+        },
+        onToastMessageShown = viewModel::onToastMessageShown,
     )
 }
 
@@ -77,8 +80,12 @@ fun PersonDetailsContent(
     onSortByChange: (SortBy) -> Unit,
     onSettingsClick: () -> Unit,
     onAddNoteClick: () -> Unit,
+    onToastMessageShown: () -> Unit,
 ) {
+    val context = LocalContext.current
+    val scaffoldState = rememberScaffoldState()
     Scaffold(
+        scaffoldState = scaffoldState,
         topBar = {
             val notesCount =
                 (state as? PersonDetailsUiState.Loaded)?.personDetails?.notes?.notes?.size ?: 0
@@ -89,6 +96,7 @@ fun PersonDetailsContent(
                     end = MaterialTheme.spacing.medium,
                 ),
                 state = state.searchBarState,
+                showActions = state.showActions,
                 placeholder = stringResource(id = R.string.search_notes, notesCount),
                 visualTransformation = SuffixVisualTransformation(
                     text = state.searchBarState.searchTerm,
@@ -139,6 +147,11 @@ fun PersonDetailsContent(
                 }
             }
         }
+    }
+    (state as? PersonDetailsUiState.Loaded)?.toastMessage?.let { toastMessage ->
+        val message = toastMessage.text.asString(context.resources)
+        context.showShortToast(message)
+        onToastMessageShown()
     }
 }
 
@@ -194,6 +207,7 @@ private fun PersonDetailsContentPreview(
                 onSortByChange = {},
                 onSettingsClick = {},
                 onAddNoteClick = {},
+                onToastMessageShown = {},
             )
         }
     }
@@ -205,7 +219,6 @@ class PersonDetailsPreviewParameterProvider : PreviewParameterProvider<PersonDet
         searchTerm = "",
         listStyle = ListStyle.DEFAULT,
         sortBy = SortBy.DEFAULT,
-        showActions = false,
     )
 
     private val loadedState: PersonDetailsUiState.Loaded
@@ -241,7 +254,6 @@ class PersonDetailsPreviewParameterProvider : PreviewParameterProvider<PersonDet
         sequenceOf(
             PersonDetailsUiState.InitialLoad(
                 searchBarState = searchBarState,
-                toastMessage = null
             ),
             loadedState
         )

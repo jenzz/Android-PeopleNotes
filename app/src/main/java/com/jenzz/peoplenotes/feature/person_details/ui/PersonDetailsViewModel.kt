@@ -34,7 +34,6 @@ class PersonDetailsViewModel @Inject constructor(
     var state by mutableStateOf<PersonDetailsUiState>(
         InitialLoad(
             searchBarState = SearchBarUiState.DEFAULT,
-            toastMessage = null,
         )
     )
         private set
@@ -78,6 +77,11 @@ class PersonDetailsViewModel @Inject constructor(
         viewModelScope.launch {
             getPersonDetails(sortBy = sortBy)
         }
+    }
+
+    fun onToastMessageShown() {
+        val loadedState = state as Loaded
+        state = loadedState.copy(toastMessage = null)
     }
 
     private suspend fun getPersonDetails(

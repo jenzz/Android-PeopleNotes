@@ -37,6 +37,7 @@ import javax.inject.Inject
 fun SearchBar(
     modifier: Modifier = Modifier,
     state: SearchBarUiState,
+    showActions: Boolean,
     placeholder: String,
     visualTransformation: () -> VisualTransformation,
     onSearchTermChange: (String) -> Unit,
@@ -49,7 +50,7 @@ fun SearchBar(
             modifier = Modifier.weight(1f),
             placeholder = placeholder,
             visualTransformation = visualTransformation,
-            showActions = state.showActions,
+            showActions = showActions,
             searchTerm = state.searchTerm,
             onSearchTermChange = onSearchTermChange,
             listStyle = state.listStyle,
@@ -233,7 +234,6 @@ data class SearchBarUiState(
     val searchTerm: String,
     val listStyle: ListStyle,
     val sortBy: SortBy,
-    val showActions: Boolean,
 ) : Parcelable {
 
     companion object {
@@ -242,7 +242,6 @@ data class SearchBarUiState(
             searchTerm = "",
             listStyle = ListStyle.DEFAULT,
             sortBy = SortBy.DEFAULT,
-            showActions = false,
         )
     }
 }
