@@ -9,7 +9,7 @@ sealed class PersonDetailsUiState {
     abstract val searchBarState: SearchBarUiState
     abstract val toastMessage: ToastMessage?
 
-    data class Loading(
+    data class InitialLoad(
         override val searchBarState: SearchBarUiState,
         override val toastMessage: ToastMessage?,
     ) : PersonDetailsUiState()
@@ -32,5 +32,5 @@ sealed class PersonDetailsUiState {
 }
 
 val PersonDetailsUiState.isLoading: Boolean
-    get() = this is PersonDetailsUiState.Loading
+    get() = this is PersonDetailsUiState.InitialLoad
             || (this is PersonDetailsUiState.Loaded && isLoading)

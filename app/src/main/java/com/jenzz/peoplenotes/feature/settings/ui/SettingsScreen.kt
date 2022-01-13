@@ -55,7 +55,7 @@ private fun SettingsContent(
         }
     ) {
         when (state) {
-            is SettingsUiState.Loading ->
+            is SettingsUiState.InitialLoad ->
                 LoadingView()
             is SettingsUiState.Loaded ->
                 SettingsLoaded(
@@ -209,7 +209,7 @@ private fun SettingsContentPreview(
 
 class SettingsPreviewParameterProvider : CollectionPreviewParameterProvider<SettingsUiState>(
     listOf(
-        SettingsUiState.Loading,
+        SettingsUiState.InitialLoad,
         SettingsUiState.Loaded(
             settings = Settings(
                 theme = ThemePreference.DEFAULT,

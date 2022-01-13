@@ -239,7 +239,7 @@ class PersonDetailsPreviewParameterProvider : PreviewParameterProvider<PersonDet
 
     override val values: Sequence<PersonDetailsUiState> =
         sequenceOf(
-            PersonDetailsUiState.Loading(
+            PersonDetailsUiState.InitialLoad(
                 searchBarState = searchBarState,
                 toastMessage = null
             ),

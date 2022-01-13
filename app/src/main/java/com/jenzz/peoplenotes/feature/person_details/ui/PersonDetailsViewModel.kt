@@ -15,8 +15,8 @@ import com.jenzz.peoplenotes.feature.destinations.PersonDetailsScreenDestination
 import com.jenzz.peoplenotes.feature.home.ui.ListStyle
 import com.jenzz.peoplenotes.feature.home.ui.SortBy
 import com.jenzz.peoplenotes.feature.person_details.data.PersonDetailsUseCases
+import com.jenzz.peoplenotes.feature.person_details.ui.PersonDetailsUiState.InitialLoad
 import com.jenzz.peoplenotes.feature.person_details.ui.PersonDetailsUiState.Loaded
-import com.jenzz.peoplenotes.feature.person_details.ui.PersonDetailsUiState.Loading
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
@@ -32,7 +32,7 @@ class PersonDetailsViewModel @Inject constructor(
     private val personId = PersonDetailsScreenDestination.argsFrom(savedStateHandle).personId
 
     var state by mutableStateOf<PersonDetailsUiState>(
-        Loading(
+        InitialLoad(
             searchBarState = SearchBarUiState.DEFAULT,
             toastMessage = null,
         )
@@ -55,7 +55,6 @@ class PersonDetailsViewModel @Inject constructor(
     }
 
     fun onSearchTermChange(searchTerm: String) {
-        // TODO JD Clean up this mess!
         val loadedState = state as Loaded
         state = loadedState.copy(searchBarState = searchBarState.onSearchTermChange(searchTerm))
         viewModelScope.launch {

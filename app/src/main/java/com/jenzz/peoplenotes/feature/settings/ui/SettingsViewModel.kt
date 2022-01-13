@@ -7,7 +7,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.jenzz.peoplenotes.feature.settings.data.SettingsUseCases
 import com.jenzz.peoplenotes.feature.settings.data.ThemePreference
-import com.jenzz.peoplenotes.feature.settings.ui.SettingsUiState.Loading
+import com.jenzz.peoplenotes.feature.settings.ui.SettingsUiState.InitialLoad
+import com.jenzz.peoplenotes.feature.settings.ui.SettingsUiState.Loaded
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
@@ -18,7 +19,7 @@ class SettingsViewModel @Inject constructor(
     private val useCases: SettingsUseCases,
 ) : ViewModel() {
 
-    var state by mutableStateOf<SettingsUiState>(Loading)
+    var state by mutableStateOf<SettingsUiState>(InitialLoad)
         private set
 
     init {
@@ -26,7 +27,7 @@ class SettingsViewModel @Inject constructor(
             useCases
                 .getSettings()
                 .collect { settings ->
-                    state = SettingsUiState.Loaded(
+                    state = Loaded(
                         settings = settings
                     )
                 }
