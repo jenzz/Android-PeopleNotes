@@ -1,4 +1,4 @@
-package com.jenzz.peoplenotes.feature.home.ui
+package com.jenzz.peoplenotes.feature.people.ui
 
 import android.content.res.Configuration.UI_MODE_NIGHT_NO
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
@@ -54,11 +54,11 @@ import java.time.LocalDateTime
 
 @Destination(start = true)
 @Composable
-fun HomeScreen(
+fun PeopleScreen(
     navigator: DestinationsNavigator,
-    viewModel: HomeViewModel = hiltViewModel(),
+    viewModel: PeopleViewModel = hiltViewModel(),
 ) {
-    HomeContent(
+    PeopleContent(
         state = viewModel.state,
         onListStyleChange = viewModel::onListStyleChange,
         onSearchTermChange = viewModel::onSearchTermChange,
@@ -83,8 +83,8 @@ fun HomeScreen(
 }
 
 @Composable
-private fun HomeContent(
-    state: HomeUiState,
+private fun PeopleContent(
+    state: PeopleUiState,
     onListStyleChange: (ListStyle) -> Unit,
     onSearchTermChange: (String) -> Unit,
     onClick: (Person) -> Unit,
@@ -105,7 +105,7 @@ private fun HomeContent(
     Scaffold(
         scaffoldState = scaffoldState,
         floatingActionButton = {
-            HomeFloatingActionButton(
+            PeopleFloatingActionButton(
                 state = floatingActionButtonState.value,
                 onStateChange = { state -> floatingActionButtonState.value = state },
                 onAddPersonManuallyClick = onAddPersonManuallyClick,
@@ -148,7 +148,7 @@ private fun HomeContent(
                         icon = R.drawable.ic_people,
                     )
                 else ->
-                    HomeLoaded(
+                    PeopleLoaded(
                         state = state,
                         onClick = onClick,
                         onDeleteRequest = onDeleteRequest,
@@ -172,8 +172,8 @@ private fun HomeContent(
 }
 
 @Composable
-private fun HomeLoaded(
-    state: HomeUiState,
+private fun PeopleLoaded(
+    state: PeopleUiState,
     onClick: (Person) -> Unit,
     onDeleteRequest: (Person) -> Unit,
     onDeleteConfirm: (Person) -> Unit,
@@ -183,7 +183,7 @@ private fun HomeLoaded(
 ) {
     when (state.searchBarState.listStyle) {
         ListStyle.Rows ->
-            HomeLoadedRows(
+            PeopleLoadedRows(
                 people = state.people.persons,
                 deleteConfirmation = state.deleteConfirmation,
                 deleteWithNotesConfirmation = state.deleteWithNotesConfirmation,
@@ -195,7 +195,7 @@ private fun HomeLoaded(
                 onDeleteWithNotesCancel = onDeleteWithNotesCancel,
             )
         ListStyle.Grid ->
-            HomeLoadedGrid(
+            PeopleLoadedGrid(
                 people = state.people.persons,
                 deleteConfirmation = state.deleteConfirmation,
                 deleteWithNotesConfirmation = state.deleteWithNotesConfirmation,
@@ -210,7 +210,7 @@ private fun HomeLoaded(
 }
 
 @Composable
-private fun HomeLoadedRows(
+private fun PeopleLoadedRows(
     people: List<Person>,
     deleteConfirmation: PersonId?,
     deleteWithNotesConfirmation: PersonId?,
@@ -242,7 +242,7 @@ private fun HomeLoadedRows(
 }
 
 @Composable
-private fun HomeLoadedGrid(
+private fun PeopleLoadedGrid(
     people: List<Person>,
     deleteConfirmation: PersonId?,
     deleteWithNotesConfirmation: PersonId?,
@@ -538,13 +538,13 @@ private fun PersonDropDownMenu(
     uiMode = UI_MODE_NIGHT_YES,
 )
 @Composable
-private fun HomeContentPreview(
-    @PreviewParameter(HomePreviewParameterProvider::class)
-    state: HomeUiState,
+private fun PeopleContentPreview(
+    @PreviewParameter(PeoplePreviewParameterProvider::class)
+    state: PeopleUiState,
 ) {
     PeopleNotesTheme {
         Surface {
-            HomeContent(
+            PeopleContent(
                 state = state,
                 onListStyleChange = {},
                 onSearchTermChange = {},
@@ -564,9 +564,9 @@ private fun HomeContentPreview(
     }
 }
 
-class HomePreviewParameterProvider : CollectionPreviewParameterProvider<HomeUiState>(
+class PeoplePreviewParameterProvider : CollectionPreviewParameterProvider<PeopleUiState>(
     listOf(
-        HomeUiState(
+        PeopleUiState(
             isLoading = true,
             searchBarState = SearchBarUiState.DEFAULT,
             people = People(
@@ -577,7 +577,7 @@ class HomePreviewParameterProvider : CollectionPreviewParameterProvider<HomeUiSt
             deleteWithNotesConfirmation = null,
             toastMessage = null,
         ),
-        HomeUiState(
+        PeopleUiState(
             isLoading = false,
             searchBarState = SearchBarUiState.DEFAULT,
             people = People(
@@ -595,7 +595,7 @@ class HomePreviewParameterProvider : CollectionPreviewParameterProvider<HomeUiSt
             deleteWithNotesConfirmation = null,
             toastMessage = null,
         ),
-        HomeUiState(
+        PeopleUiState(
             isLoading = false,
             searchBarState = SearchBarUiState.DEFAULT,
             people = People(

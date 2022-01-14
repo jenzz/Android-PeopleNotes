@@ -39,8 +39,8 @@ import com.jenzz.peoplenotes.common.ui.widgets.*
 import com.jenzz.peoplenotes.ext.stringResourceWithStyledPlaceholders
 import com.jenzz.peoplenotes.ext.toNonEmptyString
 import com.jenzz.peoplenotes.feature.destinations.SettingsScreenDestination
-import com.jenzz.peoplenotes.feature.home.ui.ListStyle
-import com.jenzz.peoplenotes.feature.home.ui.PeopleSortBy
+import com.jenzz.peoplenotes.feature.people.ui.ListStyle
+import com.jenzz.peoplenotes.feature.people.ui.PeopleSortBy
 import com.jenzz.peoplenotes.feature.person_details.data.PersonDetails
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator

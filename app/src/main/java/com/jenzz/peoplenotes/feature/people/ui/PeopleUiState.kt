@@ -1,4 +1,4 @@
-package com.jenzz.peoplenotes.feature.home.ui
+package com.jenzz.peoplenotes.feature.people.ui
 
 import android.os.Parcelable
 import com.jenzz.peoplenotes.common.data.people.People
@@ -8,14 +8,14 @@ import com.jenzz.peoplenotes.common.ui.widgets.SearchBarUiState
 import com.jenzz.peoplenotes.ext.PartialSavedState
 import kotlinx.parcelize.Parcelize
 
-data class HomeUiState(
+data class PeopleUiState(
     val isLoading: Boolean,
     val searchBarState: SearchBarUiState,
     val people: People,
     val deleteConfirmation: PersonId?,
     val deleteWithNotesConfirmation: PersonId?,
     val toastMessage: ToastMessage?,
-) : PartialSavedState<HomeUiState, HomeSavedState> {
+) : PartialSavedState<PeopleUiState, PeopleSavedState> {
 
     val isEmpty: Boolean =
         people.isEmpty
@@ -26,14 +26,14 @@ data class HomeUiState(
     val showActions: Boolean =
         !isLoading && !isEmpty
 
-    override val savedState: HomeSavedState =
-        HomeSavedState(
+    override val savedState: PeopleSavedState =
+        PeopleSavedState(
             searchBarState = searchBarState,
             deleteConfirmation = deleteConfirmation,
             deleteWithNotesConfirmation = deleteWithNotesConfirmation,
         )
 
-    override fun mergeWithSavedState(savedState: HomeSavedState): HomeUiState =
+    override fun mergeWithSavedState(savedState: PeopleSavedState): PeopleUiState =
         copy(
             searchBarState = savedState.searchBarState,
             deleteConfirmation = savedState.deleteConfirmation,
@@ -42,7 +42,7 @@ data class HomeUiState(
 }
 
 @Parcelize
-data class HomeSavedState(
+data class PeopleSavedState(
     val searchBarState: SearchBarUiState,
     val deleteConfirmation: PersonId?,
     val deleteWithNotesConfirmation: PersonId?,

@@ -1,4 +1,4 @@
-package com.jenzz.peoplenotes.feature.home.ui
+package com.jenzz.peoplenotes.feature.people.ui
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -11,21 +11,21 @@ import com.jenzz.peoplenotes.common.ui.TextResource
 import com.jenzz.peoplenotes.common.ui.ToastMessage
 import com.jenzz.peoplenotes.common.ui.widgets.SearchBarState
 import com.jenzz.peoplenotes.ext.mutableStateOf
-import com.jenzz.peoplenotes.feature.home.data.HomeUseCases
+import com.jenzz.peoplenotes.feature.people.data.PeopleUseCases
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class HomeViewModel @Inject constructor(
+class PeopleViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
-    private val useCases: HomeUseCases,
+    private val useCases: PeopleUseCases,
     private val searchBarState: SearchBarState,
 ) : ViewModel() {
 
     var state by savedStateHandle.mutableStateOf(
-        defaultValue = HomeUiState(
+        defaultValue = PeopleUiState(
             isLoading = true,
             searchBarState = searchBarState.state,
             people = People.DEFAULT,

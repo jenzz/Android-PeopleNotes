@@ -12,8 +12,8 @@ import com.jenzz.peoplenotes.common.ui.ToastMessage
 import com.jenzz.peoplenotes.common.ui.widgets.SearchBarState
 import com.jenzz.peoplenotes.common.ui.widgets.SearchBarUiState
 import com.jenzz.peoplenotes.feature.destinations.PersonDetailsScreenDestination
-import com.jenzz.peoplenotes.feature.home.ui.ListStyle
-import com.jenzz.peoplenotes.feature.home.ui.PeopleSortBy
+import com.jenzz.peoplenotes.feature.people.ui.ListStyle
+import com.jenzz.peoplenotes.feature.people.ui.PeopleSortBy
 import com.jenzz.peoplenotes.feature.person_details.data.PersonDetailsUseCases
 import com.jenzz.peoplenotes.feature.person_details.ui.PersonDetailsUiState.InitialLoad
 import com.jenzz.peoplenotes.feature.person_details.ui.PersonDetailsUiState.Loaded

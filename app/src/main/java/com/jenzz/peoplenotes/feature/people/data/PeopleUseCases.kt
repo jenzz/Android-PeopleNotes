@@ -1,11 +1,11 @@
-package com.jenzz.peoplenotes.feature.home.data
+package com.jenzz.peoplenotes.feature.people.data
 
 import com.jenzz.peoplenotes.common.data.people.*
-import com.jenzz.peoplenotes.feature.home.ui.PeopleSortBy
+import com.jenzz.peoplenotes.feature.people.ui.PeopleSortBy
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
-class HomeUseCases @Inject constructor(
+class PeopleUseCases @Inject constructor(
     val getPeople: GetPeopleUseCase,
     val deletePerson: DeletePersonUseCase,
     val deletePersonWithNotes: DeletePersonWithNotesUseCase,

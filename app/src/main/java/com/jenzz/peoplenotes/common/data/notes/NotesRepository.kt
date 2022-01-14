@@ -1,7 +1,7 @@
 package com.jenzz.peoplenotes.common.data.notes
 
 import com.jenzz.peoplenotes.common.data.people.PersonId
-import com.jenzz.peoplenotes.feature.home.ui.PeopleSortBy
+import com.jenzz.peoplenotes.feature.people.ui.PeopleSortBy
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 

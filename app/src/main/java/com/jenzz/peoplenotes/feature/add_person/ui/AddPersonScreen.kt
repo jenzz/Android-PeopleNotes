@@ -23,7 +23,7 @@ import com.jenzz.peoplenotes.R
 import com.jenzz.peoplenotes.common.ui.TextFieldUiState
 import com.jenzz.peoplenotes.common.ui.theme.PeopleNotesTheme
 import com.jenzz.peoplenotes.common.ui.theme.spacing
-import com.jenzz.peoplenotes.feature.destinations.HomeScreenDestination
+import com.jenzz.peoplenotes.feature.destinations.PeopleScreenDestination
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
@@ -40,8 +40,8 @@ fun AddPersonScreen(
         onNoteChange = viewModel::onNoteChange,
         onAddPersonClick = viewModel::onAddPerson,
         onPersonAdded = {
-            navigator.navigate(HomeScreenDestination) {
-                popUpTo(HomeScreenDestination.route) {
+            navigator.navigate(PeopleScreenDestination) {
+                popUpTo(PeopleScreenDestination.route) {
                     inclusive = true
                 }
             }

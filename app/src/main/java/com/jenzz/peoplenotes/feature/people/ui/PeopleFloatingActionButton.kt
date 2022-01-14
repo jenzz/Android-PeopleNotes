@@ -1,4 +1,4 @@
-package com.jenzz.peoplenotes.feature.home.ui
+package com.jenzz.peoplenotes.feature.people.ui
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Person
@@ -11,7 +11,7 @@ import com.jenzz.peoplenotes.common.ui.widgets.MultiFloatingActionButtonItem
 import com.jenzz.peoplenotes.common.ui.widgets.MultiFloatingActionButtonState
 
 @Composable
-fun HomeFloatingActionButton(
+fun PeopleFloatingActionButton(
     state: MultiFloatingActionButtonState,
     onStateChange: (MultiFloatingActionButtonState) -> Unit,
     onAddPersonManuallyClick: () -> Unit,
