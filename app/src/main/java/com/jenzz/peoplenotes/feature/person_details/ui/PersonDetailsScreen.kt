@@ -30,6 +30,7 @@ import com.jenzz.peoplenotes.common.data.people.Person
 import com.jenzz.peoplenotes.common.data.people.PersonId
 import com.jenzz.peoplenotes.common.data.people.di.FirstName
 import com.jenzz.peoplenotes.common.data.people.di.LastName
+import com.jenzz.peoplenotes.common.ui.ListStyle
 import com.jenzz.peoplenotes.common.ui.SuffixVisualTransformation
 import com.jenzz.peoplenotes.common.ui.showShortToast
 import com.jenzz.peoplenotes.common.ui.theme.PeopleNotesTheme
@@ -39,7 +40,6 @@ import com.jenzz.peoplenotes.common.ui.widgets.*
 import com.jenzz.peoplenotes.ext.stringResourceWithStyledPlaceholders
 import com.jenzz.peoplenotes.ext.toNonEmptyString
 import com.jenzz.peoplenotes.feature.destinations.SettingsScreenDestination
-import com.jenzz.peoplenotes.feature.people.ui.ListStyle
 import com.jenzz.peoplenotes.feature.people.ui.PeopleSortBy
 import com.jenzz.peoplenotes.feature.person_details.data.PersonDetails
 import com.ramcosta.composedestinations.annotation.Destination

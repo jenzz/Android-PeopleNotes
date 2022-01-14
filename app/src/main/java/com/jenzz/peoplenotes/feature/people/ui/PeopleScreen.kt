@@ -35,10 +35,7 @@ import com.jenzz.peoplenotes.common.data.people.PersonId
 import com.jenzz.peoplenotes.common.data.people.di.FirstName
 import com.jenzz.peoplenotes.common.data.people.di.LastName
 import com.jenzz.peoplenotes.common.data.time.formatFullDateTime
-import com.jenzz.peoplenotes.common.ui.SuffixVisualTransformation
-import com.jenzz.peoplenotes.common.ui.TextResource
-import com.jenzz.peoplenotes.common.ui.ToastMessage
-import com.jenzz.peoplenotes.common.ui.showShortToast
+import com.jenzz.peoplenotes.common.ui.*
 import com.jenzz.peoplenotes.common.ui.theme.PeopleNotesTheme
 import com.jenzz.peoplenotes.common.ui.theme.elevation
 import com.jenzz.peoplenotes.common.ui.theme.spacing

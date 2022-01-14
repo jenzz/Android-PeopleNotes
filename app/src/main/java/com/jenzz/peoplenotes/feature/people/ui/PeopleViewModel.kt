@@ -7,6 +7,7 @@ import com.jenzz.peoplenotes.R
 import com.jenzz.peoplenotes.common.data.people.DeletePersonResult
 import com.jenzz.peoplenotes.common.data.people.People
 import com.jenzz.peoplenotes.common.data.people.Person
+import com.jenzz.peoplenotes.common.ui.ListStyle
 import com.jenzz.peoplenotes.common.ui.TextResource
 import com.jenzz.peoplenotes.common.ui.ToastMessage
 import com.jenzz.peoplenotes.common.ui.widgets.SearchBarState

@@ -7,12 +7,12 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.jenzz.peoplenotes.R
+import com.jenzz.peoplenotes.common.ui.ListStyle
 import com.jenzz.peoplenotes.common.ui.TextResource
 import com.jenzz.peoplenotes.common.ui.ToastMessage
 import com.jenzz.peoplenotes.common.ui.widgets.SearchBarState
 import com.jenzz.peoplenotes.common.ui.widgets.SearchBarUiState
 import com.jenzz.peoplenotes.feature.destinations.PersonDetailsScreenDestination
-import com.jenzz.peoplenotes.feature.people.ui.ListStyle
 import com.jenzz.peoplenotes.feature.people.ui.PeopleSortBy
 import com.jenzz.peoplenotes.feature.person_details.data.PersonDetailsUseCases
 import com.jenzz.peoplenotes.feature.person_details.ui.PersonDetailsUiState.InitialLoad

@@ -27,8 +27,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.VisualTransformation
 import com.jenzz.peoplenotes.R
+import com.jenzz.peoplenotes.common.ui.ListStyle
 import com.jenzz.peoplenotes.common.ui.TextResource
-import com.jenzz.peoplenotes.feature.people.ui.ListStyle
 import com.jenzz.peoplenotes.feature.people.ui.PeopleSortBy
 import kotlinx.parcelize.Parcelize
 import javax.inject.Inject
