@@ -1,17 +1,17 @@
-package com.jenzz.peoplenotes.feature.person_details.ui
+package com.jenzz.peoplenotes.feature.notes.ui
 
 import com.jenzz.peoplenotes.common.ui.ToastMessage
 import com.jenzz.peoplenotes.common.ui.widgets.SearchBarUiState
-import com.jenzz.peoplenotes.feature.person_details.data.PersonDetails
+import com.jenzz.peoplenotes.feature.notes.data.Notes
 
-sealed class PersonDetailsUiState {
+sealed class NotesUiState {
 
     abstract val searchBarState: SearchBarUiState
     abstract val showActions: Boolean
 
     data class InitialLoad(
         override val searchBarState: SearchBarUiState,
-    ) : PersonDetailsUiState() {
+    ) : NotesUiState() {
 
         override val showActions: Boolean = false
     }
@@ -19,23 +19,23 @@ sealed class PersonDetailsUiState {
     data class Loaded(
         override val searchBarState: SearchBarUiState,
         val isLoading: Boolean,
-        val personDetails: PersonDetails,
+        val notes: Notes,
         val toastMessage: ToastMessage?,
-    ) : PersonDetailsUiState() {
+    ) : NotesUiState() {
 
         val isEmpty: Boolean =
-            personDetails.notes.isEmpty
+            notes.isEmpty
 
         val isEmptyFiltered: Boolean =
             isEmpty
                     && searchBarState.searchTerm.isNotEmpty()
-                    && personDetails.notes.totalCount > 0
+                    && notes.notes.totalCount > 0
 
         override val showActions: Boolean =
             !isLoading && !isEmpty
     }
 }
 
-val PersonDetailsUiState.isLoading: Boolean
-    get() = this is PersonDetailsUiState.InitialLoad
-            || (this is PersonDetailsUiState.Loaded && isLoading)
+val NotesUiState.isLoading: Boolean
+    get() = this is NotesUiState.InitialLoad
+            || (this is NotesUiState.Loaded && isLoading)

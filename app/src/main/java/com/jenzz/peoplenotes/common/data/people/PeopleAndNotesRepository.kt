@@ -1,7 +1,7 @@
 package com.jenzz.peoplenotes.common.data.people
 
 import com.jenzz.peoplenotes.common.data.notes.NewNote
-import com.jenzz.peoplenotes.common.data.notes.Notes
+import com.jenzz.peoplenotes.common.data.notes.NotesList
 import com.jenzz.peoplenotes.common.data.notes.NotesRepository
 import kotlinx.coroutines.flow.first
 import javax.inject.Inject
@@ -40,6 +40,6 @@ sealed class DeletePersonResult {
 
     data class RemainingNotesForPerson(
         val personId: PersonId,
-        val notes: Notes,
+        val notes: NotesList,
     ) : DeletePersonResult()
 }

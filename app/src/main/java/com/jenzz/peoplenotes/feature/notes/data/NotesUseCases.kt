@@ -1,4 +1,4 @@
-package com.jenzz.peoplenotes.feature.person_details.data
+package com.jenzz.peoplenotes.feature.notes.data
 
 import com.jenzz.peoplenotes.common.data.notes.NotesRepository
 import com.jenzz.peoplenotes.common.data.people.PeopleRepository
@@ -8,22 +8,22 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import javax.inject.Inject
 
-class PersonDetailsUseCases @Inject constructor(
-    val getPersonDetails: GetPersonDetails,
+class NotesUseCases @Inject constructor(
+    val getNotesWithPerson: GetNotesWithPersonUseCase,
 )
 
-class GetPersonDetails @Inject constructor(
+class GetNotesWithPersonUseCase @Inject constructor(
     private val peopleRepository: PeopleRepository,
     private val notesRepository: NotesRepository,
 ) {
 
-    operator fun invoke(personId: PersonId): Flow<PersonDetails> =
+    operator fun invoke(personId: PersonId): Flow<Notes> =
         peopleRepository
             .getPerson(personId)
             .combine(
                 notesRepository.getNotes(personId)
             ) { person, notes ->
-                PersonDetails(
+                Notes(
                     person = person,
                     notes = notes,
                 )
@@ -33,13 +33,13 @@ class GetPersonDetails @Inject constructor(
         personId: PersonId,
         sortBy: PeopleSortBy,
         filter: String
-    ): Flow<PersonDetails> =
+    ): Flow<Notes> =
         peopleRepository
             .getPerson(personId)
             .combine(
                 notesRepository.getNotes(personId, sortBy, filter)
             ) { person, notes ->
-                PersonDetails(
+                Notes(
                     person = person,
                     notes = notes,
                 )

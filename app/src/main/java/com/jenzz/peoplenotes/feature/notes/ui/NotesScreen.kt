@@ -1,4 +1,4 @@
-package com.jenzz.peoplenotes.feature.person_details.ui
+package com.jenzz.peoplenotes.feature.notes.ui
 
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.*
@@ -25,7 +25,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.jenzz.peoplenotes.R
 import com.jenzz.peoplenotes.common.data.notes.Note
 import com.jenzz.peoplenotes.common.data.notes.NoteId
-import com.jenzz.peoplenotes.common.data.notes.Notes
+import com.jenzz.peoplenotes.common.data.notes.NotesList
 import com.jenzz.peoplenotes.common.data.people.Person
 import com.jenzz.peoplenotes.common.data.people.PersonId
 import com.jenzz.peoplenotes.common.data.people.di.FirstName
@@ -40,23 +40,23 @@ import com.jenzz.peoplenotes.common.ui.widgets.*
 import com.jenzz.peoplenotes.ext.stringResourceWithStyledPlaceholders
 import com.jenzz.peoplenotes.ext.toNonEmptyString
 import com.jenzz.peoplenotes.feature.destinations.SettingsScreenDestination
+import com.jenzz.peoplenotes.feature.notes.data.Notes
 import com.jenzz.peoplenotes.feature.people.ui.PeopleSortBy
-import com.jenzz.peoplenotes.feature.person_details.data.PersonDetails
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import java.time.LocalDateTime
 
-data class PersonDetailsScreenNavArgs(
+data class NotesScreenNavArgs(
     val personId: PersonId
 )
 
-@Destination(navArgsDelegate = PersonDetailsScreenNavArgs::class)
+@Destination(navArgsDelegate = NotesScreenNavArgs::class)
 @Composable
-fun PersonDetailsScreen(
+fun NotesScreen(
     navigator: DestinationsNavigator,
-    viewModel: PersonDetailsViewModel = hiltViewModel(),
+    viewModel: NotesViewModel = hiltViewModel(),
 ) {
-    PersonDetailsContent(
+    NotesContent(
         state = viewModel.state,
         onSearchTermChange = viewModel::onSearchTermChange,
         onListStyleChange = viewModel::onListStyleChange,
@@ -72,8 +72,8 @@ fun PersonDetailsScreen(
 }
 
 @Composable
-fun PersonDetailsContent(
-    state: PersonDetailsUiState,
+fun NotesContent(
+    state: NotesUiState,
     onSearchTermChange: (String) -> Unit,
     onListStyleChange: (ListStyle) -> Unit,
     onSortByChange: (PeopleSortBy) -> Unit,
@@ -87,7 +87,7 @@ fun PersonDetailsContent(
         scaffoldState = scaffoldState,
         topBar = {
             val notesCount =
-                (state as? PersonDetailsUiState.Loaded)?.personDetails?.notes?.notes?.size ?: 0
+                (state as? NotesUiState.Loaded)?.notes?.notes?.items?.size ?: 0
             SearchBar(
                 modifier = Modifier.padding(
                     start = MaterialTheme.spacing.medium,
@@ -119,7 +119,7 @@ fun PersonDetailsContent(
         when {
             state.isLoading ->
                 LoadingView()
-            state is PersonDetailsUiState.Loaded -> {
+            state is NotesUiState.Loaded -> {
                 when {
                     state.isEmptyFiltered ->
                         EmptyView(
@@ -135,17 +135,17 @@ fun PersonDetailsContent(
                                 spanStyle = {
                                     SpanStyle(fontWeight = FontWeight.Bold)
                                 },
-                                state.personDetails.person.fullName,
+                                state.notes.person.fullName,
                             ),
                             icon = R.drawable.ic_note,
                         )
                     else ->
-                        PersonDetailsLoaded(state = state)
+                        NotesLoaded(state = state)
                 }
             }
         }
     }
-    (state as? PersonDetailsUiState.Loaded)?.toastMessage?.let { toastMessage ->
+    (state as? NotesUiState.Loaded)?.toastMessage?.let { toastMessage ->
         val message = toastMessage.text.asString(context.resources)
         context.showShortToast(message)
         onToastMessageShown()
@@ -153,38 +153,38 @@ fun PersonDetailsContent(
 }
 
 @Composable
-private fun PersonDetailsLoaded(
-    state: PersonDetailsUiState.Loaded,
+private fun NotesLoaded(
+    state: NotesUiState.Loaded,
 ) {
     when (state.searchBarState.listStyle) {
         ListStyle.Rows ->
-            PersonDetailsLoadedRows(
-                notes = state.personDetails.notes,
+            NotesLoadedRows(
+                notes = state.notes.notes,
             )
         ListStyle.Grid ->
-            PersonDetailsLoadedGrid(
-                notes = state.personDetails.notes,
+            NotesLoadedGrid(
+                notes = state.notes.notes,
             )
     }
 }
 
 @Composable
-private fun PersonDetailsLoadedRows(
-    notes: Notes,
+private fun NotesLoadedRows(
+    notes: NotesList,
 ) {
     LazyColumn(
         contentPadding = PaddingValues(all = MaterialTheme.spacing.medium),
         verticalArrangement = Arrangement.spacedBy(space = MaterialTheme.spacing.medium),
     ) {
-        items(notes.notes) { note ->
+        items(notes.items) { note ->
             NoteRow(note = note)
         }
     }
 }
 
 @Composable
-private fun PersonDetailsLoadedGrid(
-    notes: Notes,
+private fun NotesLoadedGrid(
+    notes: NotesList,
 ) {
     StaggeredVerticalGrid(
         modifier = Modifier
@@ -192,7 +192,7 @@ private fun PersonDetailsLoadedGrid(
             .padding(all = MaterialTheme.spacing.small),
         maxColumnWidth = 220.dp,
     ) {
-        notes.notes.forEach { note ->
+        notes.items.forEach { note ->
             NoteGrid(
                 modifier = Modifier.padding(all = MaterialTheme.spacing.small),
                 note = note,
@@ -243,13 +243,13 @@ fun NoteGrid(
     uiMode = Configuration.UI_MODE_NIGHT_YES,
 )
 @Composable
-private fun PersonDetailsContentPreview(
-    @PreviewParameter(PersonDetailsPreviewParameterProvider::class)
-    state: PersonDetailsUiState,
+private fun NotesContentPreview(
+    @PreviewParameter(NotesPreviewParameterProvider::class)
+    state: NotesUiState,
 ) {
     PeopleNotesTheme {
         Surface {
-            PersonDetailsContent(
+            NotesContent(
                 state = state,
                 onSearchTermChange = {},
                 onListStyleChange = {},
@@ -262,7 +262,7 @@ private fun PersonDetailsContentPreview(
     }
 }
 
-class PersonDetailsPreviewParameterProvider : PreviewParameterProvider<PersonDetailsUiState> {
+class NotesPreviewParameterProvider : PreviewParameterProvider<NotesUiState> {
 
     private val searchBarState = SearchBarUiState(
         searchTerm = "",
@@ -270,7 +270,7 @@ class PersonDetailsPreviewParameterProvider : PreviewParameterProvider<PersonDet
         sortBy = PeopleSortBy.DEFAULT,
     )
 
-    private val loadedState: PersonDetailsUiState.Loaded
+    private val loadedState: NotesUiState.Loaded
         get() {
             val person = Person(
                 id = PersonId(1),
@@ -278,13 +278,13 @@ class PersonDetailsPreviewParameterProvider : PreviewParameterProvider<PersonDet
                 lastName = LastName("Last Name".toNonEmptyString()),
                 lastModified = LocalDateTime.now(),
             )
-            return PersonDetailsUiState.Loaded(
+            return NotesUiState.Loaded(
                 isLoading = false,
                 searchBarState = searchBarState,
-                personDetails = PersonDetails(
+                notes = Notes(
                     person = person,
-                    notes = Notes(
-                        notes = (0..10).map { i ->
+                    notes = NotesList(
+                        items = (0..10).map { i ->
                             Note(
                                 id = NoteId(i),
                                 text = "".toNonEmptyString(),
@@ -299,9 +299,9 @@ class PersonDetailsPreviewParameterProvider : PreviewParameterProvider<PersonDet
             )
         }
 
-    override val values: Sequence<PersonDetailsUiState> =
+    override val values: Sequence<NotesUiState> =
         sequenceOf(
-            PersonDetailsUiState.InitialLoad(
+            NotesUiState.InitialLoad(
                 searchBarState = searchBarState,
             ),
             loadedState

@@ -20,9 +20,9 @@ import javax.inject.Inject
 
 interface NotesDataSource {
 
-    fun getNotes(personId: PersonId): Flow<Notes>
+    fun getNotes(personId: PersonId): Flow<NotesList>
 
-    fun getNotes(personId: PersonId, sortBy: PeopleSortBy, filter: String): Flow<Notes>
+    fun getNotes(personId: PersonId, sortBy: PeopleSortBy, filter: String): Flow<NotesList>
 
     suspend fun add(note: NewNote, personId: PersonId)
 
@@ -60,21 +60,25 @@ class NotesLocalDataSource @Inject constructor(
         )
     }
 
-    override fun getNotes(personId: PersonId): Flow<Notes> =
+    override fun getNotes(personId: PersonId): Flow<NotesList> =
         noteQueries
             .selectAll(personId.value, toNote)
             .asFlow()
             .mapToList()
             .map { notes ->
                 withContext(dispatchers.Default) {
-                    Notes(
-                        notes = notes,
+                    NotesList(
+                        items = notes,
                         totalCount = noteQueries.count().executeAsOne().toInt(),
                     )
                 }
             }
 
-    override fun getNotes(personId: PersonId, sortBy: PeopleSortBy, filter: String): Flow<Notes> {
+    override fun getNotes(
+        personId: PersonId,
+        sortBy: PeopleSortBy,
+        filter: String
+    ): Flow<NotesList> {
         val comparator = when (sortBy) {
             PeopleSortBy.FirstName -> compareBy { note: Note -> note.person.firstName }
             PeopleSortBy.LastName -> compareBy { note: Note -> note.person.lastName }
@@ -87,8 +91,8 @@ class NotesLocalDataSource @Inject constructor(
             .mapToList()
             .map { notes ->
                 withContext(dispatchers.Default) {
-                    Notes(
-                        notes = notes.sortedWith(comparator),
+                    NotesList(
+                        items = notes.sortedWith(comparator),
                         totalCount = noteQueries.count().executeAsOne().toInt(),
                     )
                 }

@@ -43,7 +43,7 @@ import com.jenzz.peoplenotes.common.ui.widgets.*
 import com.jenzz.peoplenotes.common.ui.widgets.MultiFloatingActionButtonState.Collapsed
 import com.jenzz.peoplenotes.ext.toNonEmptyString
 import com.jenzz.peoplenotes.feature.destinations.AddPersonScreenDestination
-import com.jenzz.peoplenotes.feature.destinations.PersonDetailsScreenDestination
+import com.jenzz.peoplenotes.feature.destinations.NotesScreenDestination
 import com.jenzz.peoplenotes.feature.destinations.SettingsScreenDestination
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
@@ -60,7 +60,7 @@ fun PeopleScreen(
         onListStyleChange = viewModel::onListStyleChange,
         onSearchTermChange = viewModel::onSearchTermChange,
         onClick = { person ->
-            navigator.navigate(PersonDetailsScreenDestination(person.id))
+            navigator.navigate(NotesScreenDestination(person.id))
         },
         onDeleteRequest = viewModel::onDeleteRequest,
         onDeleteConfirm = viewModel::onDeleteConfirm,

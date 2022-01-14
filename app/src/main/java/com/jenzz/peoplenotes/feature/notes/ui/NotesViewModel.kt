@@ -1,4 +1,4 @@
-package com.jenzz.peoplenotes.feature.person_details.ui
+package com.jenzz.peoplenotes.feature.notes.ui
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -12,26 +12,26 @@ import com.jenzz.peoplenotes.common.ui.TextResource
 import com.jenzz.peoplenotes.common.ui.ToastMessage
 import com.jenzz.peoplenotes.common.ui.widgets.SearchBarState
 import com.jenzz.peoplenotes.common.ui.widgets.SearchBarUiState
-import com.jenzz.peoplenotes.feature.destinations.PersonDetailsScreenDestination
+import com.jenzz.peoplenotes.feature.destinations.NotesScreenDestination
+import com.jenzz.peoplenotes.feature.notes.data.NotesUseCases
+import com.jenzz.peoplenotes.feature.notes.ui.NotesUiState.InitialLoad
+import com.jenzz.peoplenotes.feature.notes.ui.NotesUiState.Loaded
 import com.jenzz.peoplenotes.feature.people.ui.PeopleSortBy
-import com.jenzz.peoplenotes.feature.person_details.data.PersonDetailsUseCases
-import com.jenzz.peoplenotes.feature.person_details.ui.PersonDetailsUiState.InitialLoad
-import com.jenzz.peoplenotes.feature.person_details.ui.PersonDetailsUiState.Loaded
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class PersonDetailsViewModel @Inject constructor(
+class NotesViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
-    private val useCases: PersonDetailsUseCases,
+    private val useCases: NotesUseCases,
     private val searchBarState: SearchBarState,
 ) : ViewModel() {
 
-    private val personId = PersonDetailsScreenDestination.argsFrom(savedStateHandle).personId
+    private val personId = NotesScreenDestination.argsFrom(savedStateHandle).personId
 
-    var state by mutableStateOf<PersonDetailsUiState>(
+    var state by mutableStateOf<NotesUiState>(
         InitialLoad(
             searchBarState = SearchBarUiState.DEFAULT,
         )
@@ -41,12 +41,12 @@ class PersonDetailsViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             useCases
-                .getPersonDetails(personId)
-                .collect { personDetails ->
+                .getNotesWithPerson(personId)
+                .collect { notes ->
                     state = Loaded(
                         isLoading = false,
                         searchBarState = state.searchBarState,
-                        personDetails = personDetails,
+                        notes = notes,
                         toastMessage = null,
                     )
                 }
@@ -57,7 +57,7 @@ class PersonDetailsViewModel @Inject constructor(
         val loadedState = state as Loaded
         state = loadedState.copy(searchBarState = searchBarState.onSearchTermChange(searchTerm))
         viewModelScope.launch {
-            getPersonDetails(filter = searchTerm)
+            getNotes(filter = searchTerm)
         }
     }
 
@@ -75,7 +75,7 @@ class PersonDetailsViewModel @Inject constructor(
             ),
         )
         viewModelScope.launch {
-            getPersonDetails(sortBy = sortBy)
+            getNotes(sortBy = sortBy)
         }
     }
 
@@ -84,7 +84,7 @@ class PersonDetailsViewModel @Inject constructor(
         state = loadedState.copy(toastMessage = null)
     }
 
-    private suspend fun getPersonDetails(
+    private suspend fun getNotes(
         sortBy: PeopleSortBy = state.searchBarState.sortBy,
         filter: String = state.searchBarState.searchTerm,
     ) {
@@ -93,11 +93,11 @@ class PersonDetailsViewModel @Inject constructor(
             isLoading = true
         )
         useCases
-            .getPersonDetails(personId, sortBy, filter)
-            .collect { personDetails ->
+            .getNotesWithPerson(personId, sortBy, filter)
+            .collect { notes ->
                 state = loadedState.copy(
                     isLoading = false,
-                    personDetails = personDetails,
+                    notes = notes,
                 )
             }
     }
