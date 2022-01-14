@@ -8,7 +8,7 @@ import com.jenzz.peoplenotes.common.data.time.Clock
 import com.jenzz.peoplenotes.common.data.time.toEntity
 import com.jenzz.peoplenotes.common.data.time.toLocalDateTime
 import com.jenzz.peoplenotes.ext.toNonEmptyString
-import com.jenzz.peoplenotes.feature.home.ui.SortBy
+import com.jenzz.peoplenotes.feature.home.ui.PeopleSortBy
 import com.squareup.sqldelight.runtime.coroutines.asFlow
 import com.squareup.sqldelight.runtime.coroutines.mapToList
 import com.squareup.sqldelight.runtime.coroutines.mapToOne
@@ -21,7 +21,7 @@ interface PeopleDataSource {
 
     fun getPerson(personId: PersonId): Flow<Person>
 
-    fun getAllPeople(sortBy: SortBy, filter: String): Flow<People>
+    fun getAllPeople(sortBy: PeopleSortBy, filter: String): Flow<People>
 
     suspend fun add(person: NewPerson): Person
 
@@ -50,11 +50,11 @@ class PeopleLocalDataSource @Inject constructor(
             .asFlow()
             .mapToOne()
 
-    override fun getAllPeople(sortBy: SortBy, filter: String): Flow<People> {
+    override fun getAllPeople(sortBy: PeopleSortBy, filter: String): Flow<People> {
         val comparator = when (sortBy) {
-            SortBy.FirstName -> compareBy { person: Person -> person.firstName }
-            SortBy.LastName -> compareBy { person: Person -> person.lastName }
-            SortBy.LastModified -> compareByDescending { person: Person -> person.lastModified }
+            PeopleSortBy.FirstName -> compareBy { person: Person -> person.firstName }
+            PeopleSortBy.LastName -> compareBy { person: Person -> person.lastName }
+            PeopleSortBy.LastModified -> compareByDescending { person: Person -> person.lastModified }
         }
         val filterSql = if (filter.isNotEmpty()) "%$filter%" else null
         return personQueries

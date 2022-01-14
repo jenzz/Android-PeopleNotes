@@ -3,7 +3,7 @@ package com.jenzz.peoplenotes.feature.person_details.data
 import com.jenzz.peoplenotes.common.data.notes.NotesRepository
 import com.jenzz.peoplenotes.common.data.people.PeopleRepository
 import com.jenzz.peoplenotes.common.data.people.PersonId
-import com.jenzz.peoplenotes.feature.home.ui.SortBy
+import com.jenzz.peoplenotes.feature.home.ui.PeopleSortBy
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import javax.inject.Inject
@@ -29,7 +29,11 @@ class GetPersonDetails @Inject constructor(
                 )
             }
 
-    operator fun invoke(personId: PersonId, sortBy: SortBy, filter: String): Flow<PersonDetails> =
+    operator fun invoke(
+        personId: PersonId,
+        sortBy: PeopleSortBy,
+        filter: String
+    ): Flow<PersonDetails> =
         peopleRepository
             .getPerson(personId)
             .combine(

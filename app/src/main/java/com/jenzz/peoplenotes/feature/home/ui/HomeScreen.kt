@@ -93,7 +93,7 @@ private fun HomeContent(
     onDeleteCancel: () -> Unit,
     onDeleteWithNotes: (Person) -> Unit,
     onDeleteWithNotesCancel: () -> Unit,
-    onSortByChange: (SortBy) -> Unit,
+    onSortByChange: (PeopleSortBy) -> Unit,
     onAddPersonManuallyClick: () -> Unit,
     onImportFromContactsClick: () -> Unit,
     onSettingsClick: () -> Unit,

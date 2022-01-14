@@ -4,7 +4,7 @@ import androidx.annotation.StringRes
 import com.jenzz.peoplenotes.R
 import com.jenzz.peoplenotes.common.ui.TextResource
 
-enum class SortBy(@StringRes label: Int) {
+enum class PeopleSortBy(@StringRes label: Int) {
 
     LastModified(R.string.last_modified),
     FirstName(R.string.first_name),

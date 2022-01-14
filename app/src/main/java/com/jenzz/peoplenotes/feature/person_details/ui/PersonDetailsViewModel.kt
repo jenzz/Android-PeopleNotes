@@ -13,7 +13,7 @@ import com.jenzz.peoplenotes.common.ui.widgets.SearchBarState
 import com.jenzz.peoplenotes.common.ui.widgets.SearchBarUiState
 import com.jenzz.peoplenotes.feature.destinations.PersonDetailsScreenDestination
 import com.jenzz.peoplenotes.feature.home.ui.ListStyle
-import com.jenzz.peoplenotes.feature.home.ui.SortBy
+import com.jenzz.peoplenotes.feature.home.ui.PeopleSortBy
 import com.jenzz.peoplenotes.feature.person_details.data.PersonDetailsUseCases
 import com.jenzz.peoplenotes.feature.person_details.ui.PersonDetailsUiState.InitialLoad
 import com.jenzz.peoplenotes.feature.person_details.ui.PersonDetailsUiState.Loaded
@@ -66,7 +66,7 @@ class PersonDetailsViewModel @Inject constructor(
         state = loadedState.copy(searchBarState = searchBarState.onListStyleChange(listStyle))
     }
 
-    fun onSortByChange(sortBy: SortBy) {
+    fun onSortByChange(sortBy: PeopleSortBy) {
         val loadedState = state as Loaded
         state = loadedState.copy(
             searchBarState = searchBarState.onSortByChange(sortBy),
@@ -85,7 +85,7 @@ class PersonDetailsViewModel @Inject constructor(
     }
 
     private suspend fun getPersonDetails(
-        sortBy: SortBy = state.searchBarState.sortBy,
+        sortBy: PeopleSortBy = state.searchBarState.sortBy,
         filter: String = state.searchBarState.searchTerm,
     ) {
         val loadedState = state as Loaded

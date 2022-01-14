@@ -29,7 +29,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import com.jenzz.peoplenotes.R
 import com.jenzz.peoplenotes.common.ui.TextResource
 import com.jenzz.peoplenotes.feature.home.ui.ListStyle
-import com.jenzz.peoplenotes.feature.home.ui.SortBy
+import com.jenzz.peoplenotes.feature.home.ui.PeopleSortBy
 import kotlinx.parcelize.Parcelize
 import javax.inject.Inject
 
@@ -42,7 +42,7 @@ fun SearchBar(
     visualTransformation: () -> VisualTransformation,
     onSearchTermChange: (String) -> Unit,
     onListStyleChange: (ListStyle) -> Unit,
-    onSortByChange: (SortBy) -> Unit,
+    onSortByChange: (PeopleSortBy) -> Unit,
     onSettingsClick: () -> Unit,
 ) {
     Row(modifier = modifier) {
@@ -75,8 +75,8 @@ private fun SearchTextField(
     onSearchTermChange: (String) -> Unit,
     listStyle: ListStyle,
     onListStyleChange: (ListStyle) -> Unit,
-    sortBy: SortBy,
-    onSortByChange: (SortBy) -> Unit,
+    sortBy: PeopleSortBy,
+    onSortByChange: (PeopleSortBy) -> Unit,
 ) {
     TextField(
         modifier = modifier
@@ -171,8 +171,8 @@ private fun ListStyleAction(
 @Composable
 private fun SortByAction(
     modifier: Modifier = Modifier,
-    sortBy: SortBy,
-    onSortByChang: (SortBy) -> Unit,
+    sortBy: PeopleSortBy,
+    onSortByChang: (PeopleSortBy) -> Unit,
 ) {
     Box(modifier = modifier) {
         var expanded by rememberSaveable { mutableStateOf(false) }
@@ -189,7 +189,7 @@ private fun SortByAction(
             expanded = expanded,
             onDismissRequest = { expanded = false },
         ) {
-            SortBy.values().forEach { sortByItem ->
+            PeopleSortBy.values().forEach { sortByItem ->
                 SortByDropdownItem(
                     text = sortByItem.label,
                     isSelected = sortBy == sortByItem,
@@ -233,7 +233,7 @@ private fun SortByDropdownItem(
 data class SearchBarUiState(
     val searchTerm: String,
     val listStyle: ListStyle,
-    val sortBy: SortBy,
+    val sortBy: PeopleSortBy,
 ) : Parcelable {
 
     companion object {
@@ -241,7 +241,7 @@ data class SearchBarUiState(
         val DEFAULT = SearchBarUiState(
             searchTerm = "",
             listStyle = ListStyle.DEFAULT,
-            sortBy = SortBy.DEFAULT,
+            sortBy = PeopleSortBy.DEFAULT,
         )
     }
 }
@@ -261,7 +261,7 @@ class SearchBarState @Inject constructor() {
         return state
     }
 
-    fun onSortByChange(sortBy: SortBy): SearchBarUiState {
+    fun onSortByChange(sortBy: PeopleSortBy): SearchBarUiState {
         state = state.copy(sortBy = sortBy)
         return state
     }

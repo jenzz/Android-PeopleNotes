@@ -40,7 +40,7 @@ import com.jenzz.peoplenotes.ext.stringResourceWithStyledPlaceholders
 import com.jenzz.peoplenotes.ext.toNonEmptyString
 import com.jenzz.peoplenotes.feature.destinations.SettingsScreenDestination
 import com.jenzz.peoplenotes.feature.home.ui.ListStyle
-import com.jenzz.peoplenotes.feature.home.ui.SortBy
+import com.jenzz.peoplenotes.feature.home.ui.PeopleSortBy
 import com.jenzz.peoplenotes.feature.person_details.data.PersonDetails
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
@@ -76,7 +76,7 @@ fun PersonDetailsContent(
     state: PersonDetailsUiState,
     onSearchTermChange: (String) -> Unit,
     onListStyleChange: (ListStyle) -> Unit,
-    onSortByChange: (SortBy) -> Unit,
+    onSortByChange: (PeopleSortBy) -> Unit,
     onSettingsClick: () -> Unit,
     onAddNoteClick: () -> Unit,
     onToastMessageShown: () -> Unit,
@@ -267,7 +267,7 @@ class PersonDetailsPreviewParameterProvider : PreviewParameterProvider<PersonDet
     private val searchBarState = SearchBarUiState(
         searchTerm = "",
         listStyle = ListStyle.DEFAULT,
-        sortBy = SortBy.DEFAULT,
+        sortBy = PeopleSortBy.DEFAULT,
     )
 
     private val loadedState: PersonDetailsUiState.Loaded

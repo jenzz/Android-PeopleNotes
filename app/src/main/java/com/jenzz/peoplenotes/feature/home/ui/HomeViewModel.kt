@@ -53,7 +53,7 @@ class HomeViewModel @Inject constructor(
         state = state.copy(searchBarState = searchBarState.onListStyleChange(listStyle))
     }
 
-    fun onSortByChange(sortBy: SortBy) {
+    fun onSortByChange(sortBy: PeopleSortBy) {
         state = state.copy(
             searchBarState = searchBarState.onSortByChange(sortBy),
             toastMessage = ToastMessage(
@@ -119,7 +119,7 @@ class HomeViewModel @Inject constructor(
     }
 
     private suspend fun getPeople(
-        sortBy: SortBy = state.searchBarState.sortBy,
+        sortBy: PeopleSortBy = state.searchBarState.sortBy,
         filter: String = state.searchBarState.searchTerm,
     ) {
         state = state.copy(isLoading = true)
