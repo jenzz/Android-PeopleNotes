@@ -1,7 +1,8 @@
 package com.jenzz.peoplenotes.feature.people.data
 
 import com.jenzz.peoplenotes.common.data.people.*
-import com.jenzz.peoplenotes.feature.people.ui.PeopleSortBy
+import com.jenzz.peoplenotes.common.ui.SortBy
+import com.jenzz.peoplenotes.feature.people.ui.toPeopleSortBy
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
@@ -15,8 +16,8 @@ class GetPeopleUseCase @Inject constructor(
     private val peopleRepository: PeopleRepository,
 ) {
 
-    operator fun invoke(sortBy: PeopleSortBy, filter: String): Flow<People> =
-        peopleRepository.getAllPeople(sortBy, filter)
+    operator fun invoke(sortBy: SortBy, filter: String): Flow<People> =
+        peopleRepository.getAllPeople(sortBy.toPeopleSortBy(), filter)
 }
 
 class DeletePersonUseCase @Inject constructor(

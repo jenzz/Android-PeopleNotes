@@ -5,12 +5,13 @@
     <string name="search_notes">Search notes (%1$d)</string>
     <string name="sort_by">Sort by</string>
     <string name="sorted_by">Sorted by %1$s</string>
-    <string name="last_modified">Last Modified</string>
-    <string name="last_modified_at">Last Modified: %1$s</string>
-    <string name="edited">Edited %1$s</string>
-    <string name="first_name">First Name</string>
+    <string name="last_modified">Last modified</string>
+    <string name="last_modified_at">Last modified: %1$s</string>
+    <string name="most_recent_first">Most recent first</string>
+    <string name="oldest_first">Oldest first</string>
+    <string name="first_name">First name</string>
     <string name="first_name_cannot_be_empty">First name cannot be empty.</string>
-    <string name="last_name">Last Name</string>
+    <string name="last_name">Last name</string>
     <string name="last_name_cannot_be_empty">Last name cannot be empty.</string>
     <string name="notes_optional">Notes (optional)</string>
     <string name="settings">Settings</string>
@@ -20,7 +21,7 @@
     <string name="theme">Theme</string>
     <string name="light">Light</string>
     <string name="dark">Dark</string>
-    <string name="system_default">System Default</string>
+    <string name="system_default">System default</string>
     <string name="delete">Delete</string>
     <string name="person_deleted">%1$s deleted.</string>
     <string name="empty_people">Wow, such empty.\nAdd a person to get started.</string>
@@ -29,7 +30,7 @@
     <string name="empty_notes_filtered">Oops.\nNo notes are matching your search.</string>
     <string name="grid_view">Grid view</string>
     <string name="rows">Rows</string>
-    <string name="app_version">App Version</string>
+    <string name="app_version">App version</string>
     <string name="delete_person_dialog">Are you sure you want to delete %1$s?</string>
     <string name="delete_person_with_notes_dialog">There are still notes associated with %1$s. Do you want to delete %1$s including the notes?</string>
     <string name="yes">Yes</string>

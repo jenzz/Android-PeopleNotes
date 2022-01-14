@@ -25,7 +25,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
-import androidx.compose.ui.tooling.preview.datasource.CollectionPreviewParameterProvider
+import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.jenzz.peoplenotes.R
@@ -90,7 +90,7 @@ private fun PeopleContent(
     onDeleteCancel: () -> Unit,
     onDeleteWithNotes: (Person) -> Unit,
     onDeleteWithNotesCancel: () -> Unit,
-    onSortByChange: (PeopleSortBy) -> Unit,
+    onSortByChange: (SortBy) -> Unit,
     onAddPersonManuallyClick: () -> Unit,
     onImportFromContactsClick: () -> Unit,
     onSettingsClick: () -> Unit,
@@ -561,49 +561,57 @@ private fun PeopleContentPreview(
     }
 }
 
-class PeoplePreviewParameterProvider : CollectionPreviewParameterProvider<PeopleUiState>(
-    listOf(
-        PeopleUiState(
-            isLoading = true,
-            searchBarState = SearchBarUiState.DEFAULT,
-            people = People(
-                persons = emptyList(),
-                totalCount = 0
+class PeoplePreviewParameterProvider : PreviewParameterProvider<PeopleUiState> {
+
+    private val searchBarState = SearchBarUiState(
+        searchTerm = "",
+        listStyle = ListStyle.DEFAULT,
+        sortByState = SortByUiState(emptyList()),
+    )
+
+    override val values: Sequence<PeopleUiState> =
+        sequenceOf(
+            PeopleUiState(
+                isLoading = true,
+                searchBarState = searchBarState,
+                people = People(
+                    persons = emptyList(),
+                    totalCount = 0
+                ),
+                deleteConfirmation = null,
+                deleteWithNotesConfirmation = null,
+                toastMessage = null,
             ),
-            deleteConfirmation = null,
-            deleteWithNotesConfirmation = null,
-            toastMessage = null,
-        ),
-        PeopleUiState(
-            isLoading = false,
-            searchBarState = SearchBarUiState.DEFAULT,
-            people = People(
-                persons = (1..10).map { i ->
-                    Person(
-                        id = PersonId(i),
-                        firstName = FirstName("$i First Name".toNonEmptyString()),
-                        lastName = LastName("Last Name".toNonEmptyString()),
-                        lastModified = LocalDateTime.now(),
-                    )
-                },
-                totalCount = 10,
+            PeopleUiState(
+                isLoading = false,
+                searchBarState = searchBarState,
+                people = People(
+                    persons = (1..10).map { i ->
+                        Person(
+                            id = PersonId(i),
+                            firstName = FirstName("$i First Name".toNonEmptyString()),
+                            lastName = LastName("Last Name".toNonEmptyString()),
+                            lastModified = LocalDateTime.now(),
+                        )
+                    },
+                    totalCount = 10,
+                ),
+                deleteConfirmation = null,
+                deleteWithNotesConfirmation = null,
+                toastMessage = null,
             ),
-            deleteConfirmation = null,
-            deleteWithNotesConfirmation = null,
-            toastMessage = null,
-        ),
-        PeopleUiState(
-            isLoading = false,
-            searchBarState = SearchBarUiState.DEFAULT,
-            people = People(
-                persons = emptyList(),
-                totalCount = 0
+            PeopleUiState(
+                isLoading = false,
+                searchBarState = searchBarState,
+                people = People(
+                    persons = emptyList(),
+                    totalCount = 0
+                ),
+                deleteConfirmation = PersonId(1),
+                deleteWithNotesConfirmation = null,
+                toastMessage = ToastMessage(
+                    text = TextResource.fromText("User Message 1")
+                ),
             ),
-            deleteConfirmation = PersonId(1),
-            deleteWithNotesConfirmation = null,
-            toastMessage = ToastMessage(
-                text = TextResource.fromText("User Message 1")
-            ),
-        ),
-    ),
-)
+        )
+}

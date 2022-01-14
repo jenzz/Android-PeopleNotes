@@ -7,10 +7,9 @@ import com.jenzz.peoplenotes.R
 import com.jenzz.peoplenotes.common.data.people.DeletePersonResult
 import com.jenzz.peoplenotes.common.data.people.People
 import com.jenzz.peoplenotes.common.data.people.Person
-import com.jenzz.peoplenotes.common.ui.ListStyle
-import com.jenzz.peoplenotes.common.ui.TextResource
-import com.jenzz.peoplenotes.common.ui.ToastMessage
+import com.jenzz.peoplenotes.common.ui.*
 import com.jenzz.peoplenotes.common.ui.widgets.SearchBarState
+import com.jenzz.peoplenotes.common.ui.widgets.SearchBarUiState
 import com.jenzz.peoplenotes.ext.mutableStateOf
 import com.jenzz.peoplenotes.feature.people.data.PeopleUseCases
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -22,9 +21,18 @@ import javax.inject.Inject
 class PeopleViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val useCases: PeopleUseCases,
-    private val searchBarState: SearchBarState,
 ) : ViewModel() {
 
+    private val searchBarState: SearchBarState =
+        SearchBarState(
+            initialState = SearchBarUiState(
+                searchTerm = "",
+                listStyle = ListStyle.DEFAULT,
+                sortByState = SortByUiState(
+                    items = PeopleSortBy.toSortBy()
+                )
+            )
+        )
     var state by savedStateHandle.mutableStateOf(
         defaultValue = PeopleUiState(
             isLoading = true,
@@ -54,7 +62,7 @@ class PeopleViewModel @Inject constructor(
         state = state.copy(searchBarState = searchBarState.onListStyleChange(listStyle))
     }
 
-    fun onSortByChange(sortBy: PeopleSortBy) {
+    fun onSortByChange(sortBy: SortBy) {
         state = state.copy(
             searchBarState = searchBarState.onSortByChange(sortBy),
             toastMessage = ToastMessage(
@@ -90,7 +98,10 @@ class PeopleViewModel @Inject constructor(
                     state.copy(
                         isLoading = false,
                         toastMessage = ToastMessage(
-                            text = TextResource.fromId(R.string.person_deleted, person.fullName)
+                            text = TextResource.fromId(
+                                id = R.string.person_deleted,
+                                TextResource.fromText(person.fullName),
+                            )
                         ),
                     )
                 }
@@ -106,7 +117,10 @@ class PeopleViewModel @Inject constructor(
         state = state.copy(
             isLoading = false,
             toastMessage = ToastMessage(
-                text = TextResource.fromId(R.string.person_deleted, person.fullName)
+                text = TextResource.fromId(
+                    id = R.string.person_deleted,
+                    TextResource.fromText(person.fullName),
+                )
             ),
         )
     }
@@ -120,7 +134,7 @@ class PeopleViewModel @Inject constructor(
     }
 
     private suspend fun getPeople(
-        sortBy: PeopleSortBy = state.searchBarState.sortBy,
+        sortBy: SortBy = state.searchBarState.sortByState.selected,
         filter: String = state.searchBarState.searchTerm,
     ) {
         state = state.copy(isLoading = true)

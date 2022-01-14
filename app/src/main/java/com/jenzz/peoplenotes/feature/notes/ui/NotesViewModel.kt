@@ -7,16 +7,13 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.jenzz.peoplenotes.R
-import com.jenzz.peoplenotes.common.ui.ListStyle
-import com.jenzz.peoplenotes.common.ui.TextResource
-import com.jenzz.peoplenotes.common.ui.ToastMessage
+import com.jenzz.peoplenotes.common.ui.*
 import com.jenzz.peoplenotes.common.ui.widgets.SearchBarState
 import com.jenzz.peoplenotes.common.ui.widgets.SearchBarUiState
 import com.jenzz.peoplenotes.feature.destinations.NotesScreenDestination
 import com.jenzz.peoplenotes.feature.notes.data.NotesUseCases
 import com.jenzz.peoplenotes.feature.notes.ui.NotesUiState.InitialLoad
 import com.jenzz.peoplenotes.feature.notes.ui.NotesUiState.Loaded
-import com.jenzz.peoplenotes.feature.people.ui.PeopleSortBy
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
@@ -26,22 +23,32 @@ import javax.inject.Inject
 class NotesViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val useCases: NotesUseCases,
-    private val searchBarState: SearchBarState,
 ) : ViewModel() {
 
     private val personId = NotesScreenDestination.argsFrom(savedStateHandle).personId
+    private val searchBarState: SearchBarState = SearchBarState(
+        initialState = SearchBarUiState(
+            searchTerm = "",
+            listStyle = ListStyle.DEFAULT,
+            sortByState = SortByUiState(
+                items = NotesSortBy.toSortBy()
+            )
+        )
+    )
 
     var state by mutableStateOf<NotesUiState>(
-        InitialLoad(
-            searchBarState = SearchBarUiState.DEFAULT,
-        )
+        InitialLoad(searchBarState = searchBarState.state)
     )
         private set
 
     init {
         viewModelScope.launch {
             useCases
-                .getNotesWithPerson(personId)
+                .getNotesWithPerson(
+                    personId = personId,
+                    sortBy = state.searchBarState.sortByState.selected,
+                    filter = state.searchBarState.searchTerm,
+                )
                 .collect { notes ->
                     state = Loaded(
                         isLoading = false,
@@ -66,12 +73,12 @@ class NotesViewModel @Inject constructor(
         state = loadedState.copy(searchBarState = searchBarState.onListStyleChange(listStyle))
     }
 
-    fun onSortByChange(sortBy: PeopleSortBy) {
+    fun onSortByChange(sortBy: SortBy) {
         val loadedState = state as Loaded
         state = loadedState.copy(
             searchBarState = searchBarState.onSortByChange(sortBy),
             toastMessage = ToastMessage(
-                text = TextResource.fromId(R.string.sorted_by, sortBy.label)
+                text = TextResource.fromId(id = R.string.sorted_by, sortBy.label)
             ),
         )
         viewModelScope.launch {
@@ -85,7 +92,7 @@ class NotesViewModel @Inject constructor(
     }
 
     private suspend fun getNotes(
-        sortBy: PeopleSortBy = state.searchBarState.sortBy,
+        sortBy: SortBy = state.searchBarState.sortByState.selected,
         filter: String = state.searchBarState.searchTerm,
     ) {
         val loadedState = state as Loaded

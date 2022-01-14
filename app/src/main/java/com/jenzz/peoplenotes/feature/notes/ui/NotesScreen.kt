@@ -30,9 +30,7 @@ import com.jenzz.peoplenotes.common.data.people.Person
 import com.jenzz.peoplenotes.common.data.people.PersonId
 import com.jenzz.peoplenotes.common.data.people.di.FirstName
 import com.jenzz.peoplenotes.common.data.people.di.LastName
-import com.jenzz.peoplenotes.common.ui.ListStyle
-import com.jenzz.peoplenotes.common.ui.SuffixVisualTransformation
-import com.jenzz.peoplenotes.common.ui.showShortToast
+import com.jenzz.peoplenotes.common.ui.*
 import com.jenzz.peoplenotes.common.ui.theme.PeopleNotesTheme
 import com.jenzz.peoplenotes.common.ui.theme.elevation
 import com.jenzz.peoplenotes.common.ui.theme.spacing
@@ -41,7 +39,6 @@ import com.jenzz.peoplenotes.ext.stringResourceWithStyledPlaceholders
 import com.jenzz.peoplenotes.ext.toNonEmptyString
 import com.jenzz.peoplenotes.feature.destinations.SettingsScreenDestination
 import com.jenzz.peoplenotes.feature.notes.data.Notes
-import com.jenzz.peoplenotes.feature.people.ui.PeopleSortBy
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import java.time.LocalDateTime
@@ -76,7 +73,7 @@ fun NotesContent(
     state: NotesUiState,
     onSearchTermChange: (String) -> Unit,
     onListStyleChange: (ListStyle) -> Unit,
-    onSortByChange: (PeopleSortBy) -> Unit,
+    onSortByChange: (SortBy) -> Unit,
     onSettingsClick: () -> Unit,
     onAddNoteClick: () -> Unit,
     onToastMessageShown: () -> Unit,
@@ -267,7 +264,7 @@ class NotesPreviewParameterProvider : PreviewParameterProvider<NotesUiState> {
     private val searchBarState = SearchBarUiState(
         searchTerm = "",
         listStyle = ListStyle.DEFAULT,
-        sortBy = PeopleSortBy.DEFAULT,
+        sortByState = SortByUiState(emptyList()),
     )
 
     private val loadedState: NotesUiState.Loaded

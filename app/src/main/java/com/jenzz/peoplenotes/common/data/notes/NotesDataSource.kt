@@ -10,7 +10,7 @@ import com.jenzz.peoplenotes.common.data.time.Clock
 import com.jenzz.peoplenotes.common.data.time.toEntity
 import com.jenzz.peoplenotes.common.data.time.toLocalDateTime
 import com.jenzz.peoplenotes.ext.toNonEmptyString
-import com.jenzz.peoplenotes.feature.people.ui.PeopleSortBy
+import com.jenzz.peoplenotes.feature.notes.ui.NotesSortBy
 import com.squareup.sqldelight.runtime.coroutines.asFlow
 import com.squareup.sqldelight.runtime.coroutines.mapToList
 import kotlinx.coroutines.flow.Flow
@@ -22,7 +22,7 @@ interface NotesDataSource {
 
     fun getNotes(personId: PersonId): Flow<NotesList>
 
-    fun getNotes(personId: PersonId, sortBy: PeopleSortBy, filter: String): Flow<NotesList>
+    fun getNotes(personId: PersonId, sortBy: NotesSortBy, filter: String): Flow<NotesList>
 
     suspend fun add(note: NewNote, personId: PersonId)
 
@@ -76,13 +76,12 @@ class NotesLocalDataSource @Inject constructor(
 
     override fun getNotes(
         personId: PersonId,
-        sortBy: PeopleSortBy,
+        sortBy: NotesSortBy,
         filter: String
     ): Flow<NotesList> {
         val comparator = when (sortBy) {
-            PeopleSortBy.FirstName -> compareBy { note: Note -> note.person.firstName }
-            PeopleSortBy.LastName -> compareBy { note: Note -> note.person.lastName }
-            PeopleSortBy.LastModified -> compareByDescending { note: Note -> note.lastModified }
+            NotesSortBy.MostRecentFirst -> compareByDescending { note: Note -> note.lastModified }
+            NotesSortBy.OldestFirst -> compareBy { note: Note -> note.lastModified }
         }
         val filterSql = if (filter.isNotEmpty()) "%$filter%" else null
         return noteQueries

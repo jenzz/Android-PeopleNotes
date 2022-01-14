@@ -1,7 +1,7 @@
 package com.jenzz.peoplenotes.common.data.notes
 
 import com.jenzz.peoplenotes.common.data.people.PersonId
-import com.jenzz.peoplenotes.feature.people.ui.PeopleSortBy
+import com.jenzz.peoplenotes.feature.notes.ui.NotesSortBy
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
@@ -12,7 +12,7 @@ class NotesRepository @Inject constructor(
     fun getNotes(personId: PersonId): Flow<NotesList> =
         localDataSource.getNotes(personId)
 
-    fun getNotes(personId: PersonId, sortBy: PeopleSortBy, filter: String): Flow<NotesList> =
+    fun getNotes(personId: PersonId, sortBy: NotesSortBy, filter: String): Flow<NotesList> =
         localDataSource.getNotes(personId, sortBy, filter)
 
     suspend fun add(note: NewNote, personId: PersonId) {

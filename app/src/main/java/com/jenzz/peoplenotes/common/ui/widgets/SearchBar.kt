@@ -28,10 +28,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.VisualTransformation
 import com.jenzz.peoplenotes.R
 import com.jenzz.peoplenotes.common.ui.ListStyle
+import com.jenzz.peoplenotes.common.ui.SortBy
+import com.jenzz.peoplenotes.common.ui.SortByUiState
 import com.jenzz.peoplenotes.common.ui.TextResource
-import com.jenzz.peoplenotes.feature.people.ui.PeopleSortBy
 import kotlinx.parcelize.Parcelize
-import javax.inject.Inject
 
 @Composable
 fun SearchBar(
@@ -42,7 +42,7 @@ fun SearchBar(
     visualTransformation: () -> VisualTransformation,
     onSearchTermChange: (String) -> Unit,
     onListStyleChange: (ListStyle) -> Unit,
-    onSortByChange: (PeopleSortBy) -> Unit,
+    onSortByChange: (SortBy) -> Unit,
     onSettingsClick: () -> Unit,
 ) {
     Row(modifier = modifier) {
@@ -55,7 +55,7 @@ fun SearchBar(
             onSearchTermChange = onSearchTermChange,
             listStyle = state.listStyle,
             onListStyleChange = onListStyleChange,
-            sortBy = state.sortBy,
+            sortBy = state.sortByState,
             onSortByChange = onSortByChange,
         )
         SettingsIcon(
@@ -75,8 +75,8 @@ private fun SearchTextField(
     onSearchTermChange: (String) -> Unit,
     listStyle: ListStyle,
     onListStyleChange: (ListStyle) -> Unit,
-    sortBy: PeopleSortBy,
-    onSortByChange: (PeopleSortBy) -> Unit,
+    sortBy: SortByUiState,
+    onSortByChange: (SortBy) -> Unit,
 ) {
     TextField(
         modifier = modifier
@@ -109,7 +109,7 @@ private fun SearchTextField(
                     SortByAction(
                         modifier = Modifier.size(TextFieldDefaults.MinHeight),
                         sortBy = sortBy,
-                        onSortByChang = onSortByChange
+                        onSortByChange = onSortByChange
                     )
                 }
             }
@@ -171,8 +171,8 @@ private fun ListStyleAction(
 @Composable
 private fun SortByAction(
     modifier: Modifier = Modifier,
-    sortBy: PeopleSortBy,
-    onSortByChang: (PeopleSortBy) -> Unit,
+    sortBy: SortByUiState,
+    onSortByChange: (SortBy) -> Unit,
 ) {
     Box(modifier = modifier) {
         var expanded by rememberSaveable { mutableStateOf(false) }
@@ -189,13 +189,13 @@ private fun SortByAction(
             expanded = expanded,
             onDismissRequest = { expanded = false },
         ) {
-            PeopleSortBy.values().forEach { sortByItem ->
+            sortBy.items.forEach { item ->
                 SortByDropdownItem(
-                    text = sortByItem.label,
-                    isSelected = sortBy == sortByItem,
+                    text = item.label,
+                    isSelected = item.isSelected,
                     onClick = {
                         expanded = false
-                        onSortByChang(sortByItem)
+                        onSortByChange(item)
                     },
                 )
             }
@@ -233,22 +233,12 @@ private fun SortByDropdownItem(
 data class SearchBarUiState(
     val searchTerm: String,
     val listStyle: ListStyle,
-    val sortBy: PeopleSortBy,
-) : Parcelable {
+    val sortByState: SortByUiState,
+) : Parcelable
 
-    companion object {
+class SearchBarState(initialState: SearchBarUiState) {
 
-        val DEFAULT = SearchBarUiState(
-            searchTerm = "",
-            listStyle = ListStyle.DEFAULT,
-            sortBy = PeopleSortBy.DEFAULT,
-        )
-    }
-}
-
-class SearchBarState @Inject constructor() {
-
-    var state by mutableStateOf(SearchBarUiState.DEFAULT)
+    var state by mutableStateOf(initialState)
         private set
 
     fun onSearchTermChange(searchTerm: String): SearchBarUiState {
@@ -261,8 +251,14 @@ class SearchBarState @Inject constructor() {
         return state
     }
 
-    fun onSortByChange(sortBy: PeopleSortBy): SearchBarUiState {
-        state = state.copy(sortBy = sortBy)
+    fun onSortByChange(sortBy: SortBy): SearchBarUiState {
+        state = state.copy(
+            sortByState = state.sortByState.copy(
+                items = state.sortByState.items.map { item ->
+                    item.copy(isSelected = item == sortBy)
+                }
+            )
+        )
         return state
     }
 }
