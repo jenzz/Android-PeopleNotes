@@ -7,15 +7,18 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.jenzz.peoplenotes.R
-import com.jenzz.peoplenotes.common.ui.*
+import com.jenzz.peoplenotes.common.ui.SortBy
+import com.jenzz.peoplenotes.common.ui.TextResource
+import com.jenzz.peoplenotes.common.ui.ToastMessage
 import com.jenzz.peoplenotes.common.ui.widgets.SearchBarState
-import com.jenzz.peoplenotes.common.ui.widgets.SearchBarUiState
 import com.jenzz.peoplenotes.feature.destinations.NotesScreenDestination
 import com.jenzz.peoplenotes.feature.notes.data.NotesUseCases
 import com.jenzz.peoplenotes.feature.notes.ui.NotesUiState.InitialLoad
 import com.jenzz.peoplenotes.feature.notes.ui.NotesUiState.Loaded
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -26,83 +29,64 @@ class NotesViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val personId = NotesScreenDestination.argsFrom(savedStateHandle).personId
-    private val searchBarState: SearchBarState = SearchBarState(
-        initialState = SearchBarUiState(
-            searchTerm = "",
-            listStyle = ListStyle.DEFAULT,
-            sortByState = SortByUiState(
-                items = NotesSortBy.toSortBy()
-            )
-        )
-    )
 
-    var state by mutableStateOf<NotesUiState>(
-        InitialLoad(searchBarState = searchBarState.state)
-    )
+    var state by mutableStateOf<NotesUiState>(InitialLoad)
         private set
 
-    init {
+    private lateinit var searchBarState: SearchBarState
+
+    fun init(searchBarState: SearchBarState) {
+        this.searchBarState = searchBarState
         viewModelScope.launch {
             useCases
                 .observeNotesWithPerson(
                     personId = personId,
-                    sortBy = state.searchBarState.sortByState.selected,
-                    filter = state.searchBarState.searchTerm,
+                    sortBy = searchBarState.sortBy.selected,
+                    filter = searchBarState.searchTerm,
                 )
                 .collect { notes ->
                     state = Loaded(
-                        isLoading = false,
-                        searchBarState = state.searchBarState,
-                        notes = notes,
                         toastMessage = null,
+                        isLoading = false,
+                        notes = notes,
                     )
                 }
+
         }
     }
 
     fun onSearchTermChange(searchTerm: String) {
-        val loadedState = state as Loaded
-        state = loadedState.copy(searchBarState = searchBarState.onSearchTermChange(searchTerm))
         viewModelScope.launch {
             observeNotes(filter = searchTerm)
         }
     }
 
-    fun onListStyleChange(listStyle: ListStyle) {
-        val loadedState = state as Loaded
-        state = loadedState.copy(searchBarState = searchBarState.onListStyleChange(listStyle))
-    }
-
     fun onSortByChange(sortBy: SortBy) {
-        val loadedState = state as Loaded
-        state = loadedState.copy(
-            searchBarState = searchBarState.onSortByChange(sortBy),
-            toastMessage = ToastMessage(
-                text = TextResource.fromId(id = R.string.sorted_by, sortBy.label)
-            ),
-        )
         viewModelScope.launch {
             observeNotes(sortBy = sortBy)
+            state = (state as Loaded).copy(
+                toastMessage = ToastMessage(
+                    text = TextResource.fromId(id = R.string.sorted_by, sortBy.label)
+                ),
+            )
         }
     }
 
     fun onToastMessageShown() {
-        val loadedState = state as Loaded
-        state = loadedState.copy(toastMessage = null)
+        state = (state as Loaded).copy(toastMessage = null)
     }
 
     private suspend fun observeNotes(
-        sortBy: SortBy = state.searchBarState.sortByState.selected,
-        filter: String = state.searchBarState.searchTerm,
+        sortBy: SortBy = searchBarState.sortBy.selected,
+        filter: String = searchBarState.searchTerm,
     ) {
-        val loadedState = state as Loaded
-        state = loadedState.copy(
-            isLoading = true
-        )
+        val state = this.state as Loaded
+        this.state = state.copy(isLoading = true)
         useCases
             .observeNotesWithPerson(personId, sortBy, filter)
+            .onEach { delay(3000) }
             .collect { notes ->
-                state = loadedState.copy(
+                this.state = state.copy(
                     isLoading = false,
                     notes = notes,
                 )

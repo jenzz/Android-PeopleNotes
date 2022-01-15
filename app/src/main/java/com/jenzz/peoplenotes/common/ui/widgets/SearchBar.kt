@@ -1,6 +1,5 @@
 package com.jenzz.peoplenotes.common.ui.widgets
 
-import android.os.Parcelable
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
@@ -14,11 +13,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Settings
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -29,20 +25,16 @@ import androidx.compose.ui.text.input.VisualTransformation
 import com.jenzz.peoplenotes.R
 import com.jenzz.peoplenotes.common.ui.ListStyle
 import com.jenzz.peoplenotes.common.ui.SortBy
-import com.jenzz.peoplenotes.common.ui.SortByUiState
+import com.jenzz.peoplenotes.common.ui.SortByState
 import com.jenzz.peoplenotes.common.ui.TextResource
-import kotlinx.parcelize.Parcelize
 
 @Composable
 fun SearchBar(
     modifier: Modifier = Modifier,
-    state: SearchBarUiState,
+    state: SearchBarState,
     showActions: Boolean,
     placeholder: String,
     visualTransformation: () -> VisualTransformation,
-    onSearchTermChange: (String) -> Unit,
-    onListStyleChange: (ListStyle) -> Unit,
-    onSortByChange: (SortBy) -> Unit,
     onSettingsClick: () -> Unit,
 ) {
     Row(modifier = modifier) {
@@ -52,11 +44,17 @@ fun SearchBar(
             visualTransformation = visualTransformation,
             showActions = showActions,
             searchTerm = state.searchTerm,
-            onSearchTermChange = onSearchTermChange,
+            onSearchTermChange = { searchTerm -> state.searchTerm = searchTerm },
             listStyle = state.listStyle,
-            onListStyleChange = onListStyleChange,
-            sortBy = state.sortByState,
-            onSortByChange = onSortByChange,
+            onListStyleChange = { listStyle -> state.listStyle = listStyle },
+            sortBy = state.sortBy,
+            onSortByChange = { selectedSortBy ->
+                state.sortBy = state.sortBy.copy(
+                    items = state.sortBy.items.map { sortBy ->
+                        sortBy.copy(isSelected = sortBy == selectedSortBy)
+                    }
+                )
+            },
         )
         SettingsIcon(
             modifier = Modifier.size(TextFieldDefaults.MinHeight),
@@ -75,7 +73,7 @@ private fun SearchTextField(
     onSearchTermChange: (String) -> Unit,
     listStyle: ListStyle,
     onListStyleChange: (ListStyle) -> Unit,
-    sortBy: SortByUiState,
+    sortBy: SortByState,
     onSortByChange: (SortBy) -> Unit,
 ) {
     TextField(
@@ -171,7 +169,7 @@ private fun ListStyleAction(
 @Composable
 private fun SortByAction(
     modifier: Modifier = Modifier,
-    sortBy: SortByUiState,
+    sortBy: SortByState,
     onSortByChange: (SortBy) -> Unit,
 ) {
     Box(modifier = modifier) {
@@ -229,36 +227,29 @@ private fun SortByDropdownItem(
     }
 }
 
-@Parcelize
-data class SearchBarUiState(
-    val searchTerm: String,
-    val listStyle: ListStyle,
-    val sortByState: SortByUiState,
-) : Parcelable
+@Stable
+class SearchBarState(
+    searchTerm: String,
+    listStyle: ListStyle,
+    sortBy: SortByState,
+) {
 
-class SearchBarState(initialState: SearchBarUiState) {
-
-    var state by mutableStateOf(initialState)
-        private set
-
-    fun onSearchTermChange(searchTerm: String): SearchBarUiState {
-        state = state.copy(searchTerm = searchTerm)
-        return state
-    }
-
-    fun onListStyleChange(listStyle: ListStyle): SearchBarUiState {
-        state = state.copy(listStyle = listStyle)
-        return state
-    }
-
-    fun onSortByChange(sortBy: SortBy): SearchBarUiState {
-        state = state.copy(
-            sortByState = state.sortByState.copy(
-                items = state.sortByState.items.map { item ->
-                    item.copy(isSelected = item == sortBy)
-                }
-            )
-        )
-        return state
-    }
+    var searchTerm by mutableStateOf(searchTerm)
+    var listStyle by mutableStateOf(listStyle)
+    var sortBy by mutableStateOf(sortBy)
 }
+
+@Composable
+fun rememberSearchBarState(
+    searchTerm: String = "",
+    listStyle: ListStyle = ListStyle.DEFAULT,
+    sortBy: SortByState,
+): SearchBarState =
+    // TODO JD Use rememberSaveable with custom saver instead.
+    remember {
+        SearchBarState(
+            searchTerm = searchTerm,
+            listStyle = listStyle,
+            sortBy = sortBy,
+        )
+    }

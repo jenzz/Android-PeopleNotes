@@ -7,9 +7,10 @@ import com.jenzz.peoplenotes.R
 import com.jenzz.peoplenotes.common.data.people.DeletePersonResult
 import com.jenzz.peoplenotes.common.data.people.People
 import com.jenzz.peoplenotes.common.data.people.Person
-import com.jenzz.peoplenotes.common.ui.*
+import com.jenzz.peoplenotes.common.ui.SortBy
+import com.jenzz.peoplenotes.common.ui.TextResource
+import com.jenzz.peoplenotes.common.ui.ToastMessage
 import com.jenzz.peoplenotes.common.ui.widgets.SearchBarState
-import com.jenzz.peoplenotes.common.ui.widgets.SearchBarUiState
 import com.jenzz.peoplenotes.ext.mutableStateOf
 import com.jenzz.peoplenotes.feature.people.data.PeopleUseCases
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -23,20 +24,9 @@ class PeopleViewModel @Inject constructor(
     private val useCases: PeopleUseCases,
 ) : ViewModel() {
 
-    private val searchBarState: SearchBarState =
-        SearchBarState(
-            initialState = SearchBarUiState(
-                searchTerm = "",
-                listStyle = ListStyle.DEFAULT,
-                sortByState = SortByUiState(
-                    items = PeopleSortBy.toSortBy()
-                )
-            )
-        )
     var state by savedStateHandle.mutableStateOf(
         defaultValue = PeopleUiState(
             isLoading = true,
-            searchBarState = searchBarState.state,
             people = People.DEFAULT,
             deleteConfirmation = null,
             deleteWithNotesConfirmation = null,
@@ -45,33 +35,30 @@ class PeopleViewModel @Inject constructor(
     )
         private set
 
-    init {
+    private lateinit var searchBarState: SearchBarState
+
+    fun init(searchBarState: SearchBarState) {
+        this.searchBarState = searchBarState
         viewModelScope.launch {
             observePeople()
         }
     }
 
     fun onSearchTermChange(searchTerm: String) {
-        state = state.copy(searchBarState = searchBarState.onSearchTermChange(searchTerm))
         viewModelScope.launch {
             observePeople(filter = searchTerm)
         }
     }
 
-    fun onListStyleChange(listStyle: ListStyle) {
-        state = state.copy(searchBarState = searchBarState.onListStyleChange(listStyle))
-    }
-
     fun onSortByChange(sortBy: SortBy) {
+        viewModelScope.launch {
+            observePeople(sortBy = sortBy)
+        }
         state = state.copy(
-            searchBarState = searchBarState.onSortByChange(sortBy),
             toastMessage = ToastMessage(
                 text = TextResource.fromId(R.string.sorted_by, sortBy.label)
             ),
         )
-        viewModelScope.launch {
-            observePeople(sortBy = sortBy)
-        }
     }
 
     fun onDeleteRequest(person: Person) {
@@ -134,8 +121,8 @@ class PeopleViewModel @Inject constructor(
     }
 
     private suspend fun observePeople(
-        sortBy: SortBy = state.searchBarState.sortByState.selected,
-        filter: String = state.searchBarState.searchTerm,
+        sortBy: SortBy = searchBarState.sortBy.selected,
+        filter: String = searchBarState.searchTerm,
     ) {
         state = state.copy(isLoading = true)
         useCases

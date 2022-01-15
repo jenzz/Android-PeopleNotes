@@ -3,6 +3,7 @@ package com.jenzz.peoplenotes.feature.notes.ui
 import androidx.annotation.StringRes
 import com.jenzz.peoplenotes.R
 import com.jenzz.peoplenotes.common.ui.SortBy
+import com.jenzz.peoplenotes.common.ui.SortByState
 import com.jenzz.peoplenotes.common.ui.TextResource
 
 enum class NotesSortBy(@StringRes label: Int) {
@@ -18,11 +19,13 @@ enum class NotesSortBy(@StringRes label: Int) {
     }
 }
 
-fun NotesSortBy.Companion.toSortBy(): List<SortBy> =
-    NotesSortBy.values()
-        .map { sortBy ->
-            SortBy(sortBy.label, sortBy == NotesSortBy.MostRecentFirst)
-        }
+fun NotesSortBy.Companion.toSortByState(): SortByState =
+    SortByState(
+        items = NotesSortBy.values()
+            .map { sortBy ->
+                SortBy(sortBy.label, sortBy == NotesSortBy.MostRecentFirst)
+            }
+    )
 
 fun SortBy.toNotesSortBy(): NotesSortBy =
     NotesSortBy.values()
