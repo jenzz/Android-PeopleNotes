@@ -5,12 +5,13 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import com.google.accompanist.navigation.animation.AnimatedNavHost
-import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 import com.jenzz.peoplenotes.common.ui.theme.PeopleNotesTheme
+import com.jenzz.peoplenotes.feature.NavGraphs
 import com.jenzz.peoplenotes.feature.settings.data.Settings
 import com.jenzz.peoplenotes.feature.settings.data.SettingsRepository
-import com.jenzz.peoplenotes.navigation.Navigation
+import com.ramcosta.composedestinations.DestinationsNavHost
+import com.ramcosta.composedestinations.animations.defaults.RootNavGraphDefaultAnimations
+import com.ramcosta.composedestinations.animations.rememberAnimatedNavHostEngine
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -30,22 +31,18 @@ class MainActivity : ComponentActivity() {
 
     @Composable
     private fun App() {
-        val settingsState = settingsRepository.settings.collectAsState(initial = Settings.DEFAULT)
+        val settingsState = settingsRepository
+            .observeSettings()
+            .collectAsState(initial = Settings.DEFAULT)
         PeopleNotesTheme(
             theme = settingsState.value.theme
         ) {
-            MainScreen()
+            DestinationsNavHost(
+                navGraph = NavGraphs.root,
+                engine = rememberAnimatedNavHostEngine(
+                    rootDefaultAnimations = RootNavGraphDefaultAnimations.ACCOMPANIST_FADING,
+                ),
+            )
         }
-    }
-}
-
-@Composable
-private fun MainScreen() {
-    val navController = rememberAnimatedNavController()
-    AnimatedNavHost(
-        navController = navController,
-        startDestination = Navigation.root.value,
-    ) {
-        Navigation.install(this, navController)
     }
 }

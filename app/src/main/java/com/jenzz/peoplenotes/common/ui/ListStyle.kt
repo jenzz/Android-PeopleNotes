@@ -1,4 +1,4 @@
-package com.jenzz.peoplenotes.feature.home.ui
+package com.jenzz.peoplenotes.common.ui
 
 enum class ListStyle {
 

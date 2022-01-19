@@ -6,11 +6,26 @@ CREATE TABLE NoteEntity (
     FOREIGN KEY (personId) REFERENCES PersonEntity(id)
 );
 
+count:
+SELECT COUNT(*)
+FROM NoteEntity;
+
 selectAll:
 SELECT *
 FROM NoteEntity
 INNER JOIN PersonEntity ON personId = PersonEntity.id
 WHERE personId = :personId;
+
+selectAllFilteredByText:
+SELECT *
+FROM NoteEntity
+INNER JOIN PersonEntity ON personId = PersonEntity.id
+WHERE personId = :personId
+AND
+CASE WHEN :filter IS NOT NULL
+    THEN text LIKE :filter
+    ELSE 1
+END;
 
 insert:
 INSERT

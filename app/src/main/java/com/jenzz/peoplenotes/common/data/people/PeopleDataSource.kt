@@ -8,9 +8,10 @@ import com.jenzz.peoplenotes.common.data.time.Clock
 import com.jenzz.peoplenotes.common.data.time.toEntity
 import com.jenzz.peoplenotes.common.data.time.toLocalDateTime
 import com.jenzz.peoplenotes.ext.toNonEmptyString
-import com.jenzz.peoplenotes.feature.home.ui.SortBy
+import com.jenzz.peoplenotes.feature.people.ui.PeopleSortBy
 import com.squareup.sqldelight.runtime.coroutines.asFlow
 import com.squareup.sqldelight.runtime.coroutines.mapToList
+import com.squareup.sqldelight.runtime.coroutines.mapToOne
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
@@ -18,7 +19,9 @@ import javax.inject.Inject
 
 interface PeopleDataSource {
 
-    fun getAllPeople(sortBy: SortBy, filter: String): Flow<People>
+    fun observePerson(personId: PersonId): Flow<Person>
+
+    fun observeAllPeople(sortBy: PeopleSortBy, filter: String): Flow<People>
 
     suspend fun add(person: NewPerson): Person
 
@@ -41,11 +44,17 @@ class PeopleLocalDataSource @Inject constructor(
             )
         }
 
-    override fun getAllPeople(sortBy: SortBy, filter: String): Flow<People> {
+    override fun observePerson(personId: PersonId): Flow<Person> =
+        personQueries
+            .selectById(personId.value, toPerson)
+            .asFlow()
+            .mapToOne()
+
+    override fun observeAllPeople(sortBy: PeopleSortBy, filter: String): Flow<People> {
         val comparator = when (sortBy) {
-            SortBy.FirstName -> compareBy { person: Person -> person.firstName }
-            SortBy.LastName -> compareBy { person: Person -> person.lastName }
-            SortBy.LastModified -> compareByDescending { person: Person -> person.lastModified }
+            PeopleSortBy.FirstName -> compareBy { person: Person -> person.firstName }
+            PeopleSortBy.LastName -> compareBy { person: Person -> person.lastName }
+            PeopleSortBy.LastModified -> compareByDescending { person: Person -> person.lastModified }
         }
         val filterSql = if (filter.isNotEmpty()) "%$filter%" else null
         return personQueries

@@ -1,9 +1,7 @@
-package com.jenzz.peoplenotes.feature.home.ui
+package com.jenzz.peoplenotes.feature.people.ui
 
 import android.content.res.Configuration.UI_MODE_NIGHT_NO
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
-import androidx.annotation.DrawableRes
-import androidx.annotation.StringRes
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -11,11 +9,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -23,13 +18,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
-import androidx.compose.ui.tooling.preview.datasource.CollectionPreviewParameterProvider
+import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.jenzz.peoplenotes.R
@@ -39,54 +32,74 @@ import com.jenzz.peoplenotes.common.data.people.PersonId
 import com.jenzz.peoplenotes.common.data.people.di.FirstName
 import com.jenzz.peoplenotes.common.data.people.di.LastName
 import com.jenzz.peoplenotes.common.data.time.formatFullDateTime
-import com.jenzz.peoplenotes.common.ui.TextResource
-import com.jenzz.peoplenotes.common.ui.ToastMessage
-import com.jenzz.peoplenotes.common.ui.showShortToast
+import com.jenzz.peoplenotes.common.ui.*
 import com.jenzz.peoplenotes.common.ui.theme.PeopleNotesTheme
 import com.jenzz.peoplenotes.common.ui.theme.elevation
 import com.jenzz.peoplenotes.common.ui.theme.spacing
-import com.jenzz.peoplenotes.common.ui.widgets.MultiFloatingActionButtonContentOverlay
+import com.jenzz.peoplenotes.common.ui.widgets.*
 import com.jenzz.peoplenotes.common.ui.widgets.MultiFloatingActionButtonState.Collapsed
-import com.jenzz.peoplenotes.common.ui.widgets.StaggeredVerticalGrid
 import com.jenzz.peoplenotes.ext.toNonEmptyString
+import com.jenzz.peoplenotes.feature.destinations.AddPersonScreenDestination
+import com.jenzz.peoplenotes.feature.destinations.NotesScreenDestination
+import com.jenzz.peoplenotes.feature.destinations.SettingsScreenDestination
+import com.ramcosta.composedestinations.annotation.Destination
+import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.drop
 import java.time.LocalDateTime
 
+@Destination(start = true)
 @Composable
-fun HomeScreen(
-    viewModel: HomeViewModel = hiltViewModel(),
-    onAddPersonManuallyClick: () -> Unit,
-    onSettingsClick: () -> Unit,
+fun PeopleScreen(
+    navigator: DestinationsNavigator,
+    viewModel: PeopleViewModel = hiltViewModel(),
 ) {
-    HomeContent(
+    val searchBarState = rememberSearchBarState(sortBy = PeopleSortBy.toSortByState())
+    LaunchedEffect(Unit) {
+        viewModel.init(searchBarState)
+    }
+    LaunchedEffect(searchBarState.searchTerm) {
+        snapshotFlow { searchBarState.searchTerm }
+            .drop(1)
+            .collect { searchTerm -> viewModel.onSearchTermChange(searchTerm) }
+    }
+    LaunchedEffect(searchBarState.sortBy) {
+        snapshotFlow { searchBarState.sortBy }
+            .drop(1)
+            .collect { sortBy -> viewModel.onSortByChange(sortBy.selected) }
+    }
+    PeopleContent(
         state = viewModel.state,
-        onListStyleChange = viewModel::onListStyleChange,
-        onFilterChange = viewModel::onFilterChange,
-        onClick = { /* TODO JD */ },
+        searchBarState = searchBarState,
+        onClick = { person ->
+            navigator.navigate(NotesScreenDestination(person.id))
+        },
         onDeleteRequest = viewModel::onDeleteRequest,
         onDeleteConfirm = viewModel::onDeleteConfirm,
         onDeleteCancel = viewModel::onDeleteCancel,
         onDeleteWithNotes = viewModel::onDeleteWithNotes,
         onDeleteWithNotesCancel = viewModel::onDeleteWithNotesCancel,
-        onSortByChange = viewModel::onSortByChange,
-        onAddPersonManuallyClick = onAddPersonManuallyClick,
+        onAddPersonManuallyClick = {
+            navigator.navigate(AddPersonScreenDestination)
+        },
         onImportFromContactsClick = {  /* TODO JD */ },
-        onSettingsClick = onSettingsClick,
+        onSettingsClick = {
+            navigator.navigate(SettingsScreenDestination)
+        },
         onToastMessageShown = viewModel::onToastMessageShown,
     )
 }
 
 @Composable
-private fun HomeContent(
-    state: HomeUiState,
-    onListStyleChange: (ListStyle) -> Unit,
-    onFilterChange: (String) -> Unit,
+private fun PeopleContent(
+    state: PeopleUiState,
+    searchBarState: SearchBarState,
     onClick: (Person) -> Unit,
     onDeleteRequest: (Person) -> Unit,
     onDeleteConfirm: (Person) -> Unit,
     onDeleteCancel: () -> Unit,
     onDeleteWithNotes: (Person) -> Unit,
     onDeleteWithNotesCancel: () -> Unit,
-    onSortByChange: (SortBy) -> Unit,
     onAddPersonManuallyClick: () -> Unit,
     onImportFromContactsClick: () -> Unit,
     onSettingsClick: () -> Unit,
@@ -98,7 +111,7 @@ private fun HomeContent(
     Scaffold(
         scaffoldState = scaffoldState,
         floatingActionButton = {
-            HomeFloatingActionButton(
+            PeopleFloatingActionButton(
                 state = floatingActionButtonState.value,
                 onStateChange = { state -> floatingActionButtonState.value = state },
                 onAddPersonManuallyClick = onAddPersonManuallyClick,
@@ -107,37 +120,39 @@ private fun HomeContent(
         }
     ) {
         Column {
-            HomeTopAppBar(
+            SearchBar(
                 modifier = Modifier.padding(
                     start = MaterialTheme.spacing.medium,
                     top = MaterialTheme.spacing.medium,
                     end = MaterialTheme.spacing.medium,
                 ),
-                peopleCount = state.people.persons.size,
-                filter = state.filter,
+                state = searchBarState,
                 showActions = state.showActions,
-                onFilterChange = onFilterChange,
-                listStyle = state.listStyle,
-                onListStyleChange = onListStyleChange,
-                sortBy = state.sortBy,
-                onSortByChange = onSortByChange,
+                placeholder = stringResource(R.string.search_people, state.people.persons.size),
+                visualTransformation = SuffixVisualTransformation(
+                    text = searchBarState.searchTerm,
+                    suffix = " (${state.people.persons.size})",
+                ),
                 onSettingsClick = onSettingsClick,
             )
             when {
                 state.isLoading ->
-                    HomeLoading()
-                state.isEmptyFiltered ->
-                    HomeEmpty(
-                        text = R.string.empty_people_filtered,
+                    LoadingView()
+                state.isEmptyFiltered(searchBarState) ->
+                    EmptyView(
+                        modifier = Modifier.fillMaxSize(),
+                        text = stringResource(id = R.string.empty_people_filtered),
                         icon = R.drawable.ic_sentiment_very_dissatisfied,
                     )
                 state.isEmpty ->
-                    HomeEmpty(
-                        text = R.string.empty_people,
+                    EmptyView(
+                        modifier = Modifier.fillMaxSize(),
+                        text = stringResource(id = R.string.empty_people),
                         icon = R.drawable.ic_people,
                     )
                 else ->
-                    HomeLoaded(
+                    PeopleLoaded(
+                        searchBarState = searchBarState,
                         state = state,
                         onClick = onClick,
                         onDeleteRequest = onDeleteRequest,
@@ -153,50 +168,17 @@ private fun HomeContent(
             state = floatingActionButtonState,
         )
     }
-    if (state.toastMessage != null) {
-        val message = state.toastMessage.text.asString(context.resources)
+    state.toastMessage?.let { toastMessage ->
+        val message = toastMessage.text.asString(context.resources)
         context.showShortToast(message)
         onToastMessageShown()
     }
 }
 
 @Composable
-private fun HomeLoading() {
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center,
-    ) {
-        CircularProgressIndicator()
-    }
-}
-
-@Composable
-private fun HomeEmpty(
-    @StringRes text: Int,
-    @DrawableRes icon: Int,
-) {
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        Icon(
-            modifier = Modifier.size(48.dp),
-            painter = painterResource(id = icon),
-            contentDescription = stringResource(id = R.string.empty_people),
-        )
-        Spacer(modifier = Modifier.height(MaterialTheme.spacing.small))
-        Text(
-            text = stringResource(id = text),
-            textAlign = TextAlign.Center,
-            style = MaterialTheme.typography.caption,
-        )
-    }
-}
-
-@Composable
-private fun HomeLoaded(
-    state: HomeUiState,
+private fun PeopleLoaded(
+    state: PeopleUiState,
+    searchBarState: SearchBarState,
     onClick: (Person) -> Unit,
     onDeleteRequest: (Person) -> Unit,
     onDeleteConfirm: (Person) -> Unit,
@@ -204,9 +186,9 @@ private fun HomeLoaded(
     onDeleteWithNotes: (Person) -> Unit,
     onDeleteWithNotesCancel: () -> Unit,
 ) {
-    when (state.listStyle) {
+    when (searchBarState.listStyle) {
         ListStyle.Rows ->
-            HomeLoadedRows(
+            PeopleLoadedRows(
                 people = state.people.persons,
                 deleteConfirmation = state.deleteConfirmation,
                 deleteWithNotesConfirmation = state.deleteWithNotesConfirmation,
@@ -218,7 +200,7 @@ private fun HomeLoaded(
                 onDeleteWithNotesCancel = onDeleteWithNotesCancel,
             )
         ListStyle.Grid ->
-            HomeLoadedGrid(
+            PeopleLoadedGrid(
                 people = state.people.persons,
                 deleteConfirmation = state.deleteConfirmation,
                 deleteWithNotesConfirmation = state.deleteWithNotesConfirmation,
@@ -233,7 +215,7 @@ private fun HomeLoaded(
 }
 
 @Composable
-private fun HomeLoadedRows(
+private fun PeopleLoadedRows(
     people: List<Person>,
     deleteConfirmation: PersonId?,
     deleteWithNotesConfirmation: PersonId?,
@@ -265,7 +247,7 @@ private fun HomeLoadedRows(
 }
 
 @Composable
-private fun HomeLoadedGrid(
+private fun PeopleLoadedGrid(
     people: List<Person>,
     deleteConfirmation: PersonId?,
     deleteWithNotesConfirmation: PersonId?,
@@ -561,23 +543,25 @@ private fun PersonDropDownMenu(
     uiMode = UI_MODE_NIGHT_YES,
 )
 @Composable
-private fun HomeContentPreview(
-    @PreviewParameter(HomePreviewParameterProvider::class)
-    state: HomeUiState,
+private fun PeopleContentPreview(
+    @PreviewParameter(PeoplePreviewParameterProvider::class)
+    state: PeopleUiState,
 ) {
     PeopleNotesTheme {
         Surface {
-            HomeContent(
+            PeopleContent(
                 state = state,
-                onListStyleChange = {},
-                onFilterChange = {},
+                searchBarState = SearchBarState(
+                    searchTerm = "",
+                    listStyle = ListStyle.DEFAULT,
+                    sortBy = SortByState(items = emptyList()),
+                ),
                 onClick = {},
                 onDeleteRequest = {},
                 onDeleteConfirm = {},
                 onDeleteCancel = {},
                 onDeleteWithNotes = {},
                 onDeleteWithNotesCancel = {},
-                onSortByChange = {},
                 onAddPersonManuallyClick = {},
                 onImportFromContactsClick = {},
                 onSettingsClick = {},
@@ -587,56 +571,48 @@ private fun HomeContentPreview(
     }
 }
 
-class HomePreviewParameterProvider : CollectionPreviewParameterProvider<HomeUiState>(
-    listOf(
-        HomeUiState(
-            isLoading = true,
-            filter = "",
-            listStyle = ListStyle.Rows,
-            sortBy = SortBy.DEFAULT,
-            people = People(
-                persons = emptyList(),
-                totalCount = 0
+class PeoplePreviewParameterProvider : PreviewParameterProvider<PeopleUiState> {
+
+    override val values: Sequence<PeopleUiState> =
+        sequenceOf(
+            PeopleUiState(
+                isLoading = true,
+                people = People(
+                    persons = emptyList(),
+                    totalCount = 0
+                ),
+                deleteConfirmation = null,
+                deleteWithNotesConfirmation = null,
+                toastMessage = null,
             ),
-            deleteConfirmation = null,
-            deleteWithNotesConfirmation = null,
-            toastMessage = null,
-        ),
-        HomeUiState(
-            isLoading = false,
-            filter = "",
-            listStyle = ListStyle.Rows,
-            sortBy = SortBy.DEFAULT,
-            people = People(
-                persons = (1..10).map { i ->
-                    Person(
-                        id = PersonId(i),
-                        firstName = FirstName("$i First Name".toNonEmptyString()),
-                        lastName = LastName("Last Name".toNonEmptyString()),
-                        lastModified = LocalDateTime.now(),
-                    )
-                },
-                totalCount = 10
+            PeopleUiState(
+                isLoading = false,
+                people = People(
+                    persons = (1..10).map { i ->
+                        Person(
+                            id = PersonId(i),
+                            firstName = FirstName("$i First Name".toNonEmptyString()),
+                            lastName = LastName("Last Name".toNonEmptyString()),
+                            lastModified = LocalDateTime.now(),
+                        )
+                    },
+                    totalCount = 10,
+                ),
+                deleteConfirmation = null,
+                deleteWithNotesConfirmation = null,
+                toastMessage = null,
             ),
-            deleteConfirmation = null,
-            deleteWithNotesConfirmation = null,
-            toastMessage = null,
-        ),
-        HomeUiState(
-            isLoading = false,
-            filter = "",
-            listStyle = ListStyle.Rows,
-            sortBy = SortBy.DEFAULT,
-            people = People(
-                persons = emptyList(),
-                totalCount = 0
+            PeopleUiState(
+                isLoading = false,
+                people = People(
+                    persons = emptyList(),
+                    totalCount = 0
+                ),
+                deleteConfirmation = PersonId(1),
+                deleteWithNotesConfirmation = null,
+                toastMessage = ToastMessage(
+                    text = TextResource.fromText("User Message 1")
+                ),
             ),
-            deleteConfirmation = PersonId(1),
-            deleteWithNotesConfirmation = null,
-            toastMessage =
-            ToastMessage(
-                text = TextResource.fromText("User Message 1")
-            ),
-        ),
-    ),
-)
+        )
+}

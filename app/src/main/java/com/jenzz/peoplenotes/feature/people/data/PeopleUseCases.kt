@@ -1,22 +1,23 @@
-package com.jenzz.peoplenotes.feature.home.data
+package com.jenzz.peoplenotes.feature.people.data
 
 import com.jenzz.peoplenotes.common.data.people.*
-import com.jenzz.peoplenotes.feature.home.ui.SortBy
+import com.jenzz.peoplenotes.common.ui.SortBy
+import com.jenzz.peoplenotes.feature.people.ui.toPeopleSortBy
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
-class HomeUseCases @Inject constructor(
-    val getPeople: GetPeopleUseCase,
+class PeopleUseCases @Inject constructor(
+    val observePeople: ObservePeopleUseCase,
     val deletePerson: DeletePersonUseCase,
     val deletePersonWithNotes: DeletePersonWithNotesUseCase,
 )
 
-class GetPeopleUseCase @Inject constructor(
+class ObservePeopleUseCase @Inject constructor(
     private val peopleRepository: PeopleRepository,
 ) {
 
     operator fun invoke(sortBy: SortBy, filter: String): Flow<People> =
-        peopleRepository.getAllPeople(sortBy, filter)
+        peopleRepository.observeAllPeople(sortBy.toPeopleSortBy(), filter)
 }
 
 class DeletePersonUseCase @Inject constructor(

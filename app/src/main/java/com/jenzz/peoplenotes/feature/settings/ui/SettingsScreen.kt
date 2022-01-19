@@ -24,16 +24,18 @@ import com.jenzz.peoplenotes.BuildConfig
 import com.jenzz.peoplenotes.R
 import com.jenzz.peoplenotes.common.ui.theme.PeopleNotesTheme
 import com.jenzz.peoplenotes.common.ui.theme.spacing
+import com.jenzz.peoplenotes.common.ui.widgets.LoadingView
 import com.jenzz.peoplenotes.feature.settings.data.Settings
 import com.jenzz.peoplenotes.feature.settings.data.ThemePreference
+import com.ramcosta.composedestinations.annotation.Destination
 
+@Destination(start = true, navGraph = "settings")
 @Composable
 fun SettingsScreen(
     viewModel: SettingsViewModel = hiltViewModel(),
 ) {
-    val state = viewModel.state.value
     SettingsContent(
-        state = state,
+        state = viewModel.state,
         onThemeChange = viewModel::onThemeChange,
     )
 }
@@ -53,24 +55,14 @@ private fun SettingsContent(
         }
     ) {
         when (state) {
-            is SettingsUiState.Loading ->
-                SettingsLoading()
+            is SettingsUiState.InitialLoad ->
+                LoadingView()
             is SettingsUiState.Loaded ->
                 SettingsLoaded(
                     settings = state.settings,
                     onThemeChange = onThemeChange,
                 )
         }
-    }
-}
-
-@Composable
-private fun SettingsLoading() {
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center,
-    ) {
-        CircularProgressIndicator()
     }
 }
 
@@ -217,7 +209,7 @@ private fun SettingsContentPreview(
 
 class SettingsPreviewParameterProvider : CollectionPreviewParameterProvider<SettingsUiState>(
     listOf(
-        SettingsUiState.Loading,
+        SettingsUiState.InitialLoad,
         SettingsUiState.Loaded(
             settings = Settings(
                 theme = ThemePreference.DEFAULT,

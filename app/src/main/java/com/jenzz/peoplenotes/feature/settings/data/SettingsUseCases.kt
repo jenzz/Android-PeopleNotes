@@ -4,16 +4,16 @@ import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class SettingsUseCases @Inject constructor(
-    val getSettings: GetSettingsUseCase,
+    val observeSettings: ObserveSettingsUseCase,
     val setTheme: SetThemeUseCase,
 )
 
-class GetSettingsUseCase @Inject constructor(
+class ObserveSettingsUseCase @Inject constructor(
     private val settingsRepository: SettingsRepository,
 ) {
 
     operator fun invoke(): Flow<Settings> =
-        settingsRepository.settings
+        settingsRepository.observeSettings()
 }
 
 class SetThemeUseCase @Inject constructor(

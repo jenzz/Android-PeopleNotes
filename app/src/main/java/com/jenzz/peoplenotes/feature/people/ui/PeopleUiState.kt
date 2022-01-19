@@ -1,56 +1,47 @@
-package com.jenzz.peoplenotes.feature.home.ui
+package com.jenzz.peoplenotes.feature.people.ui
 
 import android.os.Parcelable
 import com.jenzz.peoplenotes.common.data.people.People
 import com.jenzz.peoplenotes.common.data.people.PersonId
 import com.jenzz.peoplenotes.common.ui.ToastMessage
+import com.jenzz.peoplenotes.common.ui.widgets.SearchBarState
 import com.jenzz.peoplenotes.ext.PartialSavedState
 import kotlinx.parcelize.Parcelize
 
-data class HomeUiState(
+data class PeopleUiState(
     val isLoading: Boolean,
-    val filter: String,
-    val listStyle: ListStyle,
-    val sortBy: SortBy,
     val people: People,
     val deleteConfirmation: PersonId?,
     val deleteWithNotesConfirmation: PersonId?,
     val toastMessage: ToastMessage?,
-) : PartialSavedState<HomeUiState, HomeSavedState> {
+) : PartialSavedState<PeopleUiState, PeopleSavedState> {
 
     val isEmpty: Boolean =
         people.isEmpty
 
-    val isEmptyFiltered: Boolean =
-        isEmpty && filter.isNotEmpty() && people.totalCount > 0
-
     val showActions: Boolean =
         !isLoading && !isEmpty
 
-    override val savedState: HomeSavedState =
-        HomeSavedState(
-            filter = filter,
-            listStyle = listStyle,
-            sortBy = sortBy,
+    fun isEmptyFiltered(searchBarState: SearchBarState): Boolean =
+        isEmpty
+                && searchBarState.searchTerm.isNotEmpty()
+                && people.totalCount > 0
+
+    override val savedState: PeopleSavedState =
+        PeopleSavedState(
             deleteConfirmation = deleteConfirmation,
             deleteWithNotesConfirmation = deleteWithNotesConfirmation,
         )
 
-    override fun mergeWithSavedState(savedState: HomeSavedState): HomeUiState =
+    override fun mergeWithSavedState(savedState: PeopleSavedState): PeopleUiState =
         copy(
-            filter = savedState.filter,
-            listStyle = savedState.listStyle,
-            sortBy = savedState.sortBy,
             deleteConfirmation = savedState.deleteConfirmation,
             deleteWithNotesConfirmation = savedState.deleteWithNotesConfirmation,
         )
 }
 
 @Parcelize
-data class HomeSavedState(
-    val filter: String,
-    val listStyle: ListStyle,
-    val sortBy: SortBy,
+data class PeopleSavedState(
     val deleteConfirmation: PersonId?,
     val deleteWithNotesConfirmation: PersonId?,
 ) : Parcelable

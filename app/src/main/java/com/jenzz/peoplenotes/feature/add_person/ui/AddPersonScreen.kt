@@ -23,11 +23,15 @@ import com.jenzz.peoplenotes.R
 import com.jenzz.peoplenotes.common.ui.TextFieldUiState
 import com.jenzz.peoplenotes.common.ui.theme.PeopleNotesTheme
 import com.jenzz.peoplenotes.common.ui.theme.spacing
+import com.jenzz.peoplenotes.feature.destinations.PeopleScreenDestination
+import com.ramcosta.composedestinations.annotation.Destination
+import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
+@Destination
 @Composable
 fun AddPersonScreen(
+    navigator: DestinationsNavigator,
     viewModel: AddPersonViewModel = hiltViewModel(),
-    onPersonAdded: () -> Unit,
 ) {
     AddPersonContent(
         state = viewModel.state,
@@ -35,7 +39,13 @@ fun AddPersonScreen(
         onLastNameChange = viewModel::onLastNameChange,
         onNoteChange = viewModel::onNoteChange,
         onAddPersonClick = viewModel::onAddPerson,
-        onPersonAdded = onPersonAdded,
+        onPersonAdded = {
+            navigator.navigate(PeopleScreenDestination) {
+                popUpTo(PeopleScreenDestination.route) {
+                    inclusive = true
+                }
+            }
+        },
     )
 }
 

@@ -4,7 +4,7 @@ import com.jenzz.peoplenotes.feature.settings.data.Settings
 
 sealed class SettingsUiState {
 
-    object Loading : SettingsUiState()
+    object InitialLoad : SettingsUiState()
 
     data class Loaded(
         val settings: Settings,
