@@ -51,8 +51,8 @@ import java.time.LocalDateTime
 @Destination(start = true)
 @Composable
 fun PeopleScreen(
-    navigator: DestinationsNavigator,
     viewModel: PeopleViewModel = hiltViewModel(),
+    navigator: DestinationsNavigator,
 ) {
     val searchBarState = rememberSearchBarState(sortBy = PeopleSortBy.toSortByState())
     LaunchedEffect(Unit) {

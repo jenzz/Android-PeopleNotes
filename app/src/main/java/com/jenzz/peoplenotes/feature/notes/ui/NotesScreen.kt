@@ -57,8 +57,8 @@ data class NotesScreenNavArgs(
 @Destination(navArgsDelegate = NotesScreenNavArgs::class)
 @Composable
 fun NotesScreen(
-    navigator: DestinationsNavigator,
     viewModel: NotesViewModel = hiltViewModel(),
+    navigator: DestinationsNavigator,
 ) {
     val searchBarState = rememberSearchBarState(sortBy = NotesSortBy.toSortByState())
     LaunchedEffect(Unit) {

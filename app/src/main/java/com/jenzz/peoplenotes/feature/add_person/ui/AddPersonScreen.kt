@@ -30,8 +30,8 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 @Destination
 @Composable
 fun AddPersonScreen(
-    navigator: DestinationsNavigator,
     viewModel: AddPersonViewModel = hiltViewModel(),
+    navigator: DestinationsNavigator,
 ) {
     AddPersonContent(
         state = viewModel.state,
