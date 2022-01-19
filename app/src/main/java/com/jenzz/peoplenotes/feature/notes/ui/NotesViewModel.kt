@@ -12,15 +12,18 @@ import com.jenzz.peoplenotes.common.ui.TextResource
 import com.jenzz.peoplenotes.common.ui.ToastMessage
 import com.jenzz.peoplenotes.common.ui.widgets.SearchBarState
 import com.jenzz.peoplenotes.feature.destinations.NotesScreenDestination
+import com.jenzz.peoplenotes.feature.notes.data.Notes
 import com.jenzz.peoplenotes.feature.notes.data.NotesUseCases
 import com.jenzz.peoplenotes.feature.notes.ui.NotesUiState.InitialLoad
 import com.jenzz.peoplenotes.feature.notes.ui.NotesUiState.Loaded
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.seconds
 
 @HiltViewModel
 class NotesViewModel @Inject constructor(
@@ -29,67 +32,77 @@ class NotesViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val personId = NotesScreenDestination.argsFrom(savedStateHandle).personId
+    private var currentObserveNotes: Job? = null
+    private lateinit var searchBarState: SearchBarState
 
     var state by mutableStateOf<NotesUiState>(InitialLoad)
         private set
 
-    private lateinit var searchBarState: SearchBarState
-
     fun init(searchBarState: SearchBarState) {
         this.searchBarState = searchBarState
-        viewModelScope.launch {
-            useCases
-                .observeNotesWithPerson(
-                    personId = personId,
-                    sortBy = searchBarState.sortBy.selected,
-                    filter = searchBarState.searchTerm,
-                )
-                .collect { notes ->
-                    state = Loaded(
-                        toastMessage = null,
-                        isLoading = false,
-                        notes = notes,
-                    )
-                }
-
-        }
-    }
-
-    fun onSearchTermChange(searchTerm: String) {
-        viewModelScope.launch {
-            observeNotes(filter = searchTerm)
-        }
-    }
-
-    fun onSortByChange(sortBy: SortBy) {
-        viewModelScope.launch {
-            observeNotes(sortBy = sortBy)
-            state = (state as Loaded).copy(
-                toastMessage = ToastMessage(
-                    text = TextResource.fromId(id = R.string.sorted_by, sortBy.label)
-                ),
+        observeNotes { notes ->
+            state = Loaded(
+                toastMessage = null,
+                isLoading = false,
+                notes = notes,
             )
         }
     }
 
-    fun onToastMessageShown() {
-        state = (state as Loaded).copy(toastMessage = null)
+    fun onSearchTermChange(searchTerm: String) {
+        when (val state = state) {
+            is InitialLoad -> {
+                /* Keep loading… */
+            }
+            is Loaded -> {
+                this.state = state.copy(isLoading = true)
+            }
+        }
+        observeNotes(filter = searchTerm) { notes ->
+            this.state = Loaded(
+                toastMessage = null,
+                isLoading = false,
+                notes = notes,
+            )
+        }
     }
 
-    private suspend fun observeNotes(
+    fun onSortByChange(sortBy: SortBy) {
+        when (val state = state) {
+            is InitialLoad -> error("Sort by cannot change during initial load.")
+            is Loaded -> {
+                this.state = state.copy(isLoading = true)
+                observeNotes(sortBy = sortBy) { notes ->
+                    this.state = state.copy(
+                        isLoading = false,
+                        notes = notes,
+                        toastMessage = ToastMessage(
+                            text = TextResource.fromId(id = R.string.sorted_by, sortBy.label)
+                        ),
+                    )
+                }
+            }
+        }
+    }
+
+    fun onToastMessageShown() {
+        when (val state = state) {
+            is InitialLoad -> error("Toast message cannot be shown during initial load.")
+            is Loaded -> this.state = state.copy(toastMessage = null)
+        }
+    }
+
+    private inline fun observeNotes(
         sortBy: SortBy = searchBarState.sortBy.selected,
         filter: String = searchBarState.searchTerm,
+        crossinline action: suspend (value: Notes) -> Unit,
     ) {
-        val state = this.state as Loaded
-        this.state = state.copy(isLoading = true)
-        useCases
-            .observeNotesWithPerson(personId, sortBy, filter)
-            .onEach { delay(3000) }
-            .collect { notes ->
-                this.state = state.copy(
-                    isLoading = false,
-                    notes = notes,
-                )
-            }
+        currentObserveNotes?.cancel()
+        currentObserveNotes = viewModelScope.launch {
+            useCases
+                .observeNotesWithPerson(personId, sortBy, filter)
+                .onEach { delay(3.seconds) } // TODO JD REMOVE!
+                .collect(action)
+        }
     }
 }

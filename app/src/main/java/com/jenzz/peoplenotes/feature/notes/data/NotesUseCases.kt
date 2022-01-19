@@ -21,7 +21,7 @@ class ObserveNotesWithPersonUseCase @Inject constructor(
     operator fun invoke(
         personId: PersonId,
         sortBy: SortBy,
-        filter: String
+        filter: String,
     ): Flow<Notes> =
         peopleRepository
             .observePerson(personId)

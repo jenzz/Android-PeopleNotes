@@ -29,6 +29,7 @@ allprojects {
                     "-Xopt-in=androidx.compose.foundation.ExperimentalFoundationApi",
                     "-Xopt-in=androidx.compose.ui.ExperimentalComposeUiApi",
                     "-Xopt-in=com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi",
+                    "-Xopt-in=kotlin.time.ExperimentalTime",
             ]
         }
     }
