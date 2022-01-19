@@ -47,14 +47,14 @@ class PeopleViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            getPeople()
+            observePeople()
         }
     }
 
     fun onSearchTermChange(searchTerm: String) {
         state = state.copy(searchBarState = searchBarState.onSearchTermChange(searchTerm))
         viewModelScope.launch {
-            getPeople(filter = searchTerm)
+            observePeople(filter = searchTerm)
         }
     }
 
@@ -70,7 +70,7 @@ class PeopleViewModel @Inject constructor(
             ),
         )
         viewModelScope.launch {
-            getPeople(sortBy = sortBy)
+            observePeople(sortBy = sortBy)
         }
     }
 
@@ -133,13 +133,13 @@ class PeopleViewModel @Inject constructor(
         state = state.copy(toastMessage = null)
     }
 
-    private suspend fun getPeople(
+    private suspend fun observePeople(
         sortBy: SortBy = state.searchBarState.sortByState.selected,
         filter: String = state.searchBarState.searchTerm,
     ) {
         state = state.copy(isLoading = true)
         useCases
-            .getPeople(sortBy, filter)
+            .observePeople(sortBy, filter)
             .collect { people ->
                 state = state.copy(
                     isLoading = false,

@@ -44,7 +44,7 @@ class NotesViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             useCases
-                .getNotesWithPerson(
+                .observeNotesWithPerson(
                     personId = personId,
                     sortBy = state.searchBarState.sortByState.selected,
                     filter = state.searchBarState.searchTerm,
@@ -64,7 +64,7 @@ class NotesViewModel @Inject constructor(
         val loadedState = state as Loaded
         state = loadedState.copy(searchBarState = searchBarState.onSearchTermChange(searchTerm))
         viewModelScope.launch {
-            getNotes(filter = searchTerm)
+            observeNotes(filter = searchTerm)
         }
     }
 
@@ -82,7 +82,7 @@ class NotesViewModel @Inject constructor(
             ),
         )
         viewModelScope.launch {
-            getNotes(sortBy = sortBy)
+            observeNotes(sortBy = sortBy)
         }
     }
 
@@ -91,7 +91,7 @@ class NotesViewModel @Inject constructor(
         state = loadedState.copy(toastMessage = null)
     }
 
-    private suspend fun getNotes(
+    private suspend fun observeNotes(
         sortBy: SortBy = state.searchBarState.sortByState.selected,
         filter: String = state.searchBarState.searchTerm,
     ) {
@@ -100,7 +100,7 @@ class NotesViewModel @Inject constructor(
             isLoading = true
         )
         useCases
-            .getNotesWithPerson(personId, sortBy, filter)
+            .observeNotesWithPerson(personId, sortBy, filter)
             .collect { notes ->
                 state = loadedState.copy(
                     isLoading = false,

@@ -8,11 +8,11 @@ class PeopleRepository @Inject constructor(
     private val localDataSource: PeopleDataSource,
 ) {
 
-    fun getPerson(personId: PersonId): Flow<Person> =
-        localDataSource.getPerson(personId)
+    fun observePerson(personId: PersonId): Flow<Person> =
+        localDataSource.observePerson(personId)
 
-    fun getAllPeople(sortBy: PeopleSortBy, filter: String): Flow<People> =
-        localDataSource.getAllPeople(sortBy, filter)
+    fun observeAllPeople(sortBy: PeopleSortBy, filter: String): Flow<People> =
+        localDataSource.observeAllPeople(sortBy, filter)
 
     suspend fun add(person: NewPerson): Person =
         localDataSource.add(person)

@@ -10,10 +10,10 @@ import kotlinx.coroutines.flow.combine
 import javax.inject.Inject
 
 class NotesUseCases @Inject constructor(
-    val getNotesWithPerson: GetNotesWithPersonUseCase,
+    val observeNotesWithPerson: ObserveNotesWithPersonUseCase,
 )
 
-class GetNotesWithPersonUseCase @Inject constructor(
+class ObserveNotesWithPersonUseCase @Inject constructor(
     private val peopleRepository: PeopleRepository,
     private val notesRepository: NotesRepository,
 ) {
@@ -24,9 +24,9 @@ class GetNotesWithPersonUseCase @Inject constructor(
         filter: String
     ): Flow<Notes> =
         peopleRepository
-            .getPerson(personId)
+            .observePerson(personId)
             .combine(
-                notesRepository.getNotes(personId, sortBy.toNotesSortBy(), filter)
+                notesRepository.observeNotes(personId, sortBy.toNotesSortBy(), filter)
             ) { person, notes ->
                 Notes(
                     person = person,

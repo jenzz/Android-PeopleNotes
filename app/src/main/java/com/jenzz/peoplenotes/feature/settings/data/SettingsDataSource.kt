@@ -10,7 +10,7 @@ import javax.inject.Inject
 
 interface SettingsDataSource {
 
-    val settings: Flow<Settings>
+    fun observeSettings(): Flow<Settings>
 
     suspend fun setTheme(theme: ThemePreference)
 }
@@ -24,8 +24,8 @@ class SettingsLocalDataSource @Inject constructor(
         private val THEME = intPreferencesKey("theme")
     }
 
-    override val settings: Flow<Settings>
-        get() = dataStore.data.map { preferences ->
+    override fun observeSettings(): Flow<Settings> =
+        dataStore.data.map { preferences ->
             Settings(
                 theme = preferences.theme,
             )

@@ -19,7 +19,7 @@ class PeopleAndNotesRepository @Inject constructor(
     }
 
     suspend fun delete(personId: PersonId): DeletePersonResult {
-        val notes = notesRepository.getNotes(personId).first()
+        val notes = notesRepository.observeNotes(personId).first()
         return if (notes.isEmpty) {
             peopleRepository.delete(personId)
             DeletePersonResult.Success

@@ -7,8 +7,8 @@ class SettingsRepository @Inject constructor(
     private val localDataSource: SettingsDataSource,
 ) {
 
-    val settings: Flow<Settings> =
-        localDataSource.settings
+    fun observeSettings(): Flow<Settings> =
+        localDataSource.observeSettings()
 
     suspend fun setTheme(theme: ThemePreference) {
         localDataSource.setTheme(theme)
