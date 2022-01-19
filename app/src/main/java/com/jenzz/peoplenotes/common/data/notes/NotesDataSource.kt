@@ -20,9 +20,9 @@ import javax.inject.Inject
 
 interface NotesDataSource {
 
-    fun getNotes(personId: PersonId): Flow<NotesList>
+    fun observeNotes(personId: PersonId): Flow<NotesList>
 
-    fun getNotes(personId: PersonId, sortBy: NotesSortBy, filter: String): Flow<NotesList>
+    fun observeNotes(personId: PersonId, sortBy: NotesSortBy, filter: String): Flow<NotesList>
 
     suspend fun add(note: NewNote, personId: PersonId)
 
@@ -60,7 +60,7 @@ class NotesLocalDataSource @Inject constructor(
         )
     }
 
-    override fun getNotes(personId: PersonId): Flow<NotesList> =
+    override fun observeNotes(personId: PersonId): Flow<NotesList> =
         noteQueries
             .selectAll(personId.value, toNote)
             .asFlow()
@@ -74,7 +74,7 @@ class NotesLocalDataSource @Inject constructor(
                 }
             }
 
-    override fun getNotes(
+    override fun observeNotes(
         personId: PersonId,
         sortBy: NotesSortBy,
         filter: String

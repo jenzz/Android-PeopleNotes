@@ -31,7 +31,9 @@ class MainActivity : ComponentActivity() {
 
     @Composable
     private fun App() {
-        val settingsState = settingsRepository.settings.collectAsState(initial = Settings.DEFAULT)
+        val settingsState = settingsRepository
+            .observeSettings()
+            .collectAsState(initial = Settings.DEFAULT)
         PeopleNotesTheme(
             theme = settingsState.value.theme
         ) {

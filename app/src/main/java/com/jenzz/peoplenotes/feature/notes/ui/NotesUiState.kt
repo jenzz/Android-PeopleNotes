@@ -1,38 +1,40 @@
 package com.jenzz.peoplenotes.feature.notes.ui
 
 import com.jenzz.peoplenotes.common.ui.ToastMessage
-import com.jenzz.peoplenotes.common.ui.widgets.SearchBarUiState
+import com.jenzz.peoplenotes.common.ui.widgets.SearchBarState
 import com.jenzz.peoplenotes.feature.notes.data.Notes
 
 sealed class NotesUiState {
 
-    abstract val searchBarState: SearchBarUiState
     abstract val showActions: Boolean
+    abstract val notesCount: Int
+    abstract val toastMessage: ToastMessage?
 
-    data class InitialLoad(
-        override val searchBarState: SearchBarUiState,
-    ) : NotesUiState() {
+    object InitialLoad : NotesUiState() {
 
         override val showActions: Boolean = false
+        override val notesCount: Int = 0
+        override val toastMessage: ToastMessage? = null
     }
 
     data class Loaded(
-        override val searchBarState: SearchBarUiState,
+        override val toastMessage: ToastMessage?,
         val isLoading: Boolean,
         val notes: Notes,
-        val toastMessage: ToastMessage?,
     ) : NotesUiState() {
 
         val isEmpty: Boolean =
             notes.isEmpty
 
-        val isEmptyFiltered: Boolean =
+        override val showActions: Boolean =
+            !isLoading && !isEmpty
+
+        override val notesCount: Int = notes.notes.items.size
+
+        fun isEmptyFiltered(searchBarState: SearchBarState): Boolean =
             isEmpty
                     && searchBarState.searchTerm.isNotEmpty()
                     && notes.notes.totalCount > 0
-
-        override val showActions: Boolean =
-            !isLoading && !isEmpty
     }
 }
 

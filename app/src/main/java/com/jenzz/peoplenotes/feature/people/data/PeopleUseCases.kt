@@ -7,17 +7,17 @@ import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class PeopleUseCases @Inject constructor(
-    val getPeople: GetPeopleUseCase,
+    val observePeople: ObservePeopleUseCase,
     val deletePerson: DeletePersonUseCase,
     val deletePersonWithNotes: DeletePersonWithNotesUseCase,
 )
 
-class GetPeopleUseCase @Inject constructor(
+class ObservePeopleUseCase @Inject constructor(
     private val peopleRepository: PeopleRepository,
 ) {
 
     operator fun invoke(sortBy: SortBy, filter: String): Flow<People> =
-        peopleRepository.getAllPeople(sortBy.toPeopleSortBy(), filter)
+        peopleRepository.observeAllPeople(sortBy.toPeopleSortBy(), filter)
 }
 
 class DeletePersonUseCase @Inject constructor(

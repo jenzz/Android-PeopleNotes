@@ -9,11 +9,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -47,6 +44,8 @@ import com.jenzz.peoplenotes.feature.destinations.NotesScreenDestination
 import com.jenzz.peoplenotes.feature.destinations.SettingsScreenDestination
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.drop
 import java.time.LocalDateTime
 
 @Destination(start = true)
@@ -55,10 +54,23 @@ fun PeopleScreen(
     navigator: DestinationsNavigator,
     viewModel: PeopleViewModel = hiltViewModel(),
 ) {
+    val searchBarState = rememberSearchBarState(sortBy = PeopleSortBy.toSortByState())
+    LaunchedEffect(Unit) {
+        viewModel.init(searchBarState)
+    }
+    LaunchedEffect(searchBarState.searchTerm) {
+        snapshotFlow { searchBarState.searchTerm }
+            .drop(1)
+            .collect { searchTerm -> viewModel.onSearchTermChange(searchTerm) }
+    }
+    LaunchedEffect(searchBarState.sortBy) {
+        snapshotFlow { searchBarState.sortBy }
+            .drop(1)
+            .collect { sortBy -> viewModel.onSortByChange(sortBy.selected) }
+    }
     PeopleContent(
         state = viewModel.state,
-        onListStyleChange = viewModel::onListStyleChange,
-        onSearchTermChange = viewModel::onSearchTermChange,
+        searchBarState = searchBarState,
         onClick = { person ->
             navigator.navigate(NotesScreenDestination(person.id))
         },
@@ -67,7 +79,6 @@ fun PeopleScreen(
         onDeleteCancel = viewModel::onDeleteCancel,
         onDeleteWithNotes = viewModel::onDeleteWithNotes,
         onDeleteWithNotesCancel = viewModel::onDeleteWithNotesCancel,
-        onSortByChange = viewModel::onSortByChange,
         onAddPersonManuallyClick = {
             navigator.navigate(AddPersonScreenDestination)
         },
@@ -82,15 +93,13 @@ fun PeopleScreen(
 @Composable
 private fun PeopleContent(
     state: PeopleUiState,
-    onListStyleChange: (ListStyle) -> Unit,
-    onSearchTermChange: (String) -> Unit,
+    searchBarState: SearchBarState,
     onClick: (Person) -> Unit,
     onDeleteRequest: (Person) -> Unit,
     onDeleteConfirm: (Person) -> Unit,
     onDeleteCancel: () -> Unit,
     onDeleteWithNotes: (Person) -> Unit,
     onDeleteWithNotesCancel: () -> Unit,
-    onSortByChange: (SortBy) -> Unit,
     onAddPersonManuallyClick: () -> Unit,
     onImportFromContactsClick: () -> Unit,
     onSettingsClick: () -> Unit,
@@ -117,22 +126,19 @@ private fun PeopleContent(
                     top = MaterialTheme.spacing.medium,
                     end = MaterialTheme.spacing.medium,
                 ),
-                state = state.searchBarState,
+                state = searchBarState,
                 showActions = state.showActions,
                 placeholder = stringResource(R.string.search_people, state.people.persons.size),
                 visualTransformation = SuffixVisualTransformation(
-                    text = state.searchBarState.searchTerm,
+                    text = searchBarState.searchTerm,
                     suffix = " (${state.people.persons.size})",
                 ),
-                onSearchTermChange = onSearchTermChange,
-                onListStyleChange = onListStyleChange,
-                onSortByChange = onSortByChange,
                 onSettingsClick = onSettingsClick,
             )
             when {
                 state.isLoading ->
                     LoadingView()
-                state.isEmptyFiltered ->
+                state.isEmptyFiltered(searchBarState) ->
                     EmptyView(
                         modifier = Modifier.fillMaxSize(),
                         text = stringResource(id = R.string.empty_people_filtered),
@@ -146,6 +152,7 @@ private fun PeopleContent(
                     )
                 else ->
                     PeopleLoaded(
+                        searchBarState = searchBarState,
                         state = state,
                         onClick = onClick,
                         onDeleteRequest = onDeleteRequest,
@@ -171,6 +178,7 @@ private fun PeopleContent(
 @Composable
 private fun PeopleLoaded(
     state: PeopleUiState,
+    searchBarState: SearchBarState,
     onClick: (Person) -> Unit,
     onDeleteRequest: (Person) -> Unit,
     onDeleteConfirm: (Person) -> Unit,
@@ -178,7 +186,7 @@ private fun PeopleLoaded(
     onDeleteWithNotes: (Person) -> Unit,
     onDeleteWithNotesCancel: () -> Unit,
 ) {
-    when (state.searchBarState.listStyle) {
+    when (searchBarState.listStyle) {
         ListStyle.Rows ->
             PeopleLoadedRows(
                 people = state.people.persons,
@@ -543,15 +551,17 @@ private fun PeopleContentPreview(
         Surface {
             PeopleContent(
                 state = state,
-                onListStyleChange = {},
-                onSearchTermChange = {},
+                searchBarState = SearchBarState(
+                    searchTerm = "",
+                    listStyle = ListStyle.DEFAULT,
+                    sortBy = SortByState(items = emptyList()),
+                ),
                 onClick = {},
                 onDeleteRequest = {},
                 onDeleteConfirm = {},
                 onDeleteCancel = {},
                 onDeleteWithNotes = {},
                 onDeleteWithNotesCancel = {},
-                onSortByChange = {},
                 onAddPersonManuallyClick = {},
                 onImportFromContactsClick = {},
                 onSettingsClick = {},
@@ -563,17 +573,10 @@ private fun PeopleContentPreview(
 
 class PeoplePreviewParameterProvider : PreviewParameterProvider<PeopleUiState> {
 
-    private val searchBarState = SearchBarUiState(
-        searchTerm = "",
-        listStyle = ListStyle.DEFAULT,
-        sortByState = SortByUiState(emptyList()),
-    )
-
     override val values: Sequence<PeopleUiState> =
         sequenceOf(
             PeopleUiState(
                 isLoading = true,
-                searchBarState = searchBarState,
                 people = People(
                     persons = emptyList(),
                     totalCount = 0
@@ -584,7 +587,6 @@ class PeoplePreviewParameterProvider : PreviewParameterProvider<PeopleUiState> {
             ),
             PeopleUiState(
                 isLoading = false,
-                searchBarState = searchBarState,
                 people = People(
                     persons = (1..10).map { i ->
                         Person(
@@ -602,7 +604,6 @@ class PeoplePreviewParameterProvider : PreviewParameterProvider<PeopleUiState> {
             ),
             PeopleUiState(
                 isLoading = false,
-                searchBarState = searchBarState,
                 people = People(
                     persons = emptyList(),
                     totalCount = 0

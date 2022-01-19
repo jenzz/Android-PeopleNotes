@@ -11,7 +11,7 @@ data class SortBy(
 ) : Parcelable
 
 @Parcelize
-data class SortByUiState(
+data class SortByState(
     val items: List<SortBy>,
 ) : Parcelable {
 

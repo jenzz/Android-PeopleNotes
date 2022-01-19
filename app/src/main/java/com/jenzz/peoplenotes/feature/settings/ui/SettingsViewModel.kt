@@ -25,7 +25,7 @@ class SettingsViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             useCases
-                .getSettings()
+                .observeSettings()
                 .collect { settings ->
                     state = Loaded(
                         settings = settings
