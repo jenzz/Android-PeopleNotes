@@ -16,5 +16,6 @@ data class SortByState(
 ) : Parcelable {
 
     @IgnoredOnParcel
-    val selected: SortBy = items.single { item -> item.isSelected }
+    val selected: SortBy =
+        items.single(SortBy::isSelected)
 }

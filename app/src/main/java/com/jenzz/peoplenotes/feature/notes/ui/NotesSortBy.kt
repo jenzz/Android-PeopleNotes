@@ -23,7 +23,10 @@ fun NotesSortBy.Companion.toSortByState(): SortByState =
     SortByState(
         items = NotesSortBy.values()
             .map { sortBy ->
-                SortBy(sortBy.label, sortBy == NotesSortBy.MostRecentFirst)
+                SortBy(
+                    label = sortBy.label,
+                    isSelected = sortBy == NotesSortBy.MostRecentFirst
+                )
             }
     )
 

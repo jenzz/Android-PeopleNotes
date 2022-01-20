@@ -14,6 +14,8 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.Saver
+import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -234,6 +236,26 @@ class SearchBarState(
     sortBy: SortByState,
 ) {
 
+    companion object {
+
+        val saver: Saver<SearchBarState, Any> = listSaver(
+            save = { state ->
+                listOf(
+                    state.searchTerm,
+                    state.listStyle,
+                    state.sortBy,
+                )
+            },
+            restore = { state ->
+                SearchBarState(
+                    searchTerm = state[0] as String,
+                    listStyle = state[1] as ListStyle,
+                    sortBy = state[2] as SortByState,
+                )
+            },
+        )
+    }
+
     var searchTerm by mutableStateOf(searchTerm)
     var listStyle by mutableStateOf(listStyle)
     var sortBy by mutableStateOf(sortBy)
@@ -245,8 +267,7 @@ fun rememberSearchBarState(
     listStyle: ListStyle = ListStyle.DEFAULT,
     sortBy: SortByState,
 ): SearchBarState =
-    // TODO JD Use rememberSaveable with custom saver instead.
-    remember {
+    rememberSaveable(saver = SearchBarState.saver) {
         SearchBarState(
             searchTerm = searchTerm,
             listStyle = listStyle,

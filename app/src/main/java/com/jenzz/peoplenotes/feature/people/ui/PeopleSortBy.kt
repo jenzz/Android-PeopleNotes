@@ -24,7 +24,10 @@ fun PeopleSortBy.Companion.toSortByState(): SortByState =
     SortByState(
         items = PeopleSortBy.values()
             .map { sortBy ->
-                SortBy(sortBy.label, sortBy == PeopleSortBy.LastModified)
+                SortBy(
+                    label = sortBy.label,
+                    isSelected = sortBy == PeopleSortBy.LastModified
+                )
             }
     )
 
