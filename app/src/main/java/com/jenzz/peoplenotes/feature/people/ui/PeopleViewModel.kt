@@ -15,12 +15,9 @@ import com.jenzz.peoplenotes.ext.mutableStateOf
 import com.jenzz.peoplenotes.feature.people.data.PeopleUseCases
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import kotlin.time.Duration.Companion.seconds
 
 @HiltViewModel
 class PeopleViewModel @Inject constructor(
@@ -146,7 +143,6 @@ class PeopleViewModel @Inject constructor(
         currentObservePeople = viewModelScope.launch {
             useCases
                 .observePeople(sortBy, filter)
-                .onEach { delay(3.seconds) } // TODO JD REMOVE!
                 .collect(action)
         }
     }
