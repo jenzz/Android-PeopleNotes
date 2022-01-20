@@ -78,7 +78,9 @@ private fun AddPersonContent(
             modifier = Modifier.padding(all = MaterialTheme.spacing.large),
             verticalArrangement = Arrangement.spacedBy(space = MaterialTheme.spacing.medium),
         ) {
-            val (firstNameInput, lastNameInput, notesInput) = remember { FocusRequester.createRefs() }
+            // TODO JD Find a way to save & restore focus state across process death.
+            val (firstNameInput, lastNameInput, notesInput) =
+                remember { FocusRequester.createRefs() }
             val focusManager = LocalFocusManager.current
             val onSubmit = {
                 focusManager.clearFocus()
