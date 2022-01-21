@@ -7,8 +7,8 @@ import com.jenzz.peoplenotes.common.data.people.PersonId
 import com.jenzz.peoplenotes.common.data.people.di.FirstName
 import com.jenzz.peoplenotes.common.data.people.di.LastName
 import com.jenzz.peoplenotes.common.data.time.Clock
-import com.jenzz.peoplenotes.common.data.time.toEntity
-import com.jenzz.peoplenotes.common.data.time.toLocalDateTime
+import com.jenzz.peoplenotes.ext.toEntity
+import com.jenzz.peoplenotes.ext.toLocalDateTime
 import com.jenzz.peoplenotes.ext.toNonEmptyString
 import com.jenzz.peoplenotes.feature.notes.ui.NotesSortBy
 import com.squareup.sqldelight.runtime.coroutines.asFlow

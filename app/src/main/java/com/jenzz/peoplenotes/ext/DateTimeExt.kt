@@ -1,4 +1,4 @@
-package com.jenzz.peoplenotes.common.data.time
+package com.jenzz.peoplenotes.ext
 
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter

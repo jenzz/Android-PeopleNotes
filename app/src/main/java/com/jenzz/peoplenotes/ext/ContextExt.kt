@@ -1,4 +1,4 @@
-package com.jenzz.peoplenotes.common.ui
+package com.jenzz.peoplenotes.ext
 
 import android.content.Context
 import android.widget.Toast
