@@ -15,6 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
@@ -35,11 +36,12 @@ import com.jenzz.peoplenotes.common.data.people.di.LastName
 import com.jenzz.peoplenotes.common.ui.ListStyle
 import com.jenzz.peoplenotes.common.ui.SortByState
 import com.jenzz.peoplenotes.common.ui.SuffixVisualTransformation
-import com.jenzz.peoplenotes.ext.showShortToast
 import com.jenzz.peoplenotes.common.ui.theme.PeopleNotesTheme
 import com.jenzz.peoplenotes.common.ui.theme.elevation
 import com.jenzz.peoplenotes.common.ui.theme.spacing
 import com.jenzz.peoplenotes.common.ui.widgets.*
+import com.jenzz.peoplenotes.ext.random
+import com.jenzz.peoplenotes.ext.showShortToast
 import com.jenzz.peoplenotes.ext.stringResourceWithStyledPlaceholders
 import com.jenzz.peoplenotes.ext.toNonEmptyString
 import com.jenzz.peoplenotes.feature.destinations.SettingsScreenDestination
@@ -285,6 +287,7 @@ class NotesPreviewParameterProvider : PreviewParameterProvider<NotesUiState> {
                 id = PersonId(1),
                 firstName = FirstName("First Name".toNonEmptyString()),
                 lastName = LastName("Last Name".toNonEmptyString()),
+                color = Color.random(),
                 lastModified = LocalDateTime.now(),
             )
             return NotesUiState.Loaded(

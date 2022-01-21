@@ -13,13 +13,11 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.painter.ColorPainter
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
@@ -31,13 +29,14 @@ import com.jenzz.peoplenotes.common.data.people.Person
 import com.jenzz.peoplenotes.common.data.people.PersonId
 import com.jenzz.peoplenotes.common.data.people.di.FirstName
 import com.jenzz.peoplenotes.common.data.people.di.LastName
-import com.jenzz.peoplenotes.ext.formatFullDateTime
 import com.jenzz.peoplenotes.common.ui.*
 import com.jenzz.peoplenotes.common.ui.theme.PeopleNotesTheme
 import com.jenzz.peoplenotes.common.ui.theme.elevation
 import com.jenzz.peoplenotes.common.ui.theme.spacing
 import com.jenzz.peoplenotes.common.ui.widgets.*
 import com.jenzz.peoplenotes.common.ui.widgets.MultiFloatingActionButtonState.Collapsed
+import com.jenzz.peoplenotes.ext.formatFullDateTime
+import com.jenzz.peoplenotes.ext.random
 import com.jenzz.peoplenotes.ext.showShortToast
 import com.jenzz.peoplenotes.ext.toNonEmptyString
 import com.jenzz.peoplenotes.feature.destinations.AddPersonScreenDestination
@@ -48,6 +47,7 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.drop
 import java.time.LocalDateTime
+
 
 @Destination(start = true)
 @Composable
@@ -502,13 +502,17 @@ private fun PersonImage(
     modifier: Modifier = Modifier,
     person: Person,
 ) {
-    Image(
-        painter = ColorPainter(Color.Blue), // TODO JD
-        contentDescription = null,
-        contentScale = ContentScale.Crop,
+    Text(
         modifier = modifier
             .size(84.dp)
-            .clip(RoundedCornerShape(corner = CornerSize(16.dp)))
+            .background(
+                color = person.color,
+                shape = RoundedCornerShape(corner = CornerSize(16.dp))
+            )
+            .wrapContentHeight(),
+        text = person.firstNameLetter.toString(),
+        textAlign = TextAlign.Center,
+        style = MaterialTheme.typography.h3.copy(fontWeight = FontWeight.Light),
     )
 }
 
@@ -594,6 +598,7 @@ class PeoplePreviewParameterProvider : PreviewParameterProvider<PeopleUiState> {
                             id = PersonId(i),
                             firstName = FirstName("$i First Name".toNonEmptyString()),
                             lastName = LastName("Last Name".toNonEmptyString()),
+                            color = Color.random(),
                             lastModified = LocalDateTime.now(),
                         )
                     },

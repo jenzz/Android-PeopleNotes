@@ -1,5 +1,6 @@
 package com.jenzz.peoplenotes.common.data.notes
 
+import androidx.compose.ui.graphics.Color
 import com.jenzz.peoplenotes.common.data.CoroutineDispatchers
 import com.jenzz.peoplenotes.common.data.NoteQueries
 import com.jenzz.peoplenotes.common.data.people.Person
@@ -45,6 +46,7 @@ class NotesLocalDataSource @Inject constructor(
             _: Int,
             firstName: String,
             lastName: String,
+            color: Int,
             personLastModified: String,
         ->
         Note(
@@ -55,6 +57,7 @@ class NotesLocalDataSource @Inject constructor(
                 id = PersonId(personId),
                 firstName = FirstName(firstName.toNonEmptyString()),
                 lastName = LastName(lastName.toNonEmptyString()),
+                color = Color(color),
                 lastModified = personLastModified.toLocalDateTime(),
             ),
         )

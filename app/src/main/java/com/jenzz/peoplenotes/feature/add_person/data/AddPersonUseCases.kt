@@ -1,6 +1,7 @@
 package com.jenzz.peoplenotes.feature.add_person.data
 
 import androidx.annotation.StringRes
+import androidx.compose.ui.graphics.Color
 import com.jenzz.peoplenotes.R
 import com.jenzz.peoplenotes.common.data.notes.NewNote
 import com.jenzz.peoplenotes.common.data.people.NewPerson
@@ -8,6 +9,7 @@ import com.jenzz.peoplenotes.common.data.people.PeopleAndNotesRepository
 import com.jenzz.peoplenotes.common.data.people.di.FirstName
 import com.jenzz.peoplenotes.common.data.people.di.LastName
 import com.jenzz.peoplenotes.ext.NonEmptyString
+import com.jenzz.peoplenotes.ext.random
 import com.jenzz.peoplenotes.ext.toNonEmptyStringOrNull
 import com.jenzz.peoplenotes.feature.add_person.data.AddPersonNameValidationResult.Invalid
 import com.jenzz.peoplenotes.feature.add_person.data.AddPersonNameValidationResult.Valid
@@ -53,6 +55,7 @@ class AddPersonWithNoteUseCase @Inject constructor(
         val newPerson = NewPerson(
             firstName = FirstName(firstName),
             lastName = LastName(lastName),
+            color = Color.random(),
         )
         val newNote = note.toNonEmptyStringOrNull()?.let { NewNote(it) }
         peopleAndNotesRepository.add(newPerson, newNote)

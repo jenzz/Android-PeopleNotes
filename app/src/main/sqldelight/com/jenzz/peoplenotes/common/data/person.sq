@@ -2,6 +2,7 @@ CREATE TABLE PersonEntity (
     id INTEGER AS Int NOT NULL PRIMARY KEY AUTOINCREMENT,
     firstName TEXT NOT NULL,
     lastName TEXT NOT NULL,
+    color INTEGER AS Int NOT NULL,
     lastModified TEXT NOT NULL
 );
 
@@ -32,8 +33,8 @@ FROM PersonEntity
 WHERE rowid = ?;
 
 insert:
-INSERT INTO PersonEntity(firstName, lastName, lastModified)
-VALUES (?, ?, ?);
+INSERT INTO PersonEntity(firstName, lastName, color, lastModified)
+VALUES (?, ?, ?, ?);
 
 delete:
 DELETE

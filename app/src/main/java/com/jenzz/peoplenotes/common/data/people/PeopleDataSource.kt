@@ -1,5 +1,7 @@
 package com.jenzz.peoplenotes.common.data.people
 
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import com.jenzz.peoplenotes.common.data.CoroutineDispatchers
 import com.jenzz.peoplenotes.common.data.PersonQueries
 import com.jenzz.peoplenotes.common.data.people.di.FirstName
@@ -35,11 +37,12 @@ class PeopleLocalDataSource @Inject constructor(
 ) : PeopleDataSource {
 
     private val toPerson =
-        { id: Int, firstName: String, lastName: String, lastModified: String ->
+        { id: Int, firstName: String, lastName: String, color: Int, lastModified: String ->
             Person(
                 id = PersonId(id),
                 firstName = FirstName(firstName.toNonEmptyString()),
                 lastName = LastName(lastName.toNonEmptyString()),
+                color = Color(color),
                 lastModified = lastModified.toLocalDateTime(),
             )
         }
@@ -77,6 +80,7 @@ class PeopleLocalDataSource @Inject constructor(
                 personQueries.insert(
                     firstName = person.firstName.value.toString(),
                     lastName = person.lastName.value.toString(),
+                    color = person.color.toArgb(),
                     lastModified = clock.now().toEntity(),
                 )
                 val rowId = personQueries.selectLastInsertRowId().executeAsOne()
