@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import java.util.*
+import kotlin.random.Random
 
 class DatabaseTest {
 
@@ -25,6 +26,7 @@ class DatabaseTest {
             personQueries.insert(
                 firstName = "first name $i",
                 lastName = "last name $i",
+                color = Random.nextInt(),
                 lastModified = "last modified",
             )
         }
@@ -43,6 +45,7 @@ class DatabaseTest {
         personQueries.insert(
             firstName = "first name",
             lastName = "last name",
+            color = Random.nextInt(),
             lastModified = "last modified",
         )
         (1..3).forEach { i ->
@@ -67,6 +70,7 @@ class DatabaseTest {
         personQueries.insert(
             firstName = "first name",
             lastName = "last name",
+            color = Random.nextInt(),
             lastModified = "last modified",
         )
         noteQueries.insert(
