@@ -8,6 +8,7 @@ import kotlinx.parcelize.Parcelize
 @Parcelize
 data class TextFieldUiState(
     val value: String,
+    val label: TextResource? = null,
     @StringRes val error: Int? = null,
 ) : Parcelable {
 
@@ -15,5 +16,5 @@ data class TextFieldUiState(
     val isError: Boolean = error != null
 
     @StringRes
-    fun requireError(): Int = requireNotNull(error) { "Required error was null." }
+    fun requireError(): Int = requireNotNull(error) { "Required error is null." }
 }

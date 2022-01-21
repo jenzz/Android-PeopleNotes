@@ -8,7 +8,7 @@ import kotlinx.parcelize.Parcelize
 data class AddPersonUiState(
     val firstName: TextFieldUiState,
     val lastName: TextFieldUiState,
-    val note: String,
+    val note: TextFieldUiState,
     val inputsEnabled: Boolean,
     val isUserAdded: Boolean,
 ) : Parcelable

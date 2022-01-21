@@ -27,10 +27,21 @@ CASE WHEN :filter IS NOT NULL
     ELSE 1
 END;
 
+selectById:
+SELECT *
+FROM NoteEntity
+INNER JOIN PersonEntity ON NoteEntity.personId = PersonEntity.id
+WHERE NoteEntity.id = :noteId;
+
 insert:
 INSERT
 INTO NoteEntity(text, personId, lastModified)
 VALUES (?, ?, ?);
+
+update:
+UPDATE NoteEntity
+SET text = :text, lastModified = :lastModified
+WHERE id = :noteId;
 
 delete:
 DELETE

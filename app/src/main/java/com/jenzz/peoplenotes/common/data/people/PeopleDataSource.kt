@@ -23,6 +23,8 @@ interface PeopleDataSource {
 
     fun observeAllPeople(sortBy: PeopleSortBy, filter: String): Flow<People>
 
+    suspend fun get(personId: PersonId): Person
+
     suspend fun add(person: NewPerson): Person
 
     suspend fun delete(personId: PersonId)
@@ -71,6 +73,13 @@ class PeopleLocalDataSource @Inject constructor(
                 }
             }
     }
+
+    override suspend fun get(personId: PersonId): Person =
+        withContext(dispatchers.Default) {
+            personQueries
+                .selectById(personId.value, toPerson)
+                .executeAsOne()
+        }
 
     override suspend fun add(person: NewPerson): Person =
         withContext(dispatchers.Default) {

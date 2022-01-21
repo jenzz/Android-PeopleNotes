@@ -2,10 +2,11 @@ package com.jenzz.peoplenotes.feature.add_person.ui
 
 import android.content.res.Configuration.UI_MODE_NIGHT_NO
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
-import androidx.annotation.StringRes
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -23,6 +24,8 @@ import com.jenzz.peoplenotes.R
 import com.jenzz.peoplenotes.common.ui.TextFieldUiState
 import com.jenzz.peoplenotes.common.ui.theme.PeopleNotesTheme
 import com.jenzz.peoplenotes.common.ui.theme.spacing
+import com.jenzz.peoplenotes.common.ui.widgets.NotesTextField
+import com.jenzz.peoplenotes.common.ui.widgets.SubmitButton
 import com.jenzz.peoplenotes.feature.destinations.PeopleScreenDestination
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
@@ -107,11 +110,10 @@ private fun AddPersonContent(
                 enabled = state.inputsEnabled,
                 imeAction = ImeAction.Done,
                 keyboardActions = KeyboardActions(onDone = { onSubmit() }),
-                state = TextFieldUiState(state.note),
+                state = state.note,
                 onValueChange = onNoteChange,
             )
             SubmitButton(
-                modifier = Modifier.padding(top = MaterialTheme.spacing.medium),
                 enabled = state.inputsEnabled,
                 onClick = onSubmit,
             )
@@ -131,9 +133,8 @@ private fun FirstNameInputField(
     state: TextFieldUiState,
     onValueChange: (String) -> Unit,
 ) {
-    PersonInputField(
+    NotesTextField(
         modifier = modifier,
-        label = R.string.first_name,
         enabled = enabled,
         singleLine = true,
         imeAction = imeAction,
@@ -152,9 +153,8 @@ private fun LastNameInputField(
     state: TextFieldUiState,
     onValueChange: (String) -> Unit,
 ) {
-    PersonInputField(
+    NotesTextField(
         modifier = modifier,
-        label = R.string.last_name,
         enabled = enabled,
         singleLine = true,
         imeAction = imeAction,
@@ -173,9 +173,8 @@ private fun NotesInputField(
     state: TextFieldUiState,
     onValueChange: (String) -> Unit,
 ) {
-    PersonInputField(
+    NotesTextField(
         modifier = modifier.heightIn(min = 112.dp),
-        label = R.string.notes_optional,
         enabled = enabled,
         singleLine = false,
         imeAction = imeAction,
@@ -183,53 +182,6 @@ private fun NotesInputField(
         state = state,
         onValueChange = onValueChange,
     )
-}
-
-@Composable
-private fun PersonInputField(
-    modifier: Modifier,
-    @StringRes label: Int,
-    enabled: Boolean,
-    singleLine: Boolean,
-    imeAction: ImeAction,
-    keyboardActions: KeyboardActions,
-    state: TextFieldUiState,
-    onValueChange: (String) -> Unit,
-) {
-    Column {
-        OutlinedTextField(
-            modifier = modifier.fillMaxWidth(),
-            enabled = enabled,
-            singleLine = singleLine,
-            label = { Text(text = stringResource(id = label)) },
-            keyboardOptions = KeyboardOptions.Default.copy(imeAction = imeAction),
-            keyboardActions = keyboardActions,
-            value = state.value,
-            isError = state.isError,
-            onValueChange = onValueChange,
-        )
-        if (state.isError) {
-            Text(
-                text = stringResource(id = state.requireError()),
-                color = MaterialTheme.colors.error,
-            )
-        }
-    }
-}
-
-@Composable
-private fun SubmitButton(
-    modifier: Modifier = Modifier,
-    enabled: Boolean,
-    onClick: () -> Unit,
-) {
-    Button(
-        modifier = modifier,
-        enabled = enabled,
-        onClick = onClick,
-    ) {
-        Text(text = stringResource(id = R.string.add))
-    }
 }
 
 @Preview(
@@ -264,21 +216,27 @@ class AddPersonPreviewParameterProvider : CollectionPreviewParameterProvider<Add
         AddPersonUiState(
             firstName = TextFieldUiState("First Name"),
             lastName = TextFieldUiState("Last Name"),
-            note = "Notes...",
+            note = TextFieldUiState("Notes..."),
             inputsEnabled = true,
             isUserAdded = false,
         ),
         AddPersonUiState(
             firstName = TextFieldUiState("First Name"),
             lastName = TextFieldUiState("Last Name"),
-            note = "Notes...",
+            note = TextFieldUiState("Notes..."),
             inputsEnabled = false,
             isUserAdded = false,
         ),
         AddPersonUiState(
-            firstName = TextFieldUiState("First Name", R.string.first_name_cannot_be_empty),
-            lastName = TextFieldUiState("Last Name", R.string.last_name_cannot_be_empty),
-            note = "Notes...",
+            firstName = TextFieldUiState(
+                value = "First Name",
+                error = R.string.first_name_cannot_be_empty
+            ),
+            lastName = TextFieldUiState(
+                value = "Last Name",
+                error = R.string.last_name_cannot_be_empty
+            ),
+            note = TextFieldUiState("Notes..."),
             inputsEnabled = true,
             isUserAdded = false,
         ),

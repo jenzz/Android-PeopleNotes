@@ -72,7 +72,10 @@ class NotesViewModel @Inject constructor(
                         isLoading = false,
                         notes = notes,
                         toastMessage = ToastMessage(
-                            text = TextResource.fromId(id = R.string.sorted_by, sortBy.label)
+                            text = TextResource.fromId(
+                                id = R.string.sorted_by,
+                                sortBy.label
+                            )
                         ),
                     )
                 }

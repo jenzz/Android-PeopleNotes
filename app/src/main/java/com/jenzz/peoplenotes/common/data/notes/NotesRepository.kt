@@ -15,8 +15,15 @@ class NotesRepository @Inject constructor(
     fun observeNotes(personId: PersonId, sortBy: NotesSortBy, filter: String): Flow<NotesList> =
         localDataSource.observeNotes(personId, sortBy, filter)
 
+    suspend fun get(noteId: NoteId): Note =
+        localDataSource.get(noteId)
+
     suspend fun add(note: NewNote, personId: PersonId) {
         localDataSource.add(note, personId)
+    }
+
+    suspend fun update(noteId: NoteId, note: NewNote) {
+        localDataSource.update(noteId, note)
     }
 
     suspend fun delete(id: NoteId) {

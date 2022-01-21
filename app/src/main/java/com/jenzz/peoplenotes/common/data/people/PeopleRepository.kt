@@ -14,6 +14,9 @@ class PeopleRepository @Inject constructor(
     fun observeAllPeople(sortBy: PeopleSortBy, filter: String): Flow<People> =
         localDataSource.observeAllPeople(sortBy, filter)
 
+    suspend fun get(personId: PersonId): Person =
+        localDataSource.get(personId)
+
     suspend fun add(person: NewPerson): Person =
         localDataSource.add(person)
 

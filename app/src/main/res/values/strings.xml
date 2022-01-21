@@ -13,7 +13,9 @@
     <string name="first_name_cannot_be_empty">First name cannot be empty.</string>
     <string name="last_name">Last name</string>
     <string name="last_name_cannot_be_empty">Last name cannot be empty.</string>
+    <string name="note_about">Note about %1$s</string>
     <string name="notes_optional">Notes (optional)</string>
+    <string name="note_cannot_be_empty">Note cannot be empty.</string>
     <string name="settings">Settings</string>
     <string name="add">Add</string>
     <string name="add_person_manually">Add person manually</string>

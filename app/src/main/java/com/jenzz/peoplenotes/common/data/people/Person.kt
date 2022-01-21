@@ -35,5 +35,4 @@ value class PersonId(val value: Int) : Parcelable {
         override fun newArray(size: Int): Array<PersonId?> =
             arrayOfNulls(size)
     }
-
 }

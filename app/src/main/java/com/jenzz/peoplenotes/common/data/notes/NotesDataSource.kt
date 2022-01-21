@@ -3,10 +3,10 @@ package com.jenzz.peoplenotes.common.data.notes
 import androidx.compose.ui.graphics.Color
 import com.jenzz.peoplenotes.common.data.CoroutineDispatchers
 import com.jenzz.peoplenotes.common.data.NoteQueries
-import com.jenzz.peoplenotes.common.data.people.Person
-import com.jenzz.peoplenotes.common.data.people.PersonId
 import com.jenzz.peoplenotes.common.data.people.FirstName
 import com.jenzz.peoplenotes.common.data.people.LastName
+import com.jenzz.peoplenotes.common.data.people.Person
+import com.jenzz.peoplenotes.common.data.people.PersonId
 import com.jenzz.peoplenotes.common.data.time.Clock
 import com.jenzz.peoplenotes.ext.toEntity
 import com.jenzz.peoplenotes.ext.toLocalDateTime
@@ -25,7 +25,11 @@ interface NotesDataSource {
 
     fun observeNotes(personId: PersonId, sortBy: NotesSortBy, filter: String): Flow<NotesList>
 
+    suspend fun get(noteId: NoteId): Note
+
     suspend fun add(note: NewNote, personId: PersonId)
+
+    suspend fun update(noteId: NoteId, note: NewNote)
 
     suspend fun delete(id: NoteId)
 
@@ -80,7 +84,7 @@ class NotesLocalDataSource @Inject constructor(
     override fun observeNotes(
         personId: PersonId,
         sortBy: NotesSortBy,
-        filter: String
+        filter: String,
     ): Flow<NotesList> {
         val comparator = when (sortBy) {
             NotesSortBy.MostRecentFirst -> compareByDescending { note: Note -> note.lastModified }
@@ -101,11 +105,28 @@ class NotesLocalDataSource @Inject constructor(
             }
     }
 
+    override suspend fun get(noteId: NoteId): Note =
+        withContext(dispatchers.Default) {
+            noteQueries
+                .selectById(noteId.value, toNote)
+                .executeAsOne()
+        }
+
     override suspend fun add(note: NewNote, personId: PersonId) {
         withContext(dispatchers.Default) {
             noteQueries.insert(
                 text = note.text.toString(),
                 personId = personId.value,
+                lastModified = clock.now().toEntity(),
+            )
+        }
+    }
+
+    override suspend fun update(noteId: NoteId, note: NewNote) {
+        withContext(dispatchers.Default) {
+            noteQueries.update(
+                noteId = noteId.value,
+                text = note.text.value,
                 lastModified = clock.now().toEntity(),
             )
         }

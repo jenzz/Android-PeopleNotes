@@ -98,7 +98,7 @@ class PeopleViewModel @Inject constructor(
                         toastMessage = ToastMessage(
                             text = TextResource.fromId(
                                 id = R.string.person_deleted,
-                                TextResource.fromText(person.fullName),
+                                person.fullName,
                             ),
                         ),
                     )
@@ -120,7 +120,7 @@ class PeopleViewModel @Inject constructor(
             toastMessage = ToastMessage(
                 text = TextResource.fromId(
                     id = R.string.person_deleted,
-                    TextResource.fromText(person.fullName),
+                    person.fullName,
                 ),
             ),
         )

@@ -29,10 +29,10 @@ import com.jenzz.peoplenotes.R
 import com.jenzz.peoplenotes.common.data.notes.Note
 import com.jenzz.peoplenotes.common.data.notes.NoteId
 import com.jenzz.peoplenotes.common.data.notes.NotesList
-import com.jenzz.peoplenotes.common.data.people.Person
-import com.jenzz.peoplenotes.common.data.people.PersonId
 import com.jenzz.peoplenotes.common.data.people.FirstName
 import com.jenzz.peoplenotes.common.data.people.LastName
+import com.jenzz.peoplenotes.common.data.people.Person
+import com.jenzz.peoplenotes.common.data.people.PersonId
 import com.jenzz.peoplenotes.common.ui.ListStyle
 import com.jenzz.peoplenotes.common.ui.SortByState
 import com.jenzz.peoplenotes.common.ui.SuffixVisualTransformation
@@ -44,6 +44,7 @@ import com.jenzz.peoplenotes.ext.random
 import com.jenzz.peoplenotes.ext.showShortToast
 import com.jenzz.peoplenotes.ext.stringResourceWithStyledPlaceholders
 import com.jenzz.peoplenotes.ext.toNonEmptyString
+import com.jenzz.peoplenotes.feature.destinations.AddNoteScreenDestination
 import com.jenzz.peoplenotes.feature.destinations.SettingsScreenDestination
 import com.jenzz.peoplenotes.feature.notes.data.Notes
 import com.ramcosta.composedestinations.annotation.Destination
@@ -60,6 +61,7 @@ data class NotesScreenNavArgs(
 @Composable
 fun NotesScreen(
     viewModel: NotesViewModel = hiltViewModel(),
+    navArgs: NotesScreenNavArgs,
     navigator: DestinationsNavigator,
 ) {
     val searchBarState = rememberSearchBarState(sortBy = NotesSortBy.toSortByState())
@@ -79,11 +81,18 @@ fun NotesScreen(
     NotesContent(
         state = viewModel.state,
         searchBarState = searchBarState,
+        onClick = { note ->
+            navigator.navigate(
+                AddNoteScreenDestination(personId = navArgs.personId, noteId = note.id)
+            )
+        },
         onSettingsClick = {
             navigator.navigate(SettingsScreenDestination)
         },
         onAddNoteClick = {
-            TODO("Implement add note screen.")
+            navigator.navigate(
+                AddNoteScreenDestination(personId = navArgs.personId)
+            )
         },
         onToastMessageShown = viewModel::onToastMessageShown,
     )
@@ -93,6 +102,7 @@ fun NotesScreen(
 fun NotesContent(
     state: NotesUiState,
     searchBarState: SearchBarState,
+    onClick: (Note) -> Unit,
     onSettingsClick: () -> Unit,
     onAddNoteClick: () -> Unit,
     onToastMessageShown: () -> Unit,
@@ -152,8 +162,9 @@ fun NotesContent(
                         )
                     else ->
                         NotesLoaded(
-                            searchBarState = searchBarState,
                             state = state,
+                            searchBarState = searchBarState,
+                            onClick = onClick,
                         )
                 }
             }
@@ -170,15 +181,18 @@ fun NotesContent(
 private fun NotesLoaded(
     state: NotesUiState.Loaded,
     searchBarState: SearchBarState,
+    onClick: (Note) -> Unit,
 ) {
     when (searchBarState.listStyle) {
         ListStyle.Rows ->
             NotesLoadedRows(
                 notes = state.notes.notes,
+                onClick = onClick,
             )
         ListStyle.Grid ->
             NotesLoadedGrid(
                 notes = state.notes.notes,
+                onClick = onClick,
             )
     }
 }
@@ -186,13 +200,17 @@ private fun NotesLoaded(
 @Composable
 private fun NotesLoadedRows(
     notes: NotesList,
+    onClick: (Note) -> Unit,
 ) {
     LazyColumn(
         contentPadding = PaddingValues(all = MaterialTheme.spacing.medium),
         verticalArrangement = Arrangement.spacedBy(space = MaterialTheme.spacing.medium),
     ) {
         items(notes.items) { note ->
-            NoteRow(note = note)
+            NoteRow(
+                note = note,
+                onClick = onClick,
+            )
         }
     }
 }
@@ -200,6 +218,7 @@ private fun NotesLoadedRows(
 @Composable
 private fun NotesLoadedGrid(
     notes: NotesList,
+    onClick: (Note) -> Unit,
 ) {
     StaggeredVerticalGrid(
         modifier = Modifier
@@ -211,6 +230,7 @@ private fun NotesLoadedGrid(
             NoteGrid(
                 modifier = Modifier.padding(all = MaterialTheme.spacing.small),
                 note = note,
+                onClick = onClick
             )
         }
     }
@@ -219,11 +239,13 @@ private fun NotesLoadedGrid(
 @Composable
 private fun NoteRow(
     note: Note,
+    onClick: (Note) -> Unit,
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         elevation = MaterialTheme.elevation.small,
         shape = RoundedCornerShape(corner = CornerSize(16.dp)),
+        onClick = { onClick(note) },
     ) {
         Text(
             modifier = Modifier.padding(all = MaterialTheme.spacing.medium),
@@ -236,11 +258,13 @@ private fun NoteRow(
 fun NoteGrid(
     modifier: Modifier = Modifier,
     note: Note,
+    onClick: (Note) -> Unit,
 ) {
     Card(
         modifier = modifier.fillMaxWidth(),
         elevation = MaterialTheme.elevation.small,
         shape = RoundedCornerShape(corner = CornerSize(16.dp)),
+        onClick = { onClick(note) }
     ) {
         Text(
             modifier = Modifier.padding(all = MaterialTheme.spacing.medium),
@@ -271,6 +295,7 @@ private fun NotesContentPreview(
                     listStyle = ListStyle.DEFAULT,
                     sortBy = SortByState(items = emptyList()),
                 ),
+                onClick = {},
                 onSettingsClick = {},
                 onAddNoteClick = {},
                 onToastMessageShown = {},
