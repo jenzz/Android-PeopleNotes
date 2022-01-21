@@ -27,8 +27,8 @@ import com.jenzz.peoplenotes.R
 import com.jenzz.peoplenotes.common.data.people.People
 import com.jenzz.peoplenotes.common.data.people.Person
 import com.jenzz.peoplenotes.common.data.people.PersonId
-import com.jenzz.peoplenotes.common.data.people.di.FirstName
-import com.jenzz.peoplenotes.common.data.people.di.LastName
+import com.jenzz.peoplenotes.common.data.people.FirstName
+import com.jenzz.peoplenotes.common.data.people.LastName
 import com.jenzz.peoplenotes.common.ui.*
 import com.jenzz.peoplenotes.common.ui.theme.PeopleNotesTheme
 import com.jenzz.peoplenotes.common.ui.theme.elevation

@@ -5,8 +5,8 @@ import com.jenzz.peoplenotes.common.data.CoroutineDispatchers
 import com.jenzz.peoplenotes.common.data.NoteQueries
 import com.jenzz.peoplenotes.common.data.people.Person
 import com.jenzz.peoplenotes.common.data.people.PersonId
-import com.jenzz.peoplenotes.common.data.people.di.FirstName
-import com.jenzz.peoplenotes.common.data.people.di.LastName
+import com.jenzz.peoplenotes.common.data.people.FirstName
+import com.jenzz.peoplenotes.common.data.people.LastName
 import com.jenzz.peoplenotes.common.data.time.Clock
 import com.jenzz.peoplenotes.ext.toEntity
 import com.jenzz.peoplenotes.ext.toLocalDateTime

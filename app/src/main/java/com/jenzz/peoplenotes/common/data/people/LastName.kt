@@ -1,4 +1,4 @@
-package com.jenzz.peoplenotes.common.data.people.di
+package com.jenzz.peoplenotes.common.data.people
 
 import com.jenzz.peoplenotes.ext.NonEmptyString
 

@@ -6,8 +6,8 @@ import com.jenzz.peoplenotes.R
 import com.jenzz.peoplenotes.common.data.notes.NewNote
 import com.jenzz.peoplenotes.common.data.people.NewPerson
 import com.jenzz.peoplenotes.common.data.people.PeopleAndNotesRepository
-import com.jenzz.peoplenotes.common.data.people.di.FirstName
-import com.jenzz.peoplenotes.common.data.people.di.LastName
+import com.jenzz.peoplenotes.common.data.people.FirstName
+import com.jenzz.peoplenotes.common.data.people.LastName
 import com.jenzz.peoplenotes.ext.NonEmptyString
 import com.jenzz.peoplenotes.ext.random
 import com.jenzz.peoplenotes.ext.toNonEmptyStringOrNull

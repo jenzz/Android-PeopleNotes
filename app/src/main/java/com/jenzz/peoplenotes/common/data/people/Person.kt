@@ -3,8 +3,6 @@ package com.jenzz.peoplenotes.common.data.people
 import android.os.Parcel
 import android.os.Parcelable
 import androidx.compose.ui.graphics.Color
-import com.jenzz.peoplenotes.common.data.people.di.FirstName
-import com.jenzz.peoplenotes.common.data.people.di.LastName
 import java.time.LocalDateTime
 
 data class Person(

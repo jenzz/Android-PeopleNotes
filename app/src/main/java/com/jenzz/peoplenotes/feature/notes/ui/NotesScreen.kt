@@ -31,8 +31,8 @@ import com.jenzz.peoplenotes.common.data.notes.NoteId
 import com.jenzz.peoplenotes.common.data.notes.NotesList
 import com.jenzz.peoplenotes.common.data.people.Person
 import com.jenzz.peoplenotes.common.data.people.PersonId
-import com.jenzz.peoplenotes.common.data.people.di.FirstName
-import com.jenzz.peoplenotes.common.data.people.di.LastName
+import com.jenzz.peoplenotes.common.data.people.FirstName
+import com.jenzz.peoplenotes.common.data.people.LastName
 import com.jenzz.peoplenotes.common.ui.ListStyle
 import com.jenzz.peoplenotes.common.ui.SortByState
 import com.jenzz.peoplenotes.common.ui.SuffixVisualTransformation

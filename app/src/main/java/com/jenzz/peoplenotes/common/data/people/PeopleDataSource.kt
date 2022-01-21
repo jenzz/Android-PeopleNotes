@@ -4,8 +4,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import com.jenzz.peoplenotes.common.data.CoroutineDispatchers
 import com.jenzz.peoplenotes.common.data.PersonQueries
-import com.jenzz.peoplenotes.common.data.people.di.FirstName
-import com.jenzz.peoplenotes.common.data.people.di.LastName
 import com.jenzz.peoplenotes.common.data.time.Clock
 import com.jenzz.peoplenotes.ext.toEntity
 import com.jenzz.peoplenotes.ext.toLocalDateTime
