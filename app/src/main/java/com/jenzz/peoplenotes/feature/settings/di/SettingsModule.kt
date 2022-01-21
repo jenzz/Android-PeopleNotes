@@ -1,4 +1,4 @@
-package com.jenzz.peoplenotes.feature.settings.data.di
+package com.jenzz.peoplenotes.feature.settings.di
 
 import com.jenzz.peoplenotes.feature.settings.data.SettingsDataSource
 import com.jenzz.peoplenotes.feature.settings.data.SettingsLocalDataSource
