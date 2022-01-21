@@ -1,7 +1,7 @@
 CREATE TABLE NoteEntity (
-    id INTEGER AS Integer NOT NULL PRIMARY KEY AUTOINCREMENT,
+    id INTEGER AS Int NOT NULL PRIMARY KEY AUTOINCREMENT,
     text TEXT NOT NULL,
-    personId INTEGER AS Integer NOT NULL,
+    personId INTEGER AS Int NOT NULL,
     lastModified TEXT NOT NULL,
     FOREIGN KEY (personId) REFERENCES PersonEntity(id)
 );
