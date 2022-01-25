@@ -32,6 +32,7 @@ class DeletePersonWithNotesUseCase @Inject constructor(
     private val peopleAndNotesRepository: PeopleAndNotesRepository,
 ) {
 
-    suspend operator fun invoke(id: PersonId) =
+    suspend operator fun invoke(id: PersonId) {
         peopleAndNotesRepository.deleteWithNotes(id)
+    }
 }

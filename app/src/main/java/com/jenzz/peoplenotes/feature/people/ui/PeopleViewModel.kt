@@ -15,7 +15,8 @@ import com.jenzz.peoplenotes.ext.mutableStateOf
 import com.jenzz.peoplenotes.feature.people.data.PeopleUseCases
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -134,16 +135,15 @@ class PeopleViewModel @Inject constructor(
         state = state.copy(toastMessage = null)
     }
 
-    private inline fun observePeople(
+    private fun observePeople(
         sortBy: SortBy = searchBarState.sortBy.selected,
         filter: String = searchBarState.searchTerm,
-        crossinline action: suspend (value: People) -> Unit,
+        action: suspend (value: People) -> Unit,
     ) {
         currentObservePeople?.cancel()
-        currentObservePeople = viewModelScope.launch {
-            useCases
-                .observePeople(sortBy, filter)
-                .collect(action)
-        }
+        currentObservePeople = useCases
+            .observePeople(sortBy, filter)
+            .onEach(action)
+            .launchIn(viewModelScope)
     }
 }

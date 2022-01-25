@@ -10,7 +10,8 @@ import com.jenzz.peoplenotes.feature.settings.data.ThemePreference
 import com.jenzz.peoplenotes.feature.settings.ui.SettingsUiState.InitialLoad
 import com.jenzz.peoplenotes.feature.settings.ui.SettingsUiState.Loaded
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -23,15 +24,12 @@ class SettingsViewModel @Inject constructor(
         private set
 
     init {
-        viewModelScope.launch {
-            useCases
-                .observeSettings()
-                .collect { settings ->
-                    state = Loaded(
-                        settings = settings
-                    )
-                }
-        }
+        useCases
+            .observeSettings()
+            .onEach { settings ->
+                state = Loaded(settings = settings)
+            }
+            .launchIn(viewModelScope)
     }
 
     fun onThemeChange(theme: ThemePreference) {

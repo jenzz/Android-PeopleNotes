@@ -16,8 +16,8 @@ import com.jenzz.peoplenotes.feature.notes.ui.NotesUiState.InitialLoad
 import com.jenzz.peoplenotes.feature.notes.ui.NotesUiState.Loaded
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 
 @HiltViewModel
@@ -90,16 +90,15 @@ class NotesViewModel @Inject constructor(
         }
     }
 
-    private inline fun observeNotes(
+    private fun observeNotes(
         sortBy: SortBy = searchBarState.sortBy.selected,
         filter: String = searchBarState.searchTerm,
-        crossinline action: suspend (value: Notes) -> Unit,
+        action: suspend (value: Notes) -> Unit,
     ) {
         currentObserveNotes?.cancel()
-        currentObserveNotes = viewModelScope.launch {
-            useCases
-                .observeNotesWithPerson(personId, sortBy, filter)
-                .collect(action)
-        }
+        currentObserveNotes = useCases
+            .observeNotesWithPerson(personId, sortBy, filter)
+            .onEach(action)
+            .launchIn(viewModelScope)
     }
 }
