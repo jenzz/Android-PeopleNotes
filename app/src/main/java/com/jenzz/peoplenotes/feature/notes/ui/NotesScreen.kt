@@ -36,6 +36,7 @@ import com.jenzz.peoplenotes.common.data.people.PersonId
 import com.jenzz.peoplenotes.common.ui.ListStyle
 import com.jenzz.peoplenotes.common.ui.SortByState
 import com.jenzz.peoplenotes.common.ui.SuffixVisualTransformation
+import com.jenzz.peoplenotes.common.ui.asString
 import com.jenzz.peoplenotes.common.ui.theme.PeopleNotesTheme
 import com.jenzz.peoplenotes.common.ui.theme.elevation
 import com.jenzz.peoplenotes.common.ui.theme.spacing
@@ -107,7 +108,6 @@ fun NotesContent(
     onAddNoteClick: () -> Unit,
     onToastMessageShown: () -> Unit,
 ) {
-    val context = LocalContext.current
     val scaffoldState = rememberScaffoldState()
     Scaffold(
         scaffoldState = scaffoldState,
@@ -171,7 +171,8 @@ fun NotesContent(
         }
     }
     state.toastMessage?.let { toastMessage ->
-        val message = toastMessage.text.asString(context.resources)
+        val context = LocalContext.current
+        val message = toastMessage.text.asString()
         context.showShortToast(message)
         onToastMessageShown()
     }

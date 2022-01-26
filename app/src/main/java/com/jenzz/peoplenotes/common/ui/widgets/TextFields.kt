@@ -9,10 +9,10 @@ import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import com.jenzz.peoplenotes.common.ui.TextFieldUiState
+import com.jenzz.peoplenotes.common.ui.asString
 
 @Composable
 fun NotesTextField(
@@ -24,13 +24,12 @@ fun NotesTextField(
     state: TextFieldUiState,
     onValueChange: (String) -> Unit,
 ) {
-    val context = LocalContext.current
     Column {
         OutlinedTextField(
             modifier = modifier.fillMaxWidth(),
             enabled = enabled,
             singleLine = singleLine,
-            label = state.label?.let { label -> { Text(text = label.asString(context.resources)) } },
+            label = state.label?.let { label -> { Text(text = label.asString()) } },
             keyboardOptions = KeyboardOptions.Default.copy(imeAction = imeAction),
             keyboardActions = keyboardActions,
             value = state.value,

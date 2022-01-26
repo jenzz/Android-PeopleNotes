@@ -19,16 +19,12 @@ import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.VisualTransformation
 import com.jenzz.peoplenotes.R
-import com.jenzz.peoplenotes.common.ui.ListStyle
-import com.jenzz.peoplenotes.common.ui.SortBy
-import com.jenzz.peoplenotes.common.ui.SortByState
-import com.jenzz.peoplenotes.common.ui.TextResource
+import com.jenzz.peoplenotes.common.ui.*
 
 @Composable
 fun SearchBar(
@@ -209,7 +205,6 @@ private fun SortByDropdownItem(
     isSelected: Boolean,
     onClick: () -> Unit,
 ) {
-    val context = LocalContext.current
     val style = if (isSelected) {
         MaterialTheme.typography.body1.copy(
             fontWeight = FontWeight.Bold,
@@ -223,7 +218,7 @@ private fun SortByDropdownItem(
     }
     DropdownMenuItem(onClick = onClick) {
         Text(
-            text = text.asString(context.resources),
+            text = text.asString(),
             style = style,
         )
     }

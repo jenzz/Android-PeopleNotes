@@ -3,6 +3,8 @@ package com.jenzz.peoplenotes.common.ui
 import android.content.res.Resources
 import android.os.Parcelable
 import androidx.annotation.StringRes
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalContext
 import kotlinx.parcelize.Parcelize
 
 interface TextResource : Parcelable {
@@ -23,6 +25,12 @@ interface TextResource : Parcelable {
         fun fromId(@StringRes id: Int, vararg formatArgs: TextResource): TextResource =
             IdTextResource(id, formatArgs.asList())
     }
+}
+
+@Composable
+fun TextResource.asString(): String {
+    val context = LocalContext.current
+    return asString(context.resources)
 }
 
 @Parcelize

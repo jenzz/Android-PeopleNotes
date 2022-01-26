@@ -24,11 +24,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.jenzz.peoplenotes.R
-import com.jenzz.peoplenotes.common.data.people.People
-import com.jenzz.peoplenotes.common.data.people.Person
-import com.jenzz.peoplenotes.common.data.people.PersonId
-import com.jenzz.peoplenotes.common.data.people.FirstName
-import com.jenzz.peoplenotes.common.data.people.LastName
+import com.jenzz.peoplenotes.common.data.people.*
 import com.jenzz.peoplenotes.common.ui.*
 import com.jenzz.peoplenotes.common.ui.theme.PeopleNotesTheme
 import com.jenzz.peoplenotes.common.ui.theme.elevation
@@ -106,7 +102,6 @@ private fun PeopleContent(
     onSettingsClick: () -> Unit,
     onToastMessageShown: () -> Unit,
 ) {
-    val context = LocalContext.current
     val scaffoldState = rememberScaffoldState()
     val floatingActionButtonState = rememberSaveable { mutableStateOf(Collapsed) }
     Scaffold(
@@ -170,7 +165,8 @@ private fun PeopleContent(
         )
     }
     state.toastMessage?.let { toastMessage ->
-        val message = toastMessage.text.asString(context.resources)
+        val context = LocalContext.current
+        val message = toastMessage.text.asString()
         context.showShortToast(message)
         onToastMessageShown()
     }
