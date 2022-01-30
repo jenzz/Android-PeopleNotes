@@ -5,13 +5,5 @@ data class NotesList(
     val totalCount: Int,
 ) {
 
-    companion object {
-
-        val DEFAULT = NotesList(
-            items = emptyList(),
-            totalCount = 0,
-        )
-    }
-
     val isEmpty: Boolean = items.isEmpty()
 }

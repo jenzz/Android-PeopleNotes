@@ -33,7 +33,7 @@ class MainActivity : ComponentActivity() {
     private fun App() {
         val settingsState = settingsRepository
             .observeSettings()
-            .collectAsState(initial = Settings.DEFAULT)
+            .collectAsState(initial = Settings())
         PeopleNotesTheme(
             theme = settingsState.value.theme
         ) {

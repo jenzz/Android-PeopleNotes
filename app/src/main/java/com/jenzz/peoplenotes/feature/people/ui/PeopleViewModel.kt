@@ -30,7 +30,7 @@ class PeopleViewModel @Inject constructor(
     var state by savedStateHandle.mutableStateOf(
         defaultValue = PeopleUiState(
             isLoading = true,
-            people = People.DEFAULT,
+            people = People(),
             deleteConfirmation = null,
             deleteWithNotesConfirmation = null,
             toastMessage = null,
