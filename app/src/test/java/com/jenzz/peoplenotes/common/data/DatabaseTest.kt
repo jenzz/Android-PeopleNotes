@@ -16,9 +16,10 @@ class DatabaseTest {
         Properties().apply { put("foreign_keys", "true") }
     ).also { Database.Schema.create(it) }
 
-    private val database = Database(driver)
-    private val personQueries = database.personQueries
-    private val noteQueries = database.noteQueries
+    private val testDatabase = Database(driver)
+
+    private val personQueries = testDatabase.personQueries
+    private val noteQueries = testDatabase.noteQueries
 
     @Test
     fun autoIncrementsPersonIds() {
