@@ -1,18 +1,23 @@
 package com.jenzz.peoplenotes.feature.add_note.ui
 
+import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.material.Scaffold
+import androidx.compose.material.Text
+import androidx.compose.material.TopAppBar
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.jenzz.peoplenotes.R
 import com.jenzz.peoplenotes.common.data.notes.NoteId
 import com.jenzz.peoplenotes.common.data.people.PersonId
 import com.jenzz.peoplenotes.common.ui.TextFieldUiState
@@ -33,9 +38,11 @@ data class AddNoteScreenNavArgs(
 fun AddNoteScreen(
     viewModel: AddNoteViewModel = hiltViewModel(),
     navigator: DestinationsNavigator,
+    navArgs: AddNoteScreenNavArgs,
 ) {
     AddNoteContent(
         state = viewModel.state,
+        title = if (navArgs.noteId != null) R.string.edit_note else R.string.add_note,
         onNoteChange = viewModel::onNoteChange,
         onAddNoteClick = viewModel::onAddNote,
         onNoteAdded = { navigator.popBackStack() },
@@ -45,20 +52,31 @@ fun AddNoteScreen(
 @Composable
 fun AddNoteContent(
     state: AddNoteUiState,
+    @StringRes title: Int,
     onNoteChange: (String) -> Unit,
     onAddNoteClick: () -> Unit,
     onNoteAdded: () -> Unit,
 ) {
-    when (state) {
-        is AddNoteUiState.InitialLoad ->
-            LoadingView()
-        is AddNoteUiState.Loaded ->
-            AddNoteLoaded(
-                state = state,
-                onNoteChange = onNoteChange,
-                onAddNoteClick = onAddNoteClick,
-                onNoteAdded = onNoteAdded,
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = {
+                    Text(text = stringResource(id = title))
+                }
             )
+        }
+    ) {
+        when (state) {
+            is AddNoteUiState.InitialLoad ->
+                LoadingView()
+            is AddNoteUiState.Loaded ->
+                AddNoteLoaded(
+                    state = state,
+                    onNoteChange = onNoteChange,
+                    onAddNoteClick = onAddNoteClick,
+                    onNoteAdded = onNoteAdded,
+                )
+        }
     }
 }
 
@@ -80,7 +98,9 @@ fun AddNoteLoaded(
         modifier = Modifier.padding(all = MaterialTheme.spacing.large),
         verticalArrangement = Arrangement.spacedBy(space = MaterialTheme.spacing.medium),
     ) {
+        val firstNameInput = remember { FocusRequester() }
         NotesInputField(
+            modifier = Modifier.focusRequester(firstNameInput),
             enabled = state.inputsEnabled,
             imeAction = ImeAction.Done,
             state = state.note,
@@ -90,18 +110,22 @@ fun AddNoteLoaded(
             enabled = state.inputsEnabled,
             onClick = onAddNoteClick,
         )
+        LaunchedEffect(Unit) {
+            firstNameInput.requestFocus()
+        }
     }
 }
 
 @Composable
 private fun NotesInputField(
+    modifier: Modifier,
     enabled: Boolean,
     imeAction: ImeAction,
     state: TextFieldUiState,
     onValueChange: (String) -> Unit,
 ) {
     NotesTextField(
-        modifier = Modifier.heightIn(min = 112.dp),
+        modifier = modifier.heightIn(min = 112.dp),
         enabled = enabled,
         singleLine = false,
         imeAction = imeAction,
