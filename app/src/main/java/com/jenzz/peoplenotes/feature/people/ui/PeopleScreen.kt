@@ -31,19 +31,13 @@ import com.jenzz.peoplenotes.common.ui.theme.elevation
 import com.jenzz.peoplenotes.common.ui.theme.spacing
 import com.jenzz.peoplenotes.common.ui.widgets.*
 import com.jenzz.peoplenotes.common.ui.widgets.MultiFloatingActionButtonState.Collapsed
-import com.jenzz.peoplenotes.ext.formatFullDateTime
-import com.jenzz.peoplenotes.ext.random
-import com.jenzz.peoplenotes.ext.showShortToast
-import com.jenzz.peoplenotes.ext.toNonEmptyString
+import com.jenzz.peoplenotes.ext.*
 import com.jenzz.peoplenotes.feature.destinations.AddPersonScreenDestination
 import com.jenzz.peoplenotes.feature.destinations.NotesScreenDestination
 import com.jenzz.peoplenotes.feature.destinations.SettingsScreenDestination
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.drop
 import java.time.LocalDateTime
-
 
 @Destination(start = true)
 @Composable
@@ -51,23 +45,11 @@ fun PeopleScreen(
     viewModel: PeopleViewModel = hiltViewModel(),
     navigator: DestinationsNavigator,
 ) {
-    val searchBarState = rememberSearchBarState(sortBy = PeopleSortBy.toSortByState())
-    LaunchedEffect(Unit) {
-        viewModel.init(searchBarState)
-    }
-    LaunchedEffect(searchBarState.searchTerm) {
-        snapshotFlow { searchBarState.searchTerm }
-            .drop(1)
-            .collect { searchTerm -> viewModel.onSearchTermChange(searchTerm) }
-    }
-    LaunchedEffect(searchBarState.sortBy) {
-        snapshotFlow { searchBarState.sortBy }
-            .drop(1)
-            .collect { sortBy -> viewModel.onSortByChange(sortBy.selected) }
-    }
+    val state by rememberFlowWithLifecycle(viewModel.state)
+        .collectAsState(initial = viewModel.initialState)
     PeopleContent(
-        state = viewModel.state,
-        searchBarState = searchBarState,
+        state = state,
+        onSearchBarStateChange = viewModel::onSearchBarStateChange,
         onClick = { person ->
             navigator.navigate(NotesScreenDestination(person.id))
         },
@@ -90,7 +72,7 @@ fun PeopleScreen(
 @Composable
 private fun PeopleContent(
     state: PeopleUiState,
-    searchBarState: SearchBarState,
+    onSearchBarStateChange: (SearchBarState) -> Unit,
     onClick: (Person) -> Unit,
     onDeleteRequest: (Person) -> Unit,
     onDeleteConfirm: (Person) -> Unit,
@@ -100,7 +82,7 @@ private fun PeopleContent(
     onAddPersonManuallyClick: () -> Unit,
     onImportFromContactsClick: () -> Unit,
     onSettingsClick: () -> Unit,
-    onToastMessageShown: () -> Unit,
+    onToastMessageShown: (Long) -> Unit,
 ) {
     val scaffoldState = rememberScaffoldState()
     var floatingActionButtonState by rememberSaveable { mutableStateOf(Collapsed) }
@@ -122,11 +104,12 @@ private fun PeopleContent(
                     top = MaterialTheme.spacing.medium,
                     end = MaterialTheme.spacing.medium,
                 ),
-                state = searchBarState,
+                state = state.searchBarState,
+                onStateChange = onSearchBarStateChange,
                 showActions = state.showActions,
                 placeholder = stringResource(R.string.search_people, state.people.persons.size),
                 visualTransformation = SuffixVisualTransformation(
-                    text = searchBarState.searchTerm,
+                    text = state.searchBarState.searchTerm,
                     suffix = " (${state.people.persons.size})",
                 ),
                 onSettingsClick = onSettingsClick,
@@ -134,7 +117,7 @@ private fun PeopleContent(
             when {
                 state.isLoading ->
                     LoadingView()
-                state.isEmptyFiltered(searchBarState) ->
+                state.isEmptyFiltered(state.searchBarState) ->
                     EmptyView(
                         modifier = Modifier.fillMaxSize(),
                         text = stringResource(id = R.string.empty_people_filtered),
@@ -148,7 +131,6 @@ private fun PeopleContent(
                     )
                 else ->
                     PeopleLoaded(
-                        searchBarState = searchBarState,
                         state = state,
                         onClick = onClick,
                         onDeleteRequest = onDeleteRequest,
@@ -169,14 +151,13 @@ private fun PeopleContent(
         val context = LocalContext.current
         val message = toastMessage.text.asString()
         context.showShortToast(message)
-        onToastMessageShown()
+        onToastMessageShown(toastMessage.id)
     }
 }
 
 @Composable
 private fun PeopleLoaded(
     state: PeopleUiState,
-    searchBarState: SearchBarState,
     onClick: (Person) -> Unit,
     onDeleteRequest: (Person) -> Unit,
     onDeleteConfirm: (Person) -> Unit,
@@ -184,7 +165,7 @@ private fun PeopleLoaded(
     onDeleteWithNotes: (Person) -> Unit,
     onDeleteWithNotesCancel: () -> Unit,
 ) {
-    when (searchBarState.listStyle) {
+    when (state.searchBarState.listStyle) {
         ListStyle.Rows ->
             PeopleLoadedRows(
                 people = state.people.persons,
@@ -553,11 +534,7 @@ private fun PeopleContentPreview(
         Surface {
             PeopleContent(
                 state = state,
-                searchBarState = SearchBarState(
-                    searchTerm = "",
-                    listStyle = ListStyle.DEFAULT,
-                    sortBy = SortByState(items = emptyList()),
-                ),
+                onSearchBarStateChange = {},
                 onClick = {},
                 onDeleteRequest = {},
                 onDeleteConfirm = {},

@@ -1,5 +1,6 @@
 package com.jenzz.peoplenotes.common.ui.widgets
 
+import android.os.Parcelable
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
@@ -13,10 +14,11 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Settings
-import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.Saver
-import androidx.compose.runtime.saveable.listSaver
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
@@ -25,11 +27,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.VisualTransformation
 import com.jenzz.peoplenotes.R
 import com.jenzz.peoplenotes.common.ui.*
+import kotlinx.parcelize.Parcelize
 
 @Composable
 fun SearchBar(
     modifier: Modifier = Modifier,
     state: SearchBarState,
+    onStateChange: (SearchBarState) -> Unit,
     showActions: Boolean,
     placeholder: String,
     visualTransformation: () -> VisualTransformation,
@@ -42,15 +46,19 @@ fun SearchBar(
             visualTransformation = visualTransformation,
             showActions = showActions,
             searchTerm = state.searchTerm,
-            onSearchTermChange = { searchTerm -> state.searchTerm = searchTerm },
+            onSearchTermChange = { searchTerm -> onStateChange(state.copy(searchTerm = searchTerm)) },
             listStyle = state.listStyle,
-            onListStyleChange = { listStyle -> state.listStyle = listStyle },
+            onListStyleChange = { listStyle -> onStateChange(state.copy(listStyle = listStyle)) },
             sortBy = state.sortBy,
             onSortByChange = { selectedSortBy ->
-                state.sortBy = state.sortBy.copy(
-                    items = state.sortBy.items.map { sortBy ->
-                        sortBy.copy(isSelected = sortBy == selectedSortBy)
-                    }
+                onStateChange(
+                    state.copy(
+                        sortBy = state.sortBy.copy(
+                            items = state.sortBy.items.map { sortBy ->
+                                sortBy.copy(isSelected = sortBy == selectedSortBy)
+                            }
+                        )
+                    )
                 )
             },
         )
@@ -224,48 +232,9 @@ private fun SortByDropdownItem(
     }
 }
 
-@Stable
-class SearchBarState(
-    searchTerm: String,
-    listStyle: ListStyle,
-    sortBy: SortByState,
-) {
-
-    companion object {
-
-        val saver: Saver<SearchBarState, Any> = listSaver(
-            save = { state ->
-                listOf(
-                    state.searchTerm,
-                    state.listStyle,
-                    state.sortBy,
-                )
-            },
-            restore = { state ->
-                SearchBarState(
-                    searchTerm = state[0] as String,
-                    listStyle = state[1] as ListStyle,
-                    sortBy = state[2] as SortByState,
-                )
-            },
-        )
-    }
-
-    var searchTerm by mutableStateOf(searchTerm)
-    var listStyle by mutableStateOf(listStyle)
-    var sortBy by mutableStateOf(sortBy)
-}
-
-@Composable
-fun rememberSearchBarState(
-    searchTerm: String = "",
-    listStyle: ListStyle = ListStyle.DEFAULT,
-    sortBy: SortByState,
-): SearchBarState =
-    rememberSaveable(saver = SearchBarState.saver) {
-        SearchBarState(
-            searchTerm = searchTerm,
-            listStyle = listStyle,
-            sortBy = sortBy,
-        )
-    }
+@Parcelize
+data class SearchBarState(
+    val searchTerm: String,
+    val listStyle: ListStyle,
+    val sortBy: SortByState,
+) : Parcelable

@@ -12,8 +12,8 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.snapshotFlow
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -41,17 +41,13 @@ import com.jenzz.peoplenotes.common.ui.theme.PeopleNotesTheme
 import com.jenzz.peoplenotes.common.ui.theme.elevation
 import com.jenzz.peoplenotes.common.ui.theme.spacing
 import com.jenzz.peoplenotes.common.ui.widgets.*
-import com.jenzz.peoplenotes.ext.random
-import com.jenzz.peoplenotes.ext.showShortToast
-import com.jenzz.peoplenotes.ext.stringResourceWithStyledPlaceholders
-import com.jenzz.peoplenotes.ext.toNonEmptyString
+import com.jenzz.peoplenotes.ext.*
 import com.jenzz.peoplenotes.feature.destinations.AddNoteScreenDestination
 import com.jenzz.peoplenotes.feature.destinations.SettingsScreenDestination
 import com.jenzz.peoplenotes.feature.notes.data.Notes
+import com.jenzz.peoplenotes.feature.notes.ui.NotesUiState.InitialLoad
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.drop
 import java.time.LocalDateTime
 
 data class NotesScreenNavArgs(
@@ -65,23 +61,11 @@ fun NotesScreen(
     navArgs: NotesScreenNavArgs,
     navigator: DestinationsNavigator,
 ) {
-    val searchBarState = rememberSearchBarState(sortBy = NotesSortBy.toSortByState())
-    LaunchedEffect(Unit) {
-        viewModel.init(searchBarState)
-    }
-    LaunchedEffect(searchBarState.searchTerm) {
-        snapshotFlow { searchBarState.searchTerm }
-            .drop(1)
-            .collect { searchTerm -> viewModel.onSearchTermChange(searchTerm) }
-    }
-    LaunchedEffect(searchBarState.sortBy) {
-        snapshotFlow { searchBarState.sortBy }
-            .drop(1)
-            .collect { sortBy -> viewModel.onSortByChange(sortBy.selected) }
-    }
+    val state by rememberFlowWithLifecycle(viewModel.state)
+        .collectAsState(initial = viewModel.initialState)
     NotesContent(
-        state = viewModel.state,
-        searchBarState = searchBarState,
+        state = state,
+        onSearchBarStateChanged = viewModel::onSearchBarStateChange,
         onClick = { note ->
             navigator.navigate(
                 AddNoteScreenDestination(personId = navArgs.personId, noteId = note.id)
@@ -102,11 +86,11 @@ fun NotesScreen(
 @Composable
 fun NotesContent(
     state: NotesUiState,
-    searchBarState: SearchBarState,
+    onSearchBarStateChanged: (SearchBarState) -> Unit,
     onClick: (Note) -> Unit,
     onSettingsClick: () -> Unit,
     onAddNoteClick: () -> Unit,
-    onToastMessageShown: () -> Unit,
+    onToastMessageShown: (Long) -> Unit,
 ) {
     val scaffoldState = rememberScaffoldState()
     Scaffold(
@@ -118,11 +102,12 @@ fun NotesContent(
                     top = MaterialTheme.spacing.medium,
                     end = MaterialTheme.spacing.medium,
                 ),
-                state = searchBarState,
+                state = state.searchBarState,
+                onStateChange = onSearchBarStateChanged,
                 showActions = state.showActions,
                 placeholder = stringResource(id = R.string.search_notes, state.notesCount),
                 visualTransformation = SuffixVisualTransformation(
-                    text = searchBarState.searchTerm,
+                    text = state.searchBarState.searchTerm,
                     suffix = " (${state.notesCount})",
                 ),
                 onSettingsClick = onSettingsClick,
@@ -142,7 +127,7 @@ fun NotesContent(
                 LoadingView()
             state is NotesUiState.Loaded -> {
                 when {
-                    state.isEmptyFiltered(searchBarState) ->
+                    state.isEmptyFiltered(state.searchBarState) ->
                         EmptyView(
                             modifier = Modifier.fillMaxSize(),
                             text = stringResource(id = R.string.empty_notes_filtered),
@@ -163,7 +148,7 @@ fun NotesContent(
                     else ->
                         NotesLoaded(
                             state = state,
-                            searchBarState = searchBarState,
+                            searchBarState = state.searchBarState,
                             onClick = onClick,
                         )
                 }
@@ -174,7 +159,7 @@ fun NotesContent(
         val context = LocalContext.current
         val message = toastMessage.text.asString()
         context.showShortToast(message)
-        onToastMessageShown()
+        onToastMessageShown(toastMessage.id)
     }
 }
 
@@ -291,11 +276,7 @@ private fun NotesContentPreview(
         Surface {
             NotesContent(
                 state = state,
-                searchBarState = SearchBarState(
-                    searchTerm = "",
-                    listStyle = ListStyle.DEFAULT,
-                    sortBy = SortByState(items = emptyList()),
-                ),
+                onSearchBarStateChanged = {},
                 onClick = {},
                 onSettingsClick = {},
                 onAddNoteClick = {},
@@ -317,6 +298,11 @@ class NotesPreviewParameterProvider : PreviewParameterProvider<NotesUiState> {
                 lastModified = LocalDateTime.now(),
             )
             return NotesUiState.Loaded(
+                searchBarState = SearchBarState(
+                    searchTerm = "",
+                    listStyle = ListStyle.DEFAULT,
+                    sortBy = SortByState(items = emptyList()),
+                ),
                 isLoading = false,
                 notes = Notes(
                     person = person,
@@ -338,7 +324,7 @@ class NotesPreviewParameterProvider : PreviewParameterProvider<NotesUiState> {
 
     override val values: Sequence<NotesUiState> =
         sequenceOf(
-            NotesUiState.InitialLoad,
+            InitialLoad,
             loadedState,
         )
 }

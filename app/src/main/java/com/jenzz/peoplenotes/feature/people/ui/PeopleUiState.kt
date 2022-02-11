@@ -1,20 +1,23 @@
 package com.jenzz.peoplenotes.feature.people.ui
 
-import android.os.Parcelable
 import com.jenzz.peoplenotes.common.data.people.People
 import com.jenzz.peoplenotes.common.data.people.PersonId
+import com.jenzz.peoplenotes.common.ui.ListStyle
 import com.jenzz.peoplenotes.common.ui.ToastMessage
 import com.jenzz.peoplenotes.common.ui.widgets.SearchBarState
-import com.jenzz.peoplenotes.ext.PartialSavedState
-import kotlinx.parcelize.Parcelize
 
 data class PeopleUiState(
-    val isLoading: Boolean,
-    val people: People,
-    val deleteConfirmation: PersonId?,
-    val deleteWithNotesConfirmation: PersonId?,
-    val toastMessage: ToastMessage?,
-) : PartialSavedState<PeopleUiState, PeopleSavedState> {
+    val searchBarState: SearchBarState = SearchBarState(
+        searchTerm = "",
+        listStyle = ListStyle.DEFAULT,
+        sortBy = PeopleSortBy.toSortByState(),
+    ),
+    val isLoading: Boolean = true,
+    val people: People = People(),
+    val deleteConfirmation: PersonId? = null,
+    val deleteWithNotesConfirmation: PersonId? = null,
+    val toastMessage: ToastMessage? = null,
+) {
 
     val isEmpty: Boolean =
         people.isEmpty
@@ -26,22 +29,4 @@ data class PeopleUiState(
         isEmpty
                 && searchBarState.searchTerm.isNotEmpty()
                 && people.totalCount > 0
-
-    override val savedState: PeopleSavedState =
-        PeopleSavedState(
-            deleteConfirmation = deleteConfirmation,
-            deleteWithNotesConfirmation = deleteWithNotesConfirmation,
-        )
-
-    override fun mergeWithSavedState(savedState: PeopleSavedState): PeopleUiState =
-        copy(
-            deleteConfirmation = savedState.deleteConfirmation,
-            deleteWithNotesConfirmation = savedState.deleteWithNotesConfirmation,
-        )
 }
-
-@Parcelize
-data class PeopleSavedState(
-    val deleteConfirmation: PersonId?,
-    val deleteWithNotesConfirmation: PersonId?,
-) : Parcelable

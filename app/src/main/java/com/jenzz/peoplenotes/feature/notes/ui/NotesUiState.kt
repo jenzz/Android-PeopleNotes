@@ -1,11 +1,17 @@
 package com.jenzz.peoplenotes.feature.notes.ui
 
+import com.jenzz.peoplenotes.common.ui.ListStyle
 import com.jenzz.peoplenotes.common.ui.ToastMessage
 import com.jenzz.peoplenotes.common.ui.widgets.SearchBarState
 import com.jenzz.peoplenotes.feature.notes.data.Notes
 
 sealed class NotesUiState {
 
+    open val searchBarState: SearchBarState = SearchBarState(
+        searchTerm = "",
+        listStyle = ListStyle.DEFAULT,
+        sortBy = NotesSortBy.toSortByState(),
+    )
     abstract val showActions: Boolean
     abstract val notesCount: Int
     abstract val toastMessage: ToastMessage?
@@ -18,6 +24,7 @@ sealed class NotesUiState {
     }
 
     data class Loaded(
+        override val searchBarState: SearchBarState,
         override val toastMessage: ToastMessage?,
         val isLoading: Boolean,
         val notes: Notes,

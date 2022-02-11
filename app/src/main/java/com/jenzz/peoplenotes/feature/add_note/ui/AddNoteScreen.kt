@@ -25,6 +25,7 @@ import com.jenzz.peoplenotes.common.ui.theme.spacing
 import com.jenzz.peoplenotes.common.ui.widgets.LoadingView
 import com.jenzz.peoplenotes.common.ui.widgets.NotesTextField
 import com.jenzz.peoplenotes.common.ui.widgets.SubmitButton
+import com.jenzz.peoplenotes.ext.rememberFlowWithLifecycle
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
@@ -40,8 +41,10 @@ fun AddNoteScreen(
     navigator: DestinationsNavigator,
     navArgs: AddNoteScreenNavArgs,
 ) {
+    val state by rememberFlowWithLifecycle(viewModel.state)
+        .collectAsState(initial = AddNoteUiState.InitialLoad)
     AddNoteContent(
-        state = viewModel.state,
+        state = state,
         title = if (navArgs.noteId != null) R.string.edit_note else R.string.add_note,
         onNoteChange = viewModel::onNoteChange,
         onAddNoteClick = viewModel::onAddNote,

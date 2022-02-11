@@ -6,7 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.jenzz.peoplenotes.R
 import com.jenzz.peoplenotes.common.ui.TextFieldUiState
 import com.jenzz.peoplenotes.common.ui.TextResource
-import com.jenzz.peoplenotes.ext.mutableStateOf
+import com.jenzz.peoplenotes.ext.saveableStateFlowOf
 import com.jenzz.peoplenotes.feature.add_person.data.AddPersonResult
 import com.jenzz.peoplenotes.feature.add_person.data.AddPersonUseCases
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -19,40 +19,49 @@ class AddPersonViewModel @Inject constructor(
     private val useCases: AddPersonUseCases,
 ) : ViewModel() {
 
-    var state by savedStateHandle.mutableStateOf(
-        AddPersonUiState(
-            firstName = TextFieldUiState(
-                value = "",
-                label = TextResource.fromId(id = R.string.first_name),
-            ),
-            lastName = TextFieldUiState(
-                value = "",
-                label = TextResource.fromId(id = R.string.last_name),
-            ),
-            note = TextFieldUiState(
-                value = "",
-                label = TextResource.fromId(id = R.string.notes_optional),
-            ),
-            inputsEnabled = true,
-            isUserAdded = false,
-        )
+    val initialState = AddPersonUiState(
+        firstName = TextFieldUiState(
+            value = "",
+            label = TextResource.fromId(id = R.string.first_name),
+        ),
+        lastName = TextFieldUiState(
+            value = "",
+            label = TextResource.fromId(id = R.string.last_name),
+        ),
+        note = TextFieldUiState(
+            value = "",
+            label = TextResource.fromId(id = R.string.notes_optional),
+        ),
+        inputsEnabled = true,
+        isUserAdded = false,
     )
-        private set
+
+    private val _state = savedStateHandle.saveableStateFlowOf(
+        key = "add_person",
+        initialValue = initialState,
+    )
+    val state = _state.asStateFlow()
 
     fun onFirstNameChange(name: String) {
-        state = state.copy(firstName = state.firstName.copy(value = name, error = null))
+        _state.value = state.value.copy(
+            firstName = state.value.firstName.copy(value = name, error = null)
+        )
     }
 
     fun onLastNameChange(name: String) {
-        state = state.copy(lastName = state.lastName.copy(value = name, error = null))
+        _state.value = state.value.copy(
+            lastName = state.value.lastName.copy(value = name, error = null)
+        )
     }
 
     fun onNoteChange(note: String) {
-        state = state.copy(note = state.note.copy(value = note, error = null))
+        _state.value = state.value.copy(
+            note = state.value.note.copy(value = note, error = null)
+        )
     }
 
     fun onAddPerson() {
-        state = state.copy(inputsEnabled = false)
+        _state.value = state.value.copy(inputsEnabled = false)
         viewModelScope.launch {
             addPersonWithNote()
         }
@@ -60,18 +69,18 @@ class AddPersonViewModel @Inject constructor(
 
     private suspend fun addPersonWithNote() {
         val result = useCases.addPersonWithNote(
-            firstName = state.firstName.value,
-            lastName = state.lastName.value,
-            note = state.note.value,
+            firstName = state.value.firstName.value,
+            lastName = state.value.lastName.value,
+            note = state.value.note.value,
         )
-        state = when (result) {
+        _state.value = when (result) {
             is AddPersonResult.Success ->
-                state.copy(isUserAdded = true)
+                state.value.copy(isUserAdded = true)
             is AddPersonResult.Error ->
-                state.copy(
+                state.value.copy(
                     inputsEnabled = true,
-                    firstName = state.firstName.copy(error = result.firstNameError),
-                    lastName = state.lastName.copy(error = result.lastNameError),
+                    firstName = state.value.firstName.copy(error = result.firstNameError),
+                    lastName = state.value.lastName.copy(error = result.lastNameError),
                 )
         }
     }

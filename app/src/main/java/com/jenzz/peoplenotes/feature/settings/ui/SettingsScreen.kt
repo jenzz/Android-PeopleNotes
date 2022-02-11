@@ -6,11 +6,8 @@ import androidx.annotation.StringRes
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -25,6 +22,7 @@ import com.jenzz.peoplenotes.R
 import com.jenzz.peoplenotes.common.ui.theme.PeopleNotesTheme
 import com.jenzz.peoplenotes.common.ui.theme.spacing
 import com.jenzz.peoplenotes.common.ui.widgets.LoadingView
+import com.jenzz.peoplenotes.ext.rememberFlowWithLifecycle
 import com.jenzz.peoplenotes.feature.settings.data.Settings
 import com.jenzz.peoplenotes.feature.settings.data.ThemePreference
 import com.ramcosta.composedestinations.annotation.Destination
@@ -34,8 +32,10 @@ import com.ramcosta.composedestinations.annotation.Destination
 fun SettingsScreen(
     viewModel: SettingsViewModel = hiltViewModel(),
 ) {
+    val state by rememberFlowWithLifecycle(viewModel.state)
+        .collectAsState(initial = SettingsUiState.InitialLoad)
     SettingsContent(
-        state = viewModel.state,
+        state = state,
         onThemeChange = viewModel::onThemeChange,
     )
 }

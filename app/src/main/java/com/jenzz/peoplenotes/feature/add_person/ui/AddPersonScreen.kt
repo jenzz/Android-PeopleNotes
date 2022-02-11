@@ -26,6 +26,7 @@ import com.jenzz.peoplenotes.common.ui.theme.PeopleNotesTheme
 import com.jenzz.peoplenotes.common.ui.theme.spacing
 import com.jenzz.peoplenotes.common.ui.widgets.NotesTextField
 import com.jenzz.peoplenotes.common.ui.widgets.SubmitButton
+import com.jenzz.peoplenotes.ext.rememberFlowWithLifecycle
 import com.jenzz.peoplenotes.feature.destinations.PeopleScreenDestination
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
@@ -36,8 +37,10 @@ fun AddPersonScreen(
     viewModel: AddPersonViewModel = hiltViewModel(),
     navigator: DestinationsNavigator,
 ) {
+    val state by rememberFlowWithLifecycle(viewModel.state)
+        .collectAsState(initial = viewModel.initialState)
     AddPersonContent(
-        state = viewModel.state,
+        state = state,
         onFirstNameChange = viewModel::onFirstNameChange,
         onLastNameChange = viewModel::onLastNameChange,
         onNoteChange = viewModel::onNoteChange,
