@@ -5,7 +5,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.jenzz.peoplenotes.R
 import com.jenzz.peoplenotes.common.data.people.DeletePersonResult
-import com.jenzz.peoplenotes.common.data.people.Person
 import com.jenzz.peoplenotes.common.data.people.PersonId
 import com.jenzz.peoplenotes.common.ui.TextResource
 import com.jenzz.peoplenotes.common.ui.ToastMessage
@@ -36,8 +35,8 @@ class PeopleViewModel @Inject constructor(
         key = "searchBar",
         initialValue = initialState.searchBarState
     )
-    private val deleteConfirmation = MutableStateFlow<PersonId?>(null)
-    private val deleteWithNotesConfirmation = MutableStateFlow<PersonId?>(null)
+    private val showDeleteConfirmation = MutableStateFlow<PersonId?>(null)
+    private val showDeleteWithNotesConfirmation = MutableStateFlow<PersonId?>(null)
     private val people = searchBar.asStateFlow().flatMapLatest { state ->
         useCases.observePeople(
             sortBy = state.sortBy.selected,
@@ -50,16 +49,19 @@ class PeopleViewModel @Inject constructor(
             searchBar.asStateFlow(),
             loading,
             people,
-            deleteConfirmation,
-            deleteWithNotesConfirmation,
+            showDeleteConfirmation,
+            showDeleteWithNotesConfirmation,
             toastMessageManager.message,
-        ) { searchBarState, _, people, deleteConfirmation, deleteWithNotesConfirmation, toastMessage ->
+        ) {
+                searchBarState, _, people, showDeleteConfirmation, showDeleteWithNotesConfirmation,
+                toastMessage,
+            ->
             PeopleUiState(
                 searchBarState = searchBarState,
                 isLoading = false,
                 people = people,
-                deleteConfirmation = deleteConfirmation,
-                deleteWithNotesConfirmation = deleteWithNotesConfirmation,
+                showDeleteConfirmation = showDeleteConfirmation,
+                showDeleteWithNotesConfirmation = showDeleteWithNotesConfirmation,
                 toastMessage = toastMessage,
             )
         }
@@ -73,57 +75,47 @@ class PeopleViewModel @Inject constructor(
         searchBar.value = state
     }
 
-    fun onDeleteRequest(person: Person) {
-        deleteConfirmation.value = person.id
+    fun onDelete(personId: PersonId) {
+        showDeleteConfirmation.value = personId
     }
 
     fun onDeleteCancel() {
-        deleteConfirmation.value = null
+        showDeleteConfirmation.value = null
     }
 
-    fun onDeleteConfirm(person: Person) {
+    fun onDeleteConfirm(personId: PersonId) {
         loading.value = true
-        deleteConfirmation.value = null
+        showDeleteConfirmation.value = null
         viewModelScope.launch {
-            when (useCases.deletePerson(person.id)) {
+            when (useCases.deletePerson(personId)) {
                 is DeletePersonResult.RemainingNotesForPerson -> {
                     loading.value = false
-                    deleteWithNotesConfirmation.value = person.id
+                    showDeleteWithNotesConfirmation.value = personId
                 }
                 is DeletePersonResult.Success -> {
                     loading.value = false
                     toastMessageManager.emitMessage(
-                        ToastMessage(
-                            text = TextResource.fromId(
-                                id = R.string.person_deleted,
-                                person.fullName,
-                            )
-                        )
+                        ToastMessage(text = TextResource.fromId(R.string.person_deleted))
                     )
                 }
             }
         }
     }
 
-    fun onDeleteWithNotes(person: Person) {
+    fun onDeleteWithNotesConfirm(personId: PersonId) {
         loading.value = true
-        deleteWithNotesConfirmation.value = null
+        showDeleteWithNotesConfirmation.value = null
         viewModelScope.launch {
-            useCases.deletePersonWithNotes(person.id)
+            useCases.deletePersonWithNotes(personId)
             loading.value = false
             toastMessageManager.emitMessage(
-                ToastMessage(
-                    text = TextResource.fromId(
-                        id = R.string.person_deleted,
-                        person.fullName,
-                    )
-                )
+                ToastMessage(text = TextResource.fromId(id = R.string.person_deleted))
             )
         }
     }
 
     fun onDeleteWithNotesCancel() {
-        deleteWithNotesConfirmation.value = null
+        showDeleteWithNotesConfirmation.value = null
     }
 
     fun onToastMessageShown(id: Long) {

@@ -32,11 +32,12 @@ import com.jenzz.peoplenotes.common.ui.theme.spacing
 import com.jenzz.peoplenotes.common.ui.widgets.*
 import com.jenzz.peoplenotes.common.ui.widgets.MultiFloatingActionButtonState.Collapsed
 import com.jenzz.peoplenotes.ext.*
-import com.jenzz.peoplenotes.feature.destinations.AddPersonScreenDestination
-import com.jenzz.peoplenotes.feature.destinations.NotesScreenDestination
-import com.jenzz.peoplenotes.feature.destinations.SettingsScreenDestination
+import com.jenzz.peoplenotes.feature.destinations.*
+import com.jenzz.peoplenotes.feature.people.ui.dialogs.DeletePersonDialogResult
+import com.jenzz.peoplenotes.feature.people.ui.dialogs.DeletePersonWithNotesDialogResult
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import com.ramcosta.composedestinations.result.ResultRecipient
 import java.time.LocalDateTime
 
 @Destination(start = true)
@@ -44,20 +45,32 @@ import java.time.LocalDateTime
 fun PeopleScreen(
     viewModel: PeopleViewModel = hiltViewModel(),
     navigator: DestinationsNavigator,
+    deletePersonResultRecipient: ResultRecipient<DeletePersonDialogDestination, DeletePersonDialogResult>,
+    deletePersonWithNotesResultRecipient: ResultRecipient<DeletePersonWithNotesDialogDestination, DeletePersonWithNotesDialogResult>,
 ) {
     val state by rememberFlowWithLifecycle(viewModel.state)
         .collectAsState(initial = viewModel.initialState)
+    handleDeleteConfirmation(
+        state = state,
+        navigator = navigator,
+        deletePersonResultRecipient = deletePersonResultRecipient,
+        onDeleteConfirm = viewModel::onDeleteConfirm,
+        onDeleteCancel = viewModel::onDeleteCancel,
+    )
+    handleDeleteWithNotesConfirmation(
+        state = state,
+        navigator = navigator,
+        deletePersonWithNotesResultRecipient = deletePersonWithNotesResultRecipient,
+        onDeleteWithNotesConfirm = viewModel::onDeleteWithNotesConfirm,
+        onDeleteWithNotesCancel = viewModel::onDeleteWithNotesCancel,
+    )
     PeopleContent(
         state = state,
         onSearchBarStateChange = viewModel::onSearchBarStateChange,
         onClick = { person ->
             navigator.navigate(NotesScreenDestination(person.id))
         },
-        onDeleteRequest = viewModel::onDeleteRequest,
-        onDeleteConfirm = viewModel::onDeleteConfirm,
-        onDeleteCancel = viewModel::onDeleteCancel,
-        onDeleteWithNotes = viewModel::onDeleteWithNotes,
-        onDeleteWithNotesCancel = viewModel::onDeleteWithNotesCancel,
+        onDelete = viewModel::onDelete,
         onAddPersonManuallyClick = {
             navigator.navigate(AddPersonScreenDestination)
         },
@@ -70,15 +83,49 @@ fun PeopleScreen(
 }
 
 @Composable
+private fun handleDeleteConfirmation(
+    state: PeopleUiState,
+    navigator: DestinationsNavigator,
+    deletePersonResultRecipient: ResultRecipient<DeletePersonDialogDestination, DeletePersonDialogResult>,
+    onDeleteConfirm: (PersonId) -> Unit,
+    onDeleteCancel: () -> Unit,
+) {
+    state.showDeleteConfirmation?.let { personId ->
+        navigator.navigate(DeletePersonDialogDestination(personId))
+    }
+    deletePersonResultRecipient.onResult { result ->
+        when (result) {
+            is DeletePersonDialogResult.Yes -> onDeleteConfirm(result.personId)
+            is DeletePersonDialogResult.No -> onDeleteCancel()
+        }
+    }
+}
+
+@Composable
+fun handleDeleteWithNotesConfirmation(
+    state: PeopleUiState,
+    navigator: DestinationsNavigator,
+    deletePersonWithNotesResultRecipient: ResultRecipient<DeletePersonWithNotesDialogDestination, DeletePersonWithNotesDialogResult>,
+    onDeleteWithNotesConfirm: (PersonId) -> Unit,
+    onDeleteWithNotesCancel: () -> Unit,
+) {
+    state.showDeleteWithNotesConfirmation?.let { personId ->
+        navigator.navigate(DeletePersonWithNotesDialogDestination(personId))
+    }
+    deletePersonWithNotesResultRecipient.onResult { result ->
+        when (result) {
+            is DeletePersonWithNotesDialogResult.Yes -> onDeleteWithNotesConfirm(result.personId)
+            is DeletePersonWithNotesDialogResult.No -> onDeleteWithNotesCancel()
+        }
+    }
+}
+
+@Composable
 private fun PeopleContent(
     state: PeopleUiState,
     onSearchBarStateChange: (SearchBarState) -> Unit,
     onClick: (Person) -> Unit,
-    onDeleteRequest: (Person) -> Unit,
-    onDeleteConfirm: (Person) -> Unit,
-    onDeleteCancel: () -> Unit,
-    onDeleteWithNotes: (Person) -> Unit,
-    onDeleteWithNotesCancel: () -> Unit,
+    onDelete: (PersonId) -> Unit,
     onAddPersonManuallyClick: () -> Unit,
     onImportFromContactsClick: () -> Unit,
     onSettingsClick: () -> Unit,
@@ -107,7 +154,10 @@ private fun PeopleContent(
                 state = state.searchBarState,
                 onStateChange = onSearchBarStateChange,
                 showActions = state.showActions,
-                placeholder = stringResource(R.string.search_people, state.people.persons.size),
+                placeholder = stringResource(
+                    id = R.string.search_people,
+                    state.people.persons.size
+                ),
                 visualTransformation = SuffixVisualTransformation(
                     text = state.searchBarState.searchTerm,
                     suffix = " (${state.people.persons.size})",
@@ -133,11 +183,7 @@ private fun PeopleContent(
                     PeopleLoaded(
                         state = state,
                         onClick = onClick,
-                        onDeleteRequest = onDeleteRequest,
-                        onDeleteConfirm = onDeleteConfirm,
-                        onDeleteCancel = onDeleteCancel,
-                        onDeleteWithNotes = onDeleteWithNotes,
-                        onDeleteWithNotesCancel = onDeleteWithNotesCancel,
+                        onDelete = onDelete,
                     )
             }
         }
@@ -159,36 +205,22 @@ private fun PeopleContent(
 private fun PeopleLoaded(
     state: PeopleUiState,
     onClick: (Person) -> Unit,
-    onDeleteRequest: (Person) -> Unit,
-    onDeleteConfirm: (Person) -> Unit,
-    onDeleteCancel: () -> Unit,
-    onDeleteWithNotes: (Person) -> Unit,
-    onDeleteWithNotesCancel: () -> Unit,
+    onDelete: (PersonId) -> Unit,
 ) {
     when (state.searchBarState.listStyle) {
         ListStyle.Rows ->
             PeopleLoadedRows(
                 people = state.people.persons,
-                deleteConfirmation = state.deleteConfirmation,
-                deleteWithNotesConfirmation = state.deleteWithNotesConfirmation,
+                deleteWithNotesConfirmation = state.showDeleteWithNotesConfirmation,
                 onClick = onClick,
-                onDeleteRequest = onDeleteRequest,
-                onDeleteConfirm = onDeleteConfirm,
-                onDeleteCancel = onDeleteCancel,
-                onDeleteWithNotes = onDeleteWithNotes,
-                onDeleteWithNotesCancel = onDeleteWithNotesCancel,
+                onDelete = onDelete,
             )
         ListStyle.Grid ->
             PeopleLoadedGrid(
                 people = state.people.persons,
-                deleteConfirmation = state.deleteConfirmation,
-                deleteWithNotesConfirmation = state.deleteWithNotesConfirmation,
+                deleteWithNotesConfirmation = state.showDeleteWithNotesConfirmation,
                 onClick = onClick,
-                onDeleteRequest = onDeleteRequest,
-                onDeleteConfirm = onDeleteConfirm,
-                onDeleteCancel = onDeleteCancel,
-                onDeleteWithNotes = onDeleteWithNotes,
-                onDeleteWithNotesCancel = onDeleteWithNotesCancel,
+                onDelete = onDelete,
             )
     }
 }
@@ -196,14 +228,9 @@ private fun PeopleLoaded(
 @Composable
 private fun PeopleLoadedRows(
     people: List<Person>,
-    deleteConfirmation: PersonId?,
     deleteWithNotesConfirmation: PersonId?,
     onClick: (Person) -> Unit,
-    onDeleteRequest: (Person) -> Unit,
-    onDeleteConfirm: (Person) -> Unit,
-    onDeleteCancel: () -> Unit,
-    onDeleteWithNotes: (Person) -> Unit,
-    onDeleteWithNotesCancel: () -> Unit,
+    onDelete: (PersonId) -> Unit,
 ) {
     LazyColumn(
         contentPadding = PaddingValues(all = MaterialTheme.spacing.medium),
@@ -212,14 +239,9 @@ private fun PeopleLoadedRows(
         items(people) { person ->
             PersonRow(
                 person = person,
-                showDeleteDialog = person.id == deleteConfirmation,
                 showDeleteWithNotesDialog = person.id == deleteWithNotesConfirmation,
                 onClick = onClick,
-                onDeleteRequest = onDeleteRequest,
-                onDeleteConfirm = onDeleteConfirm,
-                onDeleteCancel = onDeleteCancel,
-                onDeleteWithNotes = onDeleteWithNotes,
-                onDeleteWithNotesCancel = onDeleteWithNotesCancel,
+                onDelete = onDelete,
             )
         }
     }
@@ -228,14 +250,9 @@ private fun PeopleLoadedRows(
 @Composable
 private fun PeopleLoadedGrid(
     people: List<Person>,
-    deleteConfirmation: PersonId?,
     deleteWithNotesConfirmation: PersonId?,
     onClick: (Person) -> Unit,
-    onDeleteRequest: (Person) -> Unit,
-    onDeleteConfirm: (Person) -> Unit,
-    onDeleteCancel: () -> Unit,
-    onDeleteWithNotes: (Person) -> Unit,
-    onDeleteWithNotesCancel: () -> Unit,
+    onDelete: (PersonId) -> Unit,
 ) {
     StaggeredVerticalGrid(
         modifier = Modifier
@@ -247,14 +264,9 @@ private fun PeopleLoadedGrid(
             PersonGrid(
                 modifier = Modifier.padding(all = MaterialTheme.spacing.small),
                 person = person,
-                showDeleteDialog = person.id == deleteConfirmation,
                 showDeleteWithNotesDialog = person.id == deleteWithNotesConfirmation,
                 onClick = onClick,
-                onDeleteRequest = onDeleteRequest,
-                onDeleteConfirm = onDeleteConfirm,
-                onDeleteCancel = onDeleteCancel,
-                onDeleteWithNotes = onDeleteWithNotes,
-                onDeleteWithNotesCancel = onDeleteWithNotesCancel,
+                onDelete = onDelete,
             )
         }
     }
@@ -263,25 +275,15 @@ private fun PeopleLoadedGrid(
 @Composable
 private fun PersonRow(
     person: Person,
-    showDeleteDialog: Boolean,
     showDeleteWithNotesDialog: Boolean,
     onClick: (Person) -> Unit,
-    onDeleteRequest: (Person) -> Unit,
-    onDeleteConfirm: (Person) -> Unit,
-    onDeleteCancel: () -> Unit,
-    onDeleteWithNotes: (Person) -> Unit,
-    onDeleteWithNotesCancel: () -> Unit,
+    onDelete: (PersonId) -> Unit,
 ) {
     PersonCard(
         person = person,
-        showDeleteDialog = showDeleteDialog,
         showDeleteWithNotesDialog = showDeleteWithNotesDialog,
         onClick = onClick,
-        onDeleteRequest = onDeleteRequest,
-        onDeleteConfirm = onDeleteConfirm,
-        onDeleteCancel = onDeleteCancel,
-        onDeleteWithNotes = onDeleteWithNotes,
-        onDeleteWithNotesCancel = onDeleteWithNotesCancel,
+        onDelete = onDelete,
     ) {
         Row {
             PersonImage(
@@ -311,26 +313,16 @@ private fun PersonRow(
 private fun PersonGrid(
     modifier: Modifier = Modifier,
     person: Person,
-    showDeleteDialog: Boolean,
     showDeleteWithNotesDialog: Boolean,
     onClick: (Person) -> Unit,
-    onDeleteRequest: (Person) -> Unit,
-    onDeleteConfirm: (Person) -> Unit,
-    onDeleteCancel: () -> Unit,
-    onDeleteWithNotes: (Person) -> Unit,
-    onDeleteWithNotesCancel: () -> Unit,
+    onDelete: (PersonId) -> Unit,
 ) {
     PersonCard(
         modifier = modifier,
         person = person,
-        showDeleteDialog = showDeleteDialog,
         showDeleteWithNotesDialog = showDeleteWithNotesDialog,
         onClick = onClick,
-        onDeleteRequest = onDeleteRequest,
-        onDeleteConfirm = onDeleteConfirm,
-        onDeleteCancel = onDeleteCancel,
-        onDeleteWithNotes = onDeleteWithNotes,
-        onDeleteWithNotesCancel = onDeleteWithNotesCancel,
+        onDelete = onDelete,
     ) {
         Column {
             PersonImage(
@@ -363,14 +355,9 @@ private fun PersonGrid(
 private fun PersonCard(
     modifier: Modifier = Modifier,
     person: Person,
-    showDeleteDialog: Boolean,
     showDeleteWithNotesDialog: Boolean,
     onClick: (Person) -> Unit,
-    onDeleteRequest: (Person) -> Unit,
-    onDeleteConfirm: (Person) -> Unit,
-    onDeleteCancel: () -> Unit,
-    onDeleteWithNotes: (Person) -> Unit,
-    onDeleteWithNotesCancel: () -> Unit,
+    onDelete: (PersonId) -> Unit,
     content: @Composable () -> Unit,
 ) {
     var selected by rememberSaveable { mutableStateOf(false) }
@@ -397,82 +384,10 @@ private fun PersonCard(
                 onDismissRequest = { selected = false },
             ) { person ->
                 selected = false
-                onDeleteRequest(person)
+                onDelete(person.id)
             }
         }
     }
-    if (showDeleteDialog) {
-        DeletePersonDialog(
-            person = person,
-            onDeleteConfirm = onDeleteConfirm,
-            onDeleteCancel = onDeleteCancel,
-        )
-    }
-    if (showDeleteWithNotesDialog) {
-        DeletePersonWithNotesDialog(
-            person = person,
-            onDeleteWithNotes = onDeleteWithNotes,
-            onDeleteWithNotesCancel = onDeleteWithNotesCancel,
-        )
-    }
-}
-
-@Composable
-private fun DeletePersonDialog(
-    person: Person,
-    onDeleteConfirm: (Person) -> Unit,
-    onDeleteCancel: () -> Unit,
-) {
-    AlertDialog(
-        text = {
-            Text(
-                text = stringResource(
-                    id = R.string.delete_person_dialog,
-                    person.fullName
-                )
-            )
-        },
-        confirmButton = {
-            TextButton(onClick = { onDeleteConfirm(person) }) {
-                Text(text = stringResource(id = R.string.yes))
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = onDeleteCancel) {
-                Text(text = stringResource(id = R.string.cancel))
-            }
-        },
-        onDismissRequest = onDeleteCancel,
-    )
-}
-
-@Composable
-private fun DeletePersonWithNotesDialog(
-    person: Person,
-    onDeleteWithNotes: (Person) -> Unit,
-    onDeleteWithNotesCancel: () -> Unit,
-) {
-    AlertDialog(
-        text = {
-            Text(
-                text = stringResource(
-                    id = R.string.delete_person_with_notes_dialog,
-                    person.fullName
-                )
-            )
-        },
-        confirmButton = {
-            TextButton(onClick = { onDeleteWithNotes(person) }) {
-                Text(text = stringResource(id = R.string.yes))
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = onDeleteWithNotesCancel) {
-                Text(text = stringResource(id = R.string.cancel))
-            }
-        },
-        onDismissRequest = onDeleteWithNotesCancel,
-    )
 }
 
 @Composable
@@ -536,11 +451,7 @@ private fun PeopleContentPreview(
                 state = state,
                 onSearchBarStateChange = {},
                 onClick = {},
-                onDeleteRequest = {},
-                onDeleteConfirm = {},
-                onDeleteCancel = {},
-                onDeleteWithNotes = {},
-                onDeleteWithNotesCancel = {},
+                onDelete = {},
                 onAddPersonManuallyClick = {},
                 onImportFromContactsClick = {},
                 onSettingsClick = {},
@@ -560,8 +471,8 @@ class PeoplePreviewParameterProvider : PreviewParameterProvider<PeopleUiState> {
                     persons = emptyList(),
                     totalCount = 0
                 ),
-                deleteConfirmation = null,
-                deleteWithNotesConfirmation = null,
+                showDeleteConfirmation = null,
+                showDeleteWithNotesConfirmation = null,
                 toastMessage = null,
             ),
             PeopleUiState(
@@ -578,8 +489,8 @@ class PeoplePreviewParameterProvider : PreviewParameterProvider<PeopleUiState> {
                     },
                     totalCount = 10,
                 ),
-                deleteConfirmation = null,
-                deleteWithNotesConfirmation = null,
+                showDeleteConfirmation = null,
+                showDeleteWithNotesConfirmation = null,
                 toastMessage = null,
             ),
             PeopleUiState(
@@ -588,8 +499,8 @@ class PeoplePreviewParameterProvider : PreviewParameterProvider<PeopleUiState> {
                     persons = emptyList(),
                     totalCount = 0
                 ),
-                deleteConfirmation = PersonId(1),
-                deleteWithNotesConfirmation = null,
+                showDeleteConfirmation = PersonId(1),
+                showDeleteWithNotesConfirmation = null,
                 toastMessage = ToastMessage(
                     text = TextResource.fromText("User Message 1")
                 ),

@@ -14,8 +14,8 @@ data class PeopleUiState(
     ),
     val isLoading: Boolean = true,
     val people: People = People(),
-    val deleteConfirmation: PersonId? = null,
-    val deleteWithNotesConfirmation: PersonId? = null,
+    val showDeleteConfirmation: PersonId? = null,
+    val showDeleteWithNotesConfirmation: PersonId? = null,
     val toastMessage: ToastMessage? = null,
 ) {
 
