@@ -11,7 +11,6 @@ import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -89,14 +88,15 @@ fun MultiFloatingActionButton(
 @Composable
 fun MultiFloatingActionButtonContentOverlay(
     modifier: Modifier = Modifier,
-    state: MutableState<MultiFloatingActionButtonState>,
+    state: MultiFloatingActionButtonState,
+    onStateChange: (MultiFloatingActionButtonState) -> Unit,
 ) {
-    val alpha = if (state.value == Expanded) 0.20f else 0f
+    val alpha = if (state == Expanded) 0.20f else 0f
     Box(
         modifier = modifier
-            .thenIf(state.value == Expanded) {
+            .thenIf(state == Expanded) {
                 noRippleClickable(
-                    onClick = { state.value = Collapsed },
+                    onClick = { onStateChange(Collapsed) },
                 )
             }
             .alpha(animateFloatAsState(alpha).value)

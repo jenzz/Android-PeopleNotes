@@ -103,13 +103,13 @@ private fun PeopleContent(
     onToastMessageShown: () -> Unit,
 ) {
     val scaffoldState = rememberScaffoldState()
-    val floatingActionButtonState = rememberSaveable { mutableStateOf(Collapsed) }
+    var floatingActionButtonState by rememberSaveable { mutableStateOf(Collapsed) }
     Scaffold(
         scaffoldState = scaffoldState,
         floatingActionButton = {
             PeopleFloatingActionButton(
-                state = floatingActionButtonState.value,
-                onStateChange = { state -> floatingActionButtonState.value = state },
+                state = floatingActionButtonState,
+                onStateChange = { state -> floatingActionButtonState = state },
                 onAddPersonManuallyClick = onAddPersonManuallyClick,
                 onImportFromContactsClick = onImportFromContactsClick,
             )
@@ -162,6 +162,7 @@ private fun PeopleContent(
         MultiFloatingActionButtonContentOverlay(
             modifier = Modifier.fillMaxSize(),
             state = floatingActionButtonState,
+            onStateChange = { state -> floatingActionButtonState = state }
         )
     }
     state.toastMessage?.let { toastMessage ->
