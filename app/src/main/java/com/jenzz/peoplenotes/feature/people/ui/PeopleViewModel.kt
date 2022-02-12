@@ -31,48 +31,35 @@ class PeopleViewModel @Inject constructor(
 
     private val toastMessageManager = ToastMessageManager()
     private val loading = MutableStateFlow(true)
-    private val searchBar = savedStateHandle.saveableStateFlowOf(
+    private val searchBarState = savedStateHandle.saveableStateFlowOf(
         key = "searchBar",
         initialValue = initialState.searchBarState
     )
     private val showDeleteConfirmation = MutableStateFlow<PersonId?>(null)
     private val showDeleteWithNotesConfirmation = MutableStateFlow<PersonId?>(null)
-    private val people = searchBar.asStateFlow().flatMapLatest { state ->
+    private val people = searchBarState.asStateFlow().flatMapLatest { state ->
         useCases.observePeople(
             sortBy = state.sortBy.selected,
             filter = state.searchTerm,
         )
     }
 
-    val state =
-        combine(
-            searchBar.asStateFlow(),
-            loading,
-            people,
-            showDeleteConfirmation,
-            showDeleteWithNotesConfirmation,
-            toastMessageManager.message,
-        ) {
-                searchBarState, _, people, showDeleteConfirmation, showDeleteWithNotesConfirmation,
-                toastMessage,
-            ->
-            PeopleUiState(
-                searchBarState = searchBarState,
-                isLoading = false,
-                people = people,
-                showDeleteConfirmation = showDeleteConfirmation,
-                showDeleteWithNotesConfirmation = showDeleteWithNotesConfirmation,
-                toastMessage = toastMessage,
-            )
-        }
-            .stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(5000),
-                initialValue = initialState,
-            )
+    val state = combine(
+        searchBarState.asStateFlow(),
+        loading,
+        people,
+        showDeleteConfirmation,
+        showDeleteWithNotesConfirmation,
+        toastMessageManager.message,
+        ::PeopleUiState
+    ).stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = initialState,
+    )
 
     fun onSearchBarStateChange(state: SearchBarState) {
-        searchBar.value = state
+        searchBarState.value = state
     }
 
     fun onDelete(personId: PersonId) {
