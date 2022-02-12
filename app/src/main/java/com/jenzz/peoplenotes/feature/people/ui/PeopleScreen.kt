@@ -50,14 +50,14 @@ fun PeopleScreen(
 ) {
     val state by rememberFlowWithLifecycle(viewModel.state)
         .collectAsState(initial = viewModel.initialState)
-    handleDeleteConfirmation(
+    HandleDeleteConfirmation(
         state = state,
         navigator = navigator,
         deletePersonResultRecipient = deletePersonResultRecipient,
         onDeleteConfirm = viewModel::onDeleteConfirm,
         onDeleteCancel = viewModel::onDeleteCancel,
     )
-    handleDeleteWithNotesConfirmation(
+    HandleDeleteWithNotesConfirmation(
         state = state,
         navigator = navigator,
         deletePersonWithNotesResultRecipient = deletePersonWithNotesResultRecipient,
@@ -83,7 +83,7 @@ fun PeopleScreen(
 }
 
 @Composable
-private fun handleDeleteConfirmation(
+private fun HandleDeleteConfirmation(
     state: PeopleUiState,
     navigator: DestinationsNavigator,
     deletePersonResultRecipient: ResultRecipient<DeletePersonDialogDestination, DeletePersonDialogResult>,
@@ -102,7 +102,7 @@ private fun handleDeleteConfirmation(
 }
 
 @Composable
-fun handleDeleteWithNotesConfirmation(
+fun HandleDeleteWithNotesConfirmation(
     state: PeopleUiState,
     navigator: DestinationsNavigator,
     deletePersonWithNotesResultRecipient: ResultRecipient<DeletePersonWithNotesDialogDestination, DeletePersonWithNotesDialogResult>,
@@ -211,14 +211,12 @@ private fun PeopleLoaded(
         ListStyle.Rows ->
             PeopleLoadedRows(
                 people = state.people.persons,
-                deleteWithNotesConfirmation = state.showDeleteWithNotesConfirmation,
                 onClick = onClick,
                 onDelete = onDelete,
             )
         ListStyle.Grid ->
             PeopleLoadedGrid(
                 people = state.people.persons,
-                deleteWithNotesConfirmation = state.showDeleteWithNotesConfirmation,
                 onClick = onClick,
                 onDelete = onDelete,
             )
@@ -228,7 +226,6 @@ private fun PeopleLoaded(
 @Composable
 private fun PeopleLoadedRows(
     people: List<Person>,
-    deleteWithNotesConfirmation: PersonId?,
     onClick: (Person) -> Unit,
     onDelete: (PersonId) -> Unit,
 ) {
@@ -239,7 +236,6 @@ private fun PeopleLoadedRows(
         items(people) { person ->
             PersonRow(
                 person = person,
-                showDeleteWithNotesDialog = person.id == deleteWithNotesConfirmation,
                 onClick = onClick,
                 onDelete = onDelete,
             )
@@ -250,7 +246,6 @@ private fun PeopleLoadedRows(
 @Composable
 private fun PeopleLoadedGrid(
     people: List<Person>,
-    deleteWithNotesConfirmation: PersonId?,
     onClick: (Person) -> Unit,
     onDelete: (PersonId) -> Unit,
 ) {
@@ -264,7 +259,6 @@ private fun PeopleLoadedGrid(
             PersonGrid(
                 modifier = Modifier.padding(all = MaterialTheme.spacing.small),
                 person = person,
-                showDeleteWithNotesDialog = person.id == deleteWithNotesConfirmation,
                 onClick = onClick,
                 onDelete = onDelete,
             )
@@ -275,13 +269,11 @@ private fun PeopleLoadedGrid(
 @Composable
 private fun PersonRow(
     person: Person,
-    showDeleteWithNotesDialog: Boolean,
     onClick: (Person) -> Unit,
     onDelete: (PersonId) -> Unit,
 ) {
     PersonCard(
         person = person,
-        showDeleteWithNotesDialog = showDeleteWithNotesDialog,
         onClick = onClick,
         onDelete = onDelete,
     ) {
@@ -313,14 +305,12 @@ private fun PersonRow(
 private fun PersonGrid(
     modifier: Modifier = Modifier,
     person: Person,
-    showDeleteWithNotesDialog: Boolean,
     onClick: (Person) -> Unit,
     onDelete: (PersonId) -> Unit,
 ) {
     PersonCard(
         modifier = modifier,
         person = person,
-        showDeleteWithNotesDialog = showDeleteWithNotesDialog,
         onClick = onClick,
         onDelete = onDelete,
     ) {
@@ -355,7 +345,6 @@ private fun PersonGrid(
 private fun PersonCard(
     modifier: Modifier = Modifier,
     person: Person,
-    showDeleteWithNotesDialog: Boolean,
     onClick: (Person) -> Unit,
     onDelete: (PersonId) -> Unit,
     content: @Composable () -> Unit,
