@@ -4,10 +4,10 @@ import androidx.annotation.StringRes
 import androidx.compose.ui.graphics.Color
 import com.jenzz.peoplenotes.R
 import com.jenzz.peoplenotes.common.data.notes.NewNote
-import com.jenzz.peoplenotes.common.data.people.NewPerson
-import com.jenzz.peoplenotes.common.data.people.PeopleAndNotesRepository
 import com.jenzz.peoplenotes.common.data.people.FirstName
 import com.jenzz.peoplenotes.common.data.people.LastName
+import com.jenzz.peoplenotes.common.data.people.NewPerson
+import com.jenzz.peoplenotes.common.data.people.PeopleAndNotesRepository
 import com.jenzz.peoplenotes.ext.NonEmptyString
 import com.jenzz.peoplenotes.ext.random
 import com.jenzz.peoplenotes.ext.toNonEmptyStringOrNull

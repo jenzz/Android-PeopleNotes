@@ -4,12 +4,12 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 fun CharSequence.toLocalDateTime(
-    formatter: DateTimeFormatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME
+    formatter: DateTimeFormatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME,
 ): LocalDateTime =
     LocalDateTime.parse(this, formatter)
 
 fun LocalDateTime.toEntity(
-    formatter: DateTimeFormatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME
+    formatter: DateTimeFormatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME,
 ): String =
     format(formatter)
 

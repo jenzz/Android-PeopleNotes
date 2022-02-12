@@ -19,7 +19,7 @@ fun Modifier.thenIf(
 
 @SuppressLint("UnnecessaryComposedModifier")
 fun Modifier.noRippleClickable(
-    onClick: () -> Unit
+    onClick: () -> Unit,
 ): Modifier =
     composed {
         clickable(

@@ -21,9 +21,6 @@ interface TextResource : Parcelable {
 
         fun fromId(@StringRes id: Int, vararg formatArgs: String): TextResource =
             IdTextResource(id, formatArgs.map { formatArg -> fromText(formatArg) })
-
-        fun fromId(@StringRes id: Int, vararg formatArgs: TextResource): TextResource =
-            IdTextResource(id, formatArgs.asList())
     }
 }
 
