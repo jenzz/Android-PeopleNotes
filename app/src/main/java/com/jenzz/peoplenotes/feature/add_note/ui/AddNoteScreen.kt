@@ -111,6 +111,7 @@ fun AddNoteLoaded(
         )
         SubmitButton(
             enabled = state.inputsEnabled,
+            text = R.string.save,
             onClick = onAddNoteClick,
         )
         LaunchedEffect(Unit) {

@@ -118,6 +118,7 @@ private fun AddPersonContent(
             )
             SubmitButton(
                 enabled = state.inputsEnabled,
+                text = R.string.save,
                 onClick = onSubmit,
             )
             LaunchedEffect(Unit) {

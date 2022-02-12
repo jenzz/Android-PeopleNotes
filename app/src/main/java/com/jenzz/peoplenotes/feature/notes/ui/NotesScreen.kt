@@ -117,7 +117,7 @@ fun NotesContent(
             FloatingActionButton(onClick = onAddNoteClick) {
                 Icon(
                     imageVector = Icons.Rounded.Add,
-                    contentDescription = stringResource(id = R.string.add),
+                    contentDescription = stringResource(id = R.string.save),
                 )
             }
         }
