@@ -16,7 +16,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -33,7 +32,10 @@ import com.jenzz.peoplenotes.common.data.people.FirstName
 import com.jenzz.peoplenotes.common.data.people.LastName
 import com.jenzz.peoplenotes.common.data.people.Person
 import com.jenzz.peoplenotes.common.data.people.PersonId
-import com.jenzz.peoplenotes.common.ui.*
+import com.jenzz.peoplenotes.common.ui.ListStyle
+import com.jenzz.peoplenotes.common.ui.SortByState
+import com.jenzz.peoplenotes.common.ui.SuffixVisualTransformation
+import com.jenzz.peoplenotes.common.ui.ToastMessageId
 import com.jenzz.peoplenotes.common.ui.theme.PeopleNotesTheme
 import com.jenzz.peoplenotes.common.ui.theme.elevation
 import com.jenzz.peoplenotes.common.ui.theme.spacing
@@ -76,7 +78,7 @@ fun NotesScreen(
                 AddNoteScreenDestination(personId = navArgs.personId)
             )
         },
-        onToastMessageShown = viewModel::onToastMessageShown,
+        onToastShown = viewModel::onToastShown,
     )
 }
 
@@ -87,7 +89,7 @@ fun NotesContent(
     onClick: (Note) -> Unit,
     onSettingsClick: () -> Unit,
     onAddNoteClick: () -> Unit,
-    onToastMessageShown: (ToastMessageId) -> Unit,
+    onToastShown: (ToastMessageId) -> Unit,
 ) {
     val scaffoldState = rememberScaffoldState()
     Scaffold(
@@ -152,11 +154,11 @@ fun NotesContent(
             }
         }
     }
-    state.toastMessage?.let { toastMessage ->
-        val context = LocalContext.current
-        val message = toastMessage.text.asString()
-        context.showShortToast(message)
-        onToastMessageShown(toastMessage.id)
+    state.toastMessage?.let { message ->
+        Toast(
+            message = message,
+            onToastShown = onToastShown,
+        )
     }
 }
 
@@ -277,7 +279,7 @@ private fun NotesContentPreview(
                 onClick = {},
                 onSettingsClick = {},
                 onAddNoteClick = {},
-                onToastMessageShown = {},
+                onToastShown = {},
             )
         }
     }

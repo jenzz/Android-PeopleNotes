@@ -14,7 +14,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -78,7 +77,7 @@ fun PeopleScreen(
         onSettingsClick = {
             navigator.navigate(SettingsScreenDestination)
         },
-        onToastMessageShown = viewModel::onToastMessageShown,
+        onToastShown = viewModel::onToastShown,
     )
 }
 
@@ -129,7 +128,7 @@ private fun PeopleContent(
     onAddPersonManuallyClick: () -> Unit,
     onImportFromContactsClick: () -> Unit,
     onSettingsClick: () -> Unit,
-    onToastMessageShown: (ToastMessageId) -> Unit,
+    onToastShown: (ToastMessageId) -> Unit,
 ) {
     val scaffoldState = rememberScaffoldState()
     var floatingActionButtonState by rememberSaveable { mutableStateOf(Collapsed) }
@@ -193,11 +192,11 @@ private fun PeopleContent(
             onStateChange = { state -> floatingActionButtonState = state }
         )
     }
-    state.toastMessage?.let { toastMessage ->
-        val context = LocalContext.current
-        val message = toastMessage.text.asString()
-        context.showShortToast(message)
-        onToastMessageShown(toastMessage.id)
+    state.toastMessage?.let { message ->
+        Toast(
+            message = message,
+            onToastShown = onToastShown,
+        )
     }
 }
 
@@ -444,7 +443,7 @@ private fun PeopleContentPreview(
                 onAddPersonManuallyClick = {},
                 onImportFromContactsClick = {},
                 onSettingsClick = {},
-                onToastMessageShown = {},
+                onToastShown = {},
             )
         }
     }

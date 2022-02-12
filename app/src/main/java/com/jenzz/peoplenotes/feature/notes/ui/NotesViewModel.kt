@@ -54,7 +54,7 @@ class NotesViewModel @Inject constructor(
         searchBarState.value = state
     }
 
-    fun onToastMessageShown(id: ToastMessageId) {
+    fun onToastShown(id: ToastMessageId) {
         viewModelScope.launch {
             toastMessageManager.clearMessage(id)
         }

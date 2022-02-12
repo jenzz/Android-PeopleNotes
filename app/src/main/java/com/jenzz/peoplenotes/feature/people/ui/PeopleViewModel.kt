@@ -106,7 +106,7 @@ class PeopleViewModel @Inject constructor(
         showDeleteWithNotesConfirmation.value = null
     }
 
-    fun onToastMessageShown(id: ToastMessageId) {
+    fun onToastShown(id: ToastMessageId) {
         viewModelScope.launch {
             toastMessageManager.clearMessage(id)
         }
