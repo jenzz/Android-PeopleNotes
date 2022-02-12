@@ -6,6 +6,8 @@ import androidx.annotation.StringRes
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
@@ -26,16 +28,19 @@ import com.jenzz.peoplenotes.ext.rememberFlowWithLifecycle
 import com.jenzz.peoplenotes.feature.settings.data.Settings
 import com.jenzz.peoplenotes.feature.settings.data.ThemePreference
 import com.ramcosta.composedestinations.annotation.Destination
+import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
 @Destination(start = true, navGraph = "settings")
 @Composable
 fun SettingsScreen(
     viewModel: SettingsViewModel = hiltViewModel(),
+    navigator: DestinationsNavigator,
 ) {
     val state by rememberFlowWithLifecycle(viewModel.state)
         .collectAsState(initial = SettingsUiState.InitialLoad)
     SettingsContent(
         state = state,
+        onNavigateUp = navigator::navigateUp,
         onThemeChange = viewModel::onThemeChange,
     )
 }
@@ -43,11 +48,20 @@ fun SettingsScreen(
 @Composable
 private fun SettingsContent(
     state: SettingsUiState,
+    onNavigateUp: () -> Unit,
     onThemeChange: (ThemePreference) -> Unit,
 ) {
     Scaffold(
         topBar = {
             TopAppBar(
+                navigationIcon = {
+                    IconButton(onClick = onNavigateUp) {
+                        Icon(
+                            imageVector = Icons.Rounded.ArrowBack,
+                            contentDescription = stringResource(id = R.string.back)
+                        )
+                    }
+                },
                 title = {
                     Text(text = stringResource(id = R.string.settings))
                 }
@@ -201,6 +215,7 @@ private fun SettingsContentPreview(
         Surface {
             SettingsContent(
                 state = state,
+                onNavigateUp = {},
                 onThemeChange = {},
             )
         }

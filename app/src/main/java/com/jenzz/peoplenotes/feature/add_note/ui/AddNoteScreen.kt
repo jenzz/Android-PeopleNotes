@@ -5,10 +5,9 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
-import androidx.compose.material.TopAppBar
+import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -46,6 +45,7 @@ fun AddNoteScreen(
     AddNoteContent(
         state = state,
         title = if (navArgs.noteId != null) R.string.edit_note else R.string.add_note,
+        onNavigateUp = navigator::navigateUp,
         onNoteChange = viewModel::onNoteChange,
         onAddNoteClick = viewModel::onAddNote,
         onNoteAdded = { navigator.popBackStack() },
@@ -56,6 +56,7 @@ fun AddNoteScreen(
 fun AddNoteContent(
     state: AddNoteUiState,
     @StringRes title: Int,
+    onNavigateUp: () -> Unit,
     onNoteChange: (String) -> Unit,
     onAddNoteClick: () -> Unit,
     onNoteAdded: () -> Unit,
@@ -63,6 +64,14 @@ fun AddNoteContent(
     Scaffold(
         topBar = {
             TopAppBar(
+                navigationIcon = {
+                    IconButton(onClick = onNavigateUp) {
+                        Icon(
+                            imageVector = Icons.Rounded.ArrowBack,
+                            contentDescription = stringResource(id = R.string.back)
+                        )
+                    }
+                },
                 title = {
                     Text(text = stringResource(id = title))
                 }

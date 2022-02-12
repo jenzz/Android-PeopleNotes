@@ -1,8 +1,8 @@
 package com.jenzz.peoplenotes.feature.people.ui
 
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.rounded.Add
+import androidx.compose.material.icons.rounded.Person
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import com.jenzz.peoplenotes.R
@@ -25,7 +25,7 @@ fun PeopleFloatingActionButton(
     val importFromContactsItem = MultiFloatingActionButtonItem(
         id = 2,
         label = stringResource(id = R.string.import_from_contacts),
-        icon = Icons.Default.Person,
+        icon = Icons.Rounded.Person,
     )
     MultiFloatingActionButton(
         state = state,

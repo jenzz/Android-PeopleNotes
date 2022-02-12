@@ -8,6 +8,8 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -41,6 +43,7 @@ fun AddPersonScreen(
         .collectAsState(initial = viewModel.initialState)
     AddPersonContent(
         state = state,
+        onNavigateUp = navigator::navigateUp,
         onFirstNameChange = viewModel::onFirstNameChange,
         onLastNameChange = viewModel::onLastNameChange,
         onNoteChange = viewModel::onNoteChange,
@@ -58,6 +61,7 @@ fun AddPersonScreen(
 @Composable
 private fun AddPersonContent(
     state: AddPersonUiState,
+    onNavigateUp: () -> Unit,
     onFirstNameChange: (String) -> Unit,
     onLastNameChange: (String) -> Unit,
     onNoteChange: (String) -> Unit,
@@ -74,6 +78,14 @@ private fun AddPersonContent(
     Scaffold(
         topBar = {
             TopAppBar(
+                navigationIcon = {
+                    IconButton(onClick = onNavigateUp) {
+                        Icon(
+                            imageVector = Icons.Rounded.ArrowBack,
+                            contentDescription = stringResource(id = R.string.back)
+                        )
+                    }
+                },
                 title = {
                     Text(text = stringResource(id = R.string.add_person_manually))
                 }
@@ -205,6 +217,7 @@ private fun AddPersonContentPreview(
         Surface {
             AddPersonContent(
                 state = state,
+                onNavigateUp = {},
                 onFirstNameChange = {},
                 onLastNameChange = {},
                 onNoteChange = {},

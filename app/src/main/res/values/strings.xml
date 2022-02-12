@@ -39,5 +39,6 @@
     <string name="delete_person_with_notes_dialog">There are still notes associated with this person. Do you want to delete the person including the notes?</string>
     <string name="yes">Yes</string>
     <string name="cancel">Cancel</string>
+    <string name="back">Back</string>
 
 </resources>
