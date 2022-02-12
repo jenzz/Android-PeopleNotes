@@ -11,18 +11,18 @@ class SaveableStateFlow<T>(
     defaultValue: T,
 ) {
 
-    private val _state = MutableStateFlow(
+    private val state = MutableStateFlow(
         savedStateHandle.get<T>(key) ?: defaultValue
     )
 
     var value: T
-        get() = _state.value
+        get() = state.value
         set(value) {
-            _state.value = value
+            state.value = value
             savedStateHandle.set(key, value)
         }
 
-    fun asStateFlow(): StateFlow<T> = _state.asStateFlow()
+    fun asStateFlow(): StateFlow<T> = state.asStateFlow()
 }
 
 fun <T> SavedStateHandle.saveableStateFlowOf(key: String, initialValue: T): SaveableStateFlow<T> =
