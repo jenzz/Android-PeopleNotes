@@ -33,10 +33,7 @@ import com.jenzz.peoplenotes.common.data.people.FirstName
 import com.jenzz.peoplenotes.common.data.people.LastName
 import com.jenzz.peoplenotes.common.data.people.Person
 import com.jenzz.peoplenotes.common.data.people.PersonId
-import com.jenzz.peoplenotes.common.ui.ListStyle
-import com.jenzz.peoplenotes.common.ui.SortByState
-import com.jenzz.peoplenotes.common.ui.SuffixVisualTransformation
-import com.jenzz.peoplenotes.common.ui.asString
+import com.jenzz.peoplenotes.common.ui.*
 import com.jenzz.peoplenotes.common.ui.theme.PeopleNotesTheme
 import com.jenzz.peoplenotes.common.ui.theme.elevation
 import com.jenzz.peoplenotes.common.ui.theme.spacing
@@ -90,7 +87,7 @@ fun NotesContent(
     onClick: (Note) -> Unit,
     onSettingsClick: () -> Unit,
     onAddNoteClick: () -> Unit,
-    onToastMessageShown: (Long) -> Unit,
+    onToastMessageShown: (ToastMessageId) -> Unit,
 ) {
     val scaffoldState = rememberScaffoldState()
     Scaffold(

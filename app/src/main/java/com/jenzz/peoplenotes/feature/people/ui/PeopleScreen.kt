@@ -129,7 +129,7 @@ private fun PeopleContent(
     onAddPersonManuallyClick: () -> Unit,
     onImportFromContactsClick: () -> Unit,
     onSettingsClick: () -> Unit,
-    onToastMessageShown: (Long) -> Unit,
+    onToastMessageShown: (ToastMessageId) -> Unit,
 ) {
     val scaffoldState = rememberScaffoldState()
     var floatingActionButtonState by rememberSaveable { mutableStateOf(Collapsed) }

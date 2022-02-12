@@ -8,6 +8,7 @@ import com.jenzz.peoplenotes.common.data.people.DeletePersonResult
 import com.jenzz.peoplenotes.common.data.people.PersonId
 import com.jenzz.peoplenotes.common.ui.TextResource
 import com.jenzz.peoplenotes.common.ui.ToastMessage
+import com.jenzz.peoplenotes.common.ui.ToastMessageId
 import com.jenzz.peoplenotes.common.ui.ToastMessageManager
 import com.jenzz.peoplenotes.common.ui.widgets.SearchBarState
 import com.jenzz.peoplenotes.ext.combine
@@ -105,7 +106,7 @@ class PeopleViewModel @Inject constructor(
         showDeleteWithNotesConfirmation.value = null
     }
 
-    fun onToastMessageShown(id: Long) {
+    fun onToastMessageShown(id: ToastMessageId) {
         viewModelScope.launch {
             toastMessageManager.clearMessage(id)
         }

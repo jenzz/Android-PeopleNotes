@@ -3,6 +3,7 @@ package com.jenzz.peoplenotes.feature.notes.ui
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.jenzz.peoplenotes.common.ui.ToastMessageId
 import com.jenzz.peoplenotes.common.ui.ToastMessageManager
 import com.jenzz.peoplenotes.common.ui.widgets.SearchBarState
 import com.jenzz.peoplenotes.ext.saveableStateFlowOf
@@ -53,7 +54,7 @@ class NotesViewModel @Inject constructor(
         searchBarState.value = state
     }
 
-    fun onToastMessageShown(id: Long) {
+    fun onToastMessageShown(id: ToastMessageId) {
         viewModelScope.launch {
             toastMessageManager.clearMessage(id)
         }

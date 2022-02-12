@@ -9,9 +9,12 @@ import kotlinx.coroutines.sync.withLock
 import java.util.*
 
 data class ToastMessage(
-    val id: Long = UUID.randomUUID().mostSignificantBits,
+    val id: ToastMessageId = ToastMessageId(UUID.randomUUID().mostSignificantBits),
     val text: TextResource,
 )
+
+@JvmInline
+value class ToastMessageId(val value: Long)
 
 class ToastMessageManager {
 
@@ -30,7 +33,7 @@ class ToastMessageManager {
         }
     }
 
-    suspend fun clearMessage(id: Long) {
+    suspend fun clearMessage(id: ToastMessageId) {
         mutex.withLock {
             _messages.value = _messages.value.filterNot { message -> message.id == id }
         }
