@@ -10,8 +10,6 @@ import com.jenzz.peoplenotes.ext.random
 import com.jenzz.peoplenotes.ext.toNonEmptyString
 import com.jenzz.peoplenotes.feature.people.ui.PeopleSortBy
 import com.squareup.sqldelight.sqlite.driver.JdbcSqliteDriver
-import kotlinx.coroutines.test.TestScope
-import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Test
 import java.util.*
 
@@ -22,15 +20,15 @@ class PeopleLocalDataSourceTest {
         Properties().apply { put("foreign_keys", "true") }
     ).also { Database.Schema.create(it) }
 
-    private val testScope = TestScope()
+    private val dispatchers = TestCoroutineDispatchers()
     private val sut = PeopleLocalDataSource(
         personQueries = Database(driver).personQueries,
-        dispatchers = TestCoroutineDispatchers(testScope),
+        dispatchers = dispatchers,
         clock = SystemClock(),
     )
 
     @Test
-    fun `sorts people by first name`() = testScope.runTest {
+    fun `sorts people by first name`() = dispatchers.runTest {
         val person1 = NewPerson(
             firstName = FirstName("John".toNonEmptyString()),
             lastName = LastName("Doe".toNonEmptyString()),
