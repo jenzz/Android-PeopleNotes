@@ -14,6 +14,5 @@ data class Notes(
         }
     }
 
-    val isEmpty: Boolean =
-        notes.isEmpty
+    val isEmpty: Boolean = notes.isEmpty
 }

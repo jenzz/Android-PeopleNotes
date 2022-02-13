@@ -15,7 +15,7 @@ data class Person(
 
     val fullName: String = "${firstName.value} ${lastName.value}"
 
-    val firstNameLetter: Char = firstName.toString().first()
+    val firstNameLetter: String = firstName.toString().first().uppercase()
 }
 
 @JvmInline

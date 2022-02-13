@@ -43,8 +43,6 @@ import com.jenzz.peoplenotes.common.ui.widgets.*
 import com.jenzz.peoplenotes.ext.*
 import com.jenzz.peoplenotes.feature.destinations.AddNoteScreenDestination
 import com.jenzz.peoplenotes.feature.destinations.SettingsScreenDestination
-import com.jenzz.peoplenotes.feature.notes.data.Notes
-import com.jenzz.peoplenotes.feature.notes.ui.NotesUiState.InitialLoad
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import java.time.LocalDateTime
@@ -124,34 +122,16 @@ fun NotesContent(
         when {
             state.isLoading ->
                 LoadingView()
-            state is NotesUiState.Loaded -> {
-                when {
-                    state.isEmptyFiltered(state.searchBarState) ->
-                        EmptyView(
-                            modifier = Modifier.fillMaxSize(),
-                            text = stringResource(id = R.string.empty_notes_filtered),
-                            icon = R.drawable.ic_sentiment_very_dissatisfied,
-                        )
-                    state.isEmpty ->
-                        EmptyView(
-                            modifier = Modifier.fillMaxSize(),
-                            text = stringResourceWithStyledPlaceholders(
-                                id = R.string.empty_notes,
-                                spanStyle = {
-                                    SpanStyle(fontWeight = FontWeight.Bold)
-                                },
-                                state.notes.person.fullName,
-                            ),
-                            icon = R.drawable.ic_note,
-                        )
-                    else ->
-                        NotesLoaded(
-                            state = state,
-                            searchBarState = state.searchBarState,
-                            onClick = onClick,
-                        )
-                }
-            }
+            state.isEmptyFiltered(state.searchBarState) ->
+                EmptyFilteredView()
+            state.isEmpty ->
+                EmptyView()
+            else ->
+                NotesLoaded(
+                    state = state,
+                    searchBarState = state.searchBarState,
+                    onClick = onClick,
+                )
         }
     }
     state.toastMessage?.let { message ->
@@ -163,20 +143,44 @@ fun NotesContent(
 }
 
 @Composable
+private fun EmptyFilteredView() {
+    EmptyView(
+        modifier = Modifier.fillMaxSize(),
+        text = stringResource(id = R.string.empty_notes_filtered),
+        icon = R.drawable.ic_sentiment_very_dissatisfied,
+    )
+}
+
+@Composable
+private fun EmptyView() {
+    EmptyView(
+        modifier = Modifier.fillMaxSize(),
+        text = stringResourceWithStyledPlaceholders(
+            id = R.string.empty_notes,
+            spanStyle = {
+                SpanStyle(fontWeight = FontWeight.Bold)
+            },
+            "state.person.fullName", // TODO JD
+        ),
+        icon = R.drawable.ic_note,
+    )
+}
+
+@Composable
 private fun NotesLoaded(
-    state: NotesUiState.Loaded,
+    state: NotesUiState,
     searchBarState: SearchBarState,
     onClick: (Note) -> Unit,
 ) {
     when (searchBarState.listStyle) {
         ListStyle.Rows ->
             NotesLoadedRows(
-                notes = state.notes.notes,
+                notes = state.notes,
                 onClick = onClick,
             )
         ListStyle.Grid ->
             NotesLoadedGrid(
-                notes = state.notes.notes,
+                notes = state.notes,
                 onClick = onClick,
             )
     }
@@ -287,7 +291,7 @@ private fun NotesContentPreview(
 
 class NotesPreviewParameterProvider : PreviewParameterProvider<NotesUiState> {
 
-    private val loadedState: NotesUiState.Loaded
+    private val loadedState: NotesUiState
         get() {
             val person = Person(
                 id = PersonId(1),
@@ -296,26 +300,23 @@ class NotesPreviewParameterProvider : PreviewParameterProvider<NotesUiState> {
                 color = Color.random(),
                 lastModified = LocalDateTime.now(),
             )
-            return NotesUiState.Loaded(
+            return NotesUiState(
                 searchBarState = SearchBarState(
                     searchTerm = "",
                     listStyle = ListStyle.DEFAULT,
                     sortBy = SortByState(items = emptyList()),
                 ),
                 isLoading = false,
-                notes = Notes(
-                    person = person,
-                    notes = NotesList(
-                        items = (0..10).map { i ->
-                            Note(
-                                id = NoteId(i),
-                                text = "".toNonEmptyString(),
-                                lastModified = LocalDateTime.now(),
-                                person = person
-                            )
-                        },
-                        totalCount = 10,
-                    ),
+                notes = NotesList(
+                    items = (0..10).map { i ->
+                        Note(
+                            id = NoteId(i),
+                            text = "".toNonEmptyString(),
+                            lastModified = LocalDateTime.now(),
+                            person = person
+                        )
+                    },
+                    totalCount = 10,
                 ),
                 toastMessage = null,
             )
@@ -323,7 +324,6 @@ class NotesPreviewParameterProvider : PreviewParameterProvider<NotesUiState> {
 
     override val values: Sequence<NotesUiState> =
         sequenceOf(
-            InitialLoad,
             loadedState,
         )
 }

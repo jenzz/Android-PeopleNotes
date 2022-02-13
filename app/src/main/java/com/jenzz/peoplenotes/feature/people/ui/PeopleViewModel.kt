@@ -15,10 +15,7 @@ import com.jenzz.peoplenotes.ext.combine
 import com.jenzz.peoplenotes.ext.saveableStateFlowOf
 import com.jenzz.peoplenotes.feature.people.data.PeopleUseCases
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -31,33 +28,44 @@ class PeopleViewModel @Inject constructor(
     val initialState = PeopleUiState()
 
     private val toastMessageManager = ToastMessageManager()
-    private val loading = MutableStateFlow(true)
+    private val isLoading = MutableStateFlow(initialState.isLoading)
     private val searchBarState = savedStateHandle.saveableStateFlowOf(
-        key = "searchBar",
-        initialValue = initialState.searchBarState
+        key = "searchBarState",
+        initialValue = initialState.searchBarState,
     )
-    private val showDeleteConfirmation = MutableStateFlow<PersonId?>(null)
-    private val showDeleteWithNotesConfirmation = MutableStateFlow<PersonId?>(null)
-    private val people = searchBarState.asStateFlow().flatMapLatest { state ->
-        useCases.observePeople(
-            sortBy = state.sortBy.selected,
-            filter = state.searchTerm,
-        )
-    }
+    private val people = MutableStateFlow(initialState.people)
+    private val showDeleteConfirmation = MutableStateFlow(initialState.showDeleteConfirmation)
+    private val showDeleteWithNotesConfirmation =
+        MutableStateFlow(initialState.showDeleteWithNotesConfirmation)
 
     val state = combine(
         searchBarState.asStateFlow(),
-        loading,
+        isLoading,
         people,
         showDeleteConfirmation,
         showDeleteWithNotesConfirmation,
         toastMessageManager.message,
-        ::PeopleUiState
+        ::PeopleUiState,
     ).stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5000),
         initialValue = initialState,
     )
+
+    init {
+        searchBarState.asStateFlow()
+            .flatMapLatest { state ->
+                useCases.observePeople(
+                    sortBy = state.sortBy.selected,
+                    filter = state.searchTerm,
+                )
+            }
+            .onEach { people ->
+                this.isLoading.value = false
+                this.people.value = people
+            }
+            .launchIn(viewModelScope)
+    }
 
     fun onSearchBarStateChange(state: SearchBarState) {
         searchBarState.value = state
@@ -72,16 +80,16 @@ class PeopleViewModel @Inject constructor(
     }
 
     fun onDeleteConfirm(personId: PersonId) {
-        loading.value = true
+        isLoading.value = true
         showDeleteConfirmation.value = null
         viewModelScope.launch {
             when (useCases.deletePerson(personId)) {
                 is DeletePersonResult.RemainingNotesForPerson -> {
-                    loading.value = false
+                    isLoading.value = false
                     showDeleteWithNotesConfirmation.value = personId
                 }
                 is DeletePersonResult.Success -> {
-                    loading.value = false
+                    isLoading.value = false
                     toastMessageManager.emitMessage(
                         ToastMessage(text = TextResource.fromId(R.string.person_deleted))
                     )
@@ -91,11 +99,11 @@ class PeopleViewModel @Inject constructor(
     }
 
     fun onDeleteWithNotesConfirm(personId: PersonId) {
-        loading.value = true
+        isLoading.value = true
         showDeleteWithNotesConfirmation.value = null
         viewModelScope.launch {
             useCases.deletePersonWithNotes(personId)
-            loading.value = false
+            isLoading.value = false
             toastMessageManager.emitMessage(
                 ToastMessage(text = TextResource.fromId(id = R.string.person_deleted))
             )

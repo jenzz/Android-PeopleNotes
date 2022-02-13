@@ -8,8 +8,6 @@ import com.jenzz.peoplenotes.common.ui.ToastMessageManager
 import com.jenzz.peoplenotes.common.ui.widgets.SearchBarState
 import com.jenzz.peoplenotes.ext.saveableStateFlowOf
 import com.jenzz.peoplenotes.feature.notes.data.NotesUseCases
-import com.jenzz.peoplenotes.feature.notes.ui.NotesUiState.InitialLoad
-import com.jenzz.peoplenotes.feature.notes.ui.NotesUiState.Loaded
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -22,33 +20,43 @@ class NotesViewModel @Inject constructor(
     useCases: NotesUseCases,
 ) : ViewModel() {
 
-    val initialState = InitialLoad
+    val initialState = NotesUiState()
 
     private val toastMessageManager = ToastMessageManager()
-    private val loading = MutableStateFlow(true)
+    private val isLoading = MutableStateFlow(initialState.isLoading)
     private val searchBarState = savedStateHandle.saveableStateFlowOf(
-        key = "searchBar",
-        initialValue = initialState.searchBarState
+        key = "searchBarState",
+        initialValue = initialState.searchBarState,
     )
-    private val notes = searchBarState.asStateFlow().flatMapLatest { state ->
-        useCases.observeNotesWithPerson(
-            personId = navArgs.personId,
-            sortBy = state.sortBy.selected,
-            filter = state.searchTerm,
-        )
-    }
+    private val notes = MutableStateFlow(initialState.notes)
 
     val state = combine(
         searchBarState.asStateFlow(),
-        toastMessageManager.message,
-        loading,
+        isLoading,
         notes,
-        ::Loaded,
+        toastMessageManager.message,
+        ::NotesUiState,
     ).stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5000),
         initialValue = initialState,
     )
+
+    init {
+        searchBarState.asStateFlow()
+            .flatMapLatest { state ->
+                useCases.observeNotesWithPerson(
+                    personId = navArgs.personId,
+                    sortBy = state.sortBy.selected,
+                    filter = state.searchTerm,
+                )
+            }
+            .onEach { notes ->
+                this.isLoading.value = false
+                this.notes.value = notes.notes
+            }
+            .launchIn(viewModelScope)
+    }
 
     fun onSearchBarStateChange(state: SearchBarState) {
         searchBarState.value = state

@@ -30,7 +30,10 @@ import com.jenzz.peoplenotes.common.ui.theme.elevation
 import com.jenzz.peoplenotes.common.ui.theme.spacing
 import com.jenzz.peoplenotes.common.ui.widgets.*
 import com.jenzz.peoplenotes.common.ui.widgets.MultiFloatingActionButtonState.Collapsed
-import com.jenzz.peoplenotes.ext.*
+import com.jenzz.peoplenotes.ext.formatFullDateTime
+import com.jenzz.peoplenotes.ext.random
+import com.jenzz.peoplenotes.ext.rememberFlowWithLifecycle
+import com.jenzz.peoplenotes.ext.toNonEmptyString
 import com.jenzz.peoplenotes.feature.destinations.*
 import com.jenzz.peoplenotes.feature.people.ui.dialogs.DeletePersonDialogResult
 import com.jenzz.peoplenotes.feature.people.ui.dialogs.DeletePersonWithNotesDialogResult
@@ -167,17 +170,9 @@ private fun PeopleContent(
                 state.isLoading ->
                     LoadingView()
                 state.isEmptyFiltered(state.searchBarState) ->
-                    EmptyView(
-                        modifier = Modifier.fillMaxSize(),
-                        text = stringResource(id = R.string.empty_people_filtered),
-                        icon = R.drawable.ic_sentiment_very_dissatisfied,
-                    )
+                    EmptyFilteredView()
                 state.isEmpty ->
-                    EmptyView(
-                        modifier = Modifier.fillMaxSize(),
-                        text = stringResource(id = R.string.empty_people),
-                        icon = R.drawable.ic_people,
-                    )
+                    EmptyView()
                 else ->
                     PeopleLoaded(
                         state = state,
@@ -198,6 +193,24 @@ private fun PeopleContent(
             onToastShown = onToastShown,
         )
     }
+}
+
+@Composable
+private fun EmptyFilteredView() {
+    EmptyView(
+        modifier = Modifier.fillMaxSize(),
+        text = stringResource(id = R.string.empty_people_filtered),
+        icon = R.drawable.ic_sentiment_very_dissatisfied,
+    )
+}
+
+@Composable
+private fun EmptyView() {
+    EmptyView(
+        modifier = Modifier.fillMaxSize(),
+        text = stringResource(id = R.string.empty_people),
+        icon = R.drawable.ic_people,
+    )
 }
 
 @Composable
@@ -391,7 +404,7 @@ private fun PersonImage(
                 shape = RoundedCornerShape(corner = CornerSize(16.dp))
             )
             .wrapContentHeight(),
-        text = person.firstNameLetter.toString(),
+        text = person.firstNameLetter,
         textAlign = TextAlign.Center,
         style = MaterialTheme.typography.h3.copy(fontWeight = FontWeight.Light),
     )
