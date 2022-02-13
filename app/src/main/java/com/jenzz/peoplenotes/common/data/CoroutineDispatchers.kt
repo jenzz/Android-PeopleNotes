@@ -16,7 +16,7 @@ interface CoroutineDispatchers {
     val IO: CoroutineDispatcher
 }
 
-class Dispatchers @Inject constructor() : CoroutineDispatchers {
+class DefaultCoroutineDispatchers @Inject constructor() : CoroutineDispatchers {
 
     override val Default: CoroutineDispatcher = Dispatchers.Default
 

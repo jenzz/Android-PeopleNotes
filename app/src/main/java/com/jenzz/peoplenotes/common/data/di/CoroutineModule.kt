@@ -1,7 +1,7 @@
 package com.jenzz.peoplenotes.common.data.di
 
 import com.jenzz.peoplenotes.common.data.CoroutineDispatchers
-import com.jenzz.peoplenotes.common.data.Dispatchers
+import com.jenzz.peoplenotes.common.data.DefaultCoroutineDispatchers
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -12,5 +12,5 @@ import dagger.hilt.components.SingletonComponent
 interface CoroutineModule {
 
     @Binds
-    fun Dispatchers.bind(): CoroutineDispatchers
+    fun DefaultCoroutineDispatchers.bind(): CoroutineDispatchers
 }
