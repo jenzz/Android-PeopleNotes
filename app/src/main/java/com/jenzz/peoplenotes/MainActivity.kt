@@ -15,8 +15,9 @@ import com.ramcosta.composedestinations.animations.rememberAnimatedNavHostEngine
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
-@AndroidEntryPoint
-class MainActivity : ComponentActivity() {
+// Workaround for Robolectric & Hilt in JVM tests: https://github.com/google/dagger/issues/1956
+@AndroidEntryPoint(ComponentActivity::class)
+class MainActivity : Hilt_MainActivity() {
 
     @Inject
     lateinit var settingsRepository: SettingsRepository

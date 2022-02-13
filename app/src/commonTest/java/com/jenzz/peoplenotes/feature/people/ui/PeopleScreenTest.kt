@@ -10,24 +10,42 @@ import com.jenzz.peoplenotes.ext.recreateActivity
 import org.junit.Rule
 import org.junit.Test
 
-class PeopleScreenTest {
+abstract class PeopleScreenTest {
 
-    @get:Rule
+    @get:Rule(order = 1)
     val composeTestRule = createAndroidComposeRule<MainActivity>()
+
+//    @Before
+//    fun setUp() {
+//        composeTestRule.setContent {
+//            PeopleScreen(
+//                navigator = EmptyDestinationsNavigator,
+//                deletePersonResultRecipient = EmptyResultRecipient(),
+//                deletePersonWithNotesResultRecipient = EmptyResultRecipient(),
+//            )
+//        }
+//    }
 
     @Test
     fun savesAndRestoresListLayoutAcrossConfigurationChanges() {
+//        onView(withContentDescription(R.string.grid_view))
+//            .check(matches(isDisplayed()))
+//            .perform(click())
         composeTestRule
             .onNodeWithContentDescription(composeTestRule.activity.getString(R.string.grid_view))
             .assertIsDisplayed()
             .performClick()
 
+//        onView(withContentDescription(R.string.rows))
+//            .check(matches(isDisplayed()))
         composeTestRule
             .onNodeWithContentDescription(composeTestRule.activity.getString(R.string.rows))
             .assertIsDisplayed()
 
         composeTestRule.recreateActivity()
 
+//        onView(withContentDescription(R.string.rows))
+//            .check(matches(isDisplayed()))
         composeTestRule
             .onNodeWithContentDescription(composeTestRule.activity.getString(R.string.rows))
             .assertIsDisplayed()
