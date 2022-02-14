@@ -1,7 +1,7 @@
-package com.jenzz.peoplenotes.common.data
+package kotlinx.coroutines.test
 
+import com.jenzz.peoplenotes.common.data.CoroutineDispatchers
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.test.*
 
 class TestCoroutineDispatchers(
     private val scope: TestScope = TestScope(),
@@ -17,6 +17,7 @@ class TestCoroutineDispatchers(
 
     override val IO: CoroutineDispatcher = dispatcher
 
-    fun runTest(testBody: suspend TestScope.() -> Unit): TestResult =
+    fun runTest(testBody: suspend TestScope.() -> Unit) {
         scope.runTest(testBody = testBody)
+    }
 }

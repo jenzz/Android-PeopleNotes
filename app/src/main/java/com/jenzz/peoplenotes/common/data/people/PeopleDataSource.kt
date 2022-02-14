@@ -12,6 +12,7 @@ import com.jenzz.peoplenotes.feature.people.ui.PeopleSortBy
 import com.squareup.sqldelight.runtime.coroutines.asFlow
 import com.squareup.sqldelight.runtime.coroutines.mapToList
 import com.squareup.sqldelight.runtime.coroutines.mapToOne
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
@@ -66,6 +67,7 @@ class PeopleLocalDataSource @Inject constructor(
             .mapToList()
             .map { persons ->
                 withContext(dispatchers.Default) {
+                    delay(3000) // deliberate delay to test idling resource
                     People(
                         persons = persons.sortedWith(comparator),
                         totalCount = personQueries.count().executeAsOne().toInt(),
