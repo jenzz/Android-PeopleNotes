@@ -9,8 +9,12 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rxjava3.subscribeAsState
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -32,7 +36,6 @@ import com.jenzz.peoplenotes.common.ui.widgets.*
 import com.jenzz.peoplenotes.common.ui.widgets.MultiFloatingActionButtonState.Collapsed
 import com.jenzz.peoplenotes.ext.formatFullDateTime
 import com.jenzz.peoplenotes.ext.random
-import com.jenzz.peoplenotes.ext.rememberFlowWithLifecycle
 import com.jenzz.peoplenotes.ext.toNonEmptyString
 import com.jenzz.peoplenotes.feature.destinations.*
 import com.jenzz.peoplenotes.feature.people.ui.dialogs.DeletePersonDialogResult
@@ -41,6 +44,7 @@ import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.result.ResultRecipient
 import java.time.LocalDateTime
+import java.util.*
 
 @Destination(start = true)
 @Composable
@@ -50,8 +54,7 @@ fun PeopleScreen(
     deletePersonResultRecipient: ResultRecipient<DeletePersonDialogDestination, DeletePersonDialogResult>,
     deletePersonWithNotesResultRecipient: ResultRecipient<DeletePersonWithNotesDialogDestination, DeletePersonWithNotesDialogResult>,
 ) {
-    val state by rememberFlowWithLifecycle(viewModel.state)
-        .collectAsState(initial = viewModel.initialState)
+    val state by viewModel.state.subscribeAsState(initial = viewModel.initialState)
     HandleDeleteConfirmation(
         state = state,
         navigator = navigator,
@@ -92,7 +95,7 @@ private fun HandleDeleteConfirmation(
     onDeleteConfirm: (PersonId) -> Unit,
     onDeleteCancel: () -> Unit,
 ) {
-    state.showDeleteConfirmation?.let { personId ->
+    state.showDeleteConfirmation.ifPresent { personId ->
         navigator.navigate(DeletePersonDialogDestination(personId))
     }
     deletePersonResultRecipient.onResult { result ->
@@ -104,14 +107,14 @@ private fun HandleDeleteConfirmation(
 }
 
 @Composable
-fun HandleDeleteWithNotesConfirmation(
+private fun HandleDeleteWithNotesConfirmation(
     state: PeopleUiState,
     navigator: DestinationsNavigator,
     deletePersonWithNotesResultRecipient: ResultRecipient<DeletePersonWithNotesDialogDestination, DeletePersonWithNotesDialogResult>,
     onDeleteWithNotesConfirm: (PersonId) -> Unit,
     onDeleteWithNotesCancel: () -> Unit,
 ) {
-    state.showDeleteWithNotesConfirmation?.let { personId ->
+    state.showDeleteWithNotesConfirmation.ifPresent { personId ->
         navigator.navigate(DeletePersonWithNotesDialogDestination(personId))
     }
     deletePersonWithNotesResultRecipient.onResult { result ->
@@ -472,8 +475,8 @@ class PeoplePreviewParameterProvider : PreviewParameterProvider<PeopleUiState> {
                     persons = emptyList(),
                     totalCount = 0
                 ),
-                showDeleteConfirmation = null,
-                showDeleteWithNotesConfirmation = null,
+                showDeleteConfirmation = Optional.empty(),
+                showDeleteWithNotesConfirmation = Optional.empty(),
                 toastMessage = null,
             ),
             PeopleUiState(
@@ -490,8 +493,8 @@ class PeoplePreviewParameterProvider : PreviewParameterProvider<PeopleUiState> {
                     },
                     totalCount = 10,
                 ),
-                showDeleteConfirmation = null,
-                showDeleteWithNotesConfirmation = null,
+                showDeleteConfirmation = Optional.empty(),
+                showDeleteWithNotesConfirmation = Optional.empty(),
                 toastMessage = null,
             ),
             PeopleUiState(
@@ -500,8 +503,8 @@ class PeoplePreviewParameterProvider : PreviewParameterProvider<PeopleUiState> {
                     persons = emptyList(),
                     totalCount = 0
                 ),
-                showDeleteConfirmation = PersonId(1),
-                showDeleteWithNotesConfirmation = null,
+                showDeleteConfirmation = Optional.of(PersonId(1)),
+                showDeleteWithNotesConfirmation = Optional.empty(),
                 toastMessage = ToastMessage(
                     text = TextResource.fromText("User Message 1")
                 ),

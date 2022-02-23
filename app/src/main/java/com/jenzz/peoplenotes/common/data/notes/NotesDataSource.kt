@@ -14,6 +14,11 @@ import com.jenzz.peoplenotes.ext.toNonEmptyString
 import com.jenzz.peoplenotes.feature.notes.ui.NotesSortBy
 import com.squareup.sqldelight.runtime.coroutines.asFlow
 import com.squareup.sqldelight.runtime.coroutines.mapToList
+import com.squareup.sqldelight.runtime.rx3.asObservable
+import com.squareup.sqldelight.runtime.rx3.mapToList
+import io.reactivex.rxjava3.core.Completable
+import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
@@ -21,7 +26,7 @@ import javax.inject.Inject
 
 interface NotesDataSource {
 
-    fun observeNotes(personId: PersonId): Flow<NotesList>
+    fun observeNotes(personId: PersonId): Observable<NotesList>
 
     fun observeNotes(personId: PersonId, sortBy: NotesSortBy, filter: String): Flow<NotesList>
 
@@ -33,7 +38,7 @@ interface NotesDataSource {
 
     suspend fun delete(id: NoteId)
 
-    suspend fun deleteAllByPerson(personId: PersonId)
+    fun deleteAllByPerson(personId: PersonId): Completable
 }
 
 class NotesLocalDataSource @Inject constructor(
@@ -67,18 +72,16 @@ class NotesLocalDataSource @Inject constructor(
         )
     }
 
-    override fun observeNotes(personId: PersonId): Flow<NotesList> =
+    override fun observeNotes(personId: PersonId): Observable<NotesList> =
         noteQueries
             .selectAll(personId.value, toNote)
-            .asFlow()
+            .asObservable()
             .mapToList()
             .map { notes ->
-                withContext(dispatchers.Default) {
-                    NotesList(
-                        items = notes,
-                        totalCount = noteQueries.count().executeAsOne().toInt(),
-                    )
-                }
+                NotesList(
+                    items = notes,
+                    totalCount = noteQueries.count().executeAsOne().toInt(),
+                )
             }
 
     override fun observeNotes(
@@ -138,9 +141,8 @@ class NotesLocalDataSource @Inject constructor(
         }
     }
 
-    override suspend fun deleteAllByPerson(personId: PersonId) {
-        withContext(dispatchers.Default) {
-            noteQueries.deleteAllByPerson(personId.value)
-        }
-    }
+    override fun deleteAllByPerson(personId: PersonId): Completable =
+        Completable
+            .fromAction { noteQueries.deleteAllByPerson(personId.value) }
+            .subscribeOn(Schedulers.io())
 }

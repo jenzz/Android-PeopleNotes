@@ -3,7 +3,8 @@ package com.jenzz.peoplenotes.common.data.people
 import com.jenzz.peoplenotes.common.data.notes.NewNote
 import com.jenzz.peoplenotes.common.data.notes.NotesList
 import com.jenzz.peoplenotes.common.data.notes.NotesRepository
-import kotlinx.coroutines.flow.first
+import io.reactivex.rxjava3.core.Completable
+import io.reactivex.rxjava3.core.Single
 import javax.inject.Inject
 
 class PeopleAndNotesRepository @Inject constructor(
@@ -18,20 +19,25 @@ class PeopleAndNotesRepository @Inject constructor(
         }
     }
 
-    suspend fun delete(personId: PersonId): DeletePersonResult {
-        val notes = notesRepository.observeNotes(personId).first()
-        return if (notes.isEmpty) {
-            peopleRepository.delete(personId)
-            DeletePersonResult.Success
-        } else {
-            DeletePersonResult.RemainingNotesForPerson(personId, notes)
-        }
-    }
+    fun delete(personId: PersonId): Single<DeletePersonResult> =
+        notesRepository
+            .observeNotes(personId)
+            .first(NotesList())
+            .flatMap { notes ->
+                if (notes.isEmpty) {
+                    peopleRepository
+                        .delete(personId)
+                        .toSingle<DeletePersonResult> { DeletePersonResult.Success }
+                } else {
+                    Single.just<DeletePersonResult>(
+                        DeletePersonResult.RemainingNotesForPerson(personId, notes)
+                    )
+                }
+            }
 
-    suspend fun deleteWithNotes(personId: PersonId) {
+    fun deleteWithNotes(personId: PersonId): Completable =
         notesRepository.deleteAllByPerson(personId)
-        peopleRepository.delete(personId)
-    }
+            .andThen(peopleRepository.delete(personId))
 }
 
 sealed class DeletePersonResult {

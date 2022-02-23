@@ -1,6 +1,8 @@
 package com.jenzz.peoplenotes.common.data.people
 
 import com.jenzz.peoplenotes.feature.people.ui.PeopleSortBy
+import io.reactivex.rxjava3.core.Completable
+import io.reactivex.rxjava3.core.Observable
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
@@ -11,7 +13,7 @@ class PeopleRepository @Inject constructor(
     fun observePerson(personId: PersonId): Flow<Person> =
         localDataSource.observePerson(personId)
 
-    fun observeAllPeople(sortBy: PeopleSortBy, filter: String): Flow<People> =
+    fun observeAllPeople(sortBy: PeopleSortBy, filter: String): Observable<People> =
         localDataSource.observeAllPeople(sortBy, filter)
 
     suspend fun get(personId: PersonId): Person =
@@ -20,7 +22,6 @@ class PeopleRepository @Inject constructor(
     suspend fun add(person: NewPerson): Person =
         localDataSource.add(person)
 
-    suspend fun delete(personId: PersonId) {
+    fun delete(personId: PersonId): Completable =
         localDataSource.delete(personId)
-    }
 }

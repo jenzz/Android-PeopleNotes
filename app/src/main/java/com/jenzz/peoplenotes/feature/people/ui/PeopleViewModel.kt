@@ -2,21 +2,16 @@ package com.jenzz.peoplenotes.feature.people.ui
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import com.jenzz.peoplenotes.R
+import com.jakewharton.rxrelay3.BehaviorRelay
 import com.jenzz.peoplenotes.common.data.people.DeletePersonResult
 import com.jenzz.peoplenotes.common.data.people.PersonId
-import com.jenzz.peoplenotes.common.ui.TextResource
-import com.jenzz.peoplenotes.common.ui.ToastMessage
 import com.jenzz.peoplenotes.common.ui.ToastMessageId
-import com.jenzz.peoplenotes.common.ui.ToastMessageManager
 import com.jenzz.peoplenotes.common.ui.widgets.SearchBarState
-import com.jenzz.peoplenotes.ext.combine
-import com.jenzz.peoplenotes.ext.saveableStateFlowOf
 import com.jenzz.peoplenotes.feature.people.data.PeopleUseCases
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
+import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.disposables.CompositeDisposable
+import java.util.*
 import javax.inject.Inject
 
 @HiltViewModel
@@ -27,96 +22,102 @@ class PeopleViewModel @Inject constructor(
 
     val initialState = PeopleUiState()
 
-    private val toastMessageManager = ToastMessageManager()
-    private val isLoading = MutableStateFlow(initialState.isLoading)
-    private val searchBarState = savedStateHandle.saveableStateFlowOf(
-        key = "searchBarState",
-        initialValue = initialState.searchBarState,
-    )
-    private val people = MutableStateFlow(initialState.people)
-    private val showDeleteConfirmation = MutableStateFlow(initialState.showDeleteConfirmation)
+    //    private val toastMessageManager = ToastMessageManager()
+    private val isLoading = BehaviorRelay.createDefault(initialState.isLoading)
+    private val searchBarState = BehaviorRelay.createDefault(initialState.searchBarState)
+    private val people = BehaviorRelay.createDefault(initialState.people)
+    private val showDeleteConfirmation =
+        BehaviorRelay.createDefault(initialState.showDeleteConfirmation)
     private val showDeleteWithNotesConfirmation =
-        MutableStateFlow(initialState.showDeleteWithNotesConfirmation)
+        BehaviorRelay.createDefault(initialState.showDeleteWithNotesConfirmation)
 
-    val state = combine(
-        searchBarState.asStateFlow(),
+    private val disposables = CompositeDisposable()
+
+    val state = Observable.combineLatest(
+        searchBarState,
         isLoading,
         people,
         showDeleteConfirmation,
         showDeleteWithNotesConfirmation,
-        toastMessageManager.message,
+//        toastMessageManager.message,
         ::PeopleUiState,
-    ).stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5000),
-        initialValue = initialState,
     )
 
     init {
-        searchBarState.asStateFlow()
-            .flatMapLatest { state ->
-                useCases.observePeople(
-                    sortBy = state.sortBy.selected,
-                    filter = state.searchTerm,
-                )
-            }
-            .onEach { people ->
-                this.isLoading.value = false
-                this.people.value = people
-            }
-            .launchIn(viewModelScope)
+        disposables.add(
+            searchBarState
+                .flatMap { state ->
+                    useCases.observePeople(
+                        sortBy = state.sortBy.selected,
+                        filter = state.searchTerm,
+                    )
+                }
+                .forEach { people ->
+                    this.isLoading.accept(false)
+                    this.people.accept(people)
+                }
+        )
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        disposables.clear()
     }
 
     fun onSearchBarStateChange(state: SearchBarState) {
-        searchBarState.value = state
+        searchBarState.accept(state)
     }
 
     fun onDelete(personId: PersonId) {
-        showDeleteConfirmation.value = personId
+        showDeleteConfirmation.accept(Optional.of(personId))
     }
 
     fun onDeleteCancel() {
-        showDeleteConfirmation.value = null
+        showDeleteConfirmation.accept(Optional.empty())
     }
 
     fun onDeleteConfirm(personId: PersonId) {
-        isLoading.value = true
-        showDeleteConfirmation.value = null
-        viewModelScope.launch {
-            when (useCases.deletePerson(personId)) {
-                is DeletePersonResult.RemainingNotesForPerson -> {
-                    isLoading.value = false
-                    showDeleteWithNotesConfirmation.value = personId
+        isLoading.accept(true)
+        showDeleteConfirmation.accept(Optional.empty())
+        disposables.add(
+            useCases
+                .deletePerson(personId)
+                .subscribe { result ->
+                    when (result) {
+                        is DeletePersonResult.RemainingNotesForPerson -> {
+                            isLoading.accept(false)
+                            showDeleteWithNotesConfirmation.accept(Optional.of(personId))
+                        }
+                        is DeletePersonResult.Success -> {
+                            isLoading.accept(false)
+//                            toastMessageManager.emitMessage(
+//                                ToastMessage(text = TextResource.fromId(R.string.person_deleted))
+//                            )
+                        }
+                    }
                 }
-                is DeletePersonResult.Success -> {
-                    isLoading.value = false
-                    toastMessageManager.emitMessage(
-                        ToastMessage(text = TextResource.fromId(R.string.person_deleted))
-                    )
-                }
-            }
-        }
+        )
     }
 
     fun onDeleteWithNotesConfirm(personId: PersonId) {
-        isLoading.value = true
-        showDeleteWithNotesConfirmation.value = null
-        viewModelScope.launch {
-            useCases.deletePersonWithNotes(personId)
-            isLoading.value = false
-            toastMessageManager.emitMessage(
-                ToastMessage(text = TextResource.fromId(id = R.string.person_deleted))
-            )
-        }
+        isLoading.accept(true)
+        showDeleteWithNotesConfirmation.accept(Optional.empty())
+        disposables.add(
+            useCases.deletePersonWithNotes(personId).subscribe()
+        )
+        isLoading.accept(false)
+//        toastMessageManager.emitMessage(
+//            ToastMessage(text = TextResource.fromId(id = R.string.person_deleted))
+//        )
     }
 
     fun onDeleteWithNotesCancel() {
-        showDeleteWithNotesConfirmation.value = null
+        showDeleteWithNotesConfirmation.accept(Optional.empty())
     }
 
     fun onToastShown(id: ToastMessageId) {
-        viewModelScope.launch {
-            toastMessageManager.clearMessage(id)
-        }
+//        viewModelScope.launch {
+//            toastMessageManager.clearMessage(id)
+//        }
     }
 }

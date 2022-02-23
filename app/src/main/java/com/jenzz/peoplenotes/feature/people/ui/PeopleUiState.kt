@@ -5,6 +5,7 @@ import com.jenzz.peoplenotes.common.data.people.PersonId
 import com.jenzz.peoplenotes.common.ui.ListStyle
 import com.jenzz.peoplenotes.common.ui.ToastMessage
 import com.jenzz.peoplenotes.common.ui.widgets.SearchBarState
+import java.util.*
 
 data class PeopleUiState(
     val searchBarState: SearchBarState = SearchBarState(
@@ -14,8 +15,8 @@ data class PeopleUiState(
     ),
     val isLoading: Boolean = true,
     val people: People = People(),
-    val showDeleteConfirmation: PersonId? = null,
-    val showDeleteWithNotesConfirmation: PersonId? = null,
+    val showDeleteConfirmation: Optional<PersonId> = Optional.empty(),
+    val showDeleteWithNotesConfirmation: Optional<PersonId> = Optional.empty(),
     val toastMessage: ToastMessage? = null,
 ) {
 

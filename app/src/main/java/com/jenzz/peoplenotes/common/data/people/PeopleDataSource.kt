@@ -10,24 +10,28 @@ import com.jenzz.peoplenotes.ext.toLocalDateTime
 import com.jenzz.peoplenotes.ext.toNonEmptyString
 import com.jenzz.peoplenotes.feature.people.ui.PeopleSortBy
 import com.squareup.sqldelight.runtime.coroutines.asFlow
-import com.squareup.sqldelight.runtime.coroutines.mapToList
 import com.squareup.sqldelight.runtime.coroutines.mapToOne
+import com.squareup.sqldelight.runtime.rx3.asObservable
+import com.squareup.sqldelight.runtime.rx3.mapToList
+import io.reactivex.rxjava3.core.Completable
+import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 interface PeopleDataSource {
 
     fun observePerson(personId: PersonId): Flow<Person>
 
-    fun observeAllPeople(sortBy: PeopleSortBy, filter: String): Flow<People>
+    fun observeAllPeople(sortBy: PeopleSortBy, filter: String): Observable<People>
 
     suspend fun get(personId: PersonId): Person
 
     suspend fun add(person: NewPerson): Person
 
-    suspend fun delete(personId: PersonId)
+    fun delete(personId: PersonId): Completable
 }
 
 class PeopleLocalDataSource @Inject constructor(
@@ -53,7 +57,7 @@ class PeopleLocalDataSource @Inject constructor(
             .asFlow()
             .mapToOne()
 
-    override fun observeAllPeople(sortBy: PeopleSortBy, filter: String): Flow<People> {
+    override fun observeAllPeople(sortBy: PeopleSortBy, filter: String): Observable<People> {
         val comparator = when (sortBy) {
             PeopleSortBy.FirstName -> compareBy { person: Person -> person.firstName }
             PeopleSortBy.LastName -> compareBy { person: Person -> person.lastName }
@@ -62,15 +66,14 @@ class PeopleLocalDataSource @Inject constructor(
         val filterSql = if (filter.isNotEmpty()) "%$filter%" else null
         return personQueries
             .selectAll(filterSql, toPerson)
-            .asFlow()
+            .asObservable()
             .mapToList()
+            .delay(3, TimeUnit.SECONDS) // deliberate delay to test idling resource
             .map { persons ->
-                withContext(dispatchers.Default) {
-                    People(
-                        persons = persons.sortedWith(comparator),
-                        totalCount = personQueries.count().executeAsOne().toInt(),
-                    )
-                }
+                People(
+                    persons = persons.sortedWith(comparator),
+                    totalCount = personQueries.count().executeAsOne().toInt(),
+                )
             }
     }
 
@@ -97,9 +100,8 @@ class PeopleLocalDataSource @Inject constructor(
             }
         }
 
-    override suspend fun delete(personId: PersonId) {
-        withContext(dispatchers.Default) {
-            personQueries.delete(personId.value)
-        }
-    }
+    override fun delete(personId: PersonId): Completable =
+        Completable
+            .fromAction { personQueries.delete(personId.value) }
+            .subscribeOn(Schedulers.computation())
 }

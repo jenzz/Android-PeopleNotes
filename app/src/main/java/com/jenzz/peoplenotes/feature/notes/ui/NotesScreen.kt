@@ -40,7 +40,10 @@ import com.jenzz.peoplenotes.common.ui.theme.PeopleNotesTheme
 import com.jenzz.peoplenotes.common.ui.theme.elevation
 import com.jenzz.peoplenotes.common.ui.theme.spacing
 import com.jenzz.peoplenotes.common.ui.widgets.*
-import com.jenzz.peoplenotes.ext.*
+import com.jenzz.peoplenotes.ext.random
+import com.jenzz.peoplenotes.ext.rememberFlowWithLifecycle
+import com.jenzz.peoplenotes.ext.stringResourceWithStyledPlaceholders
+import com.jenzz.peoplenotes.ext.toNonEmptyString
 import com.jenzz.peoplenotes.feature.destinations.AddNoteScreenDestination
 import com.jenzz.peoplenotes.feature.destinations.SettingsScreenDestination
 import com.ramcosta.composedestinations.annotation.Destination
