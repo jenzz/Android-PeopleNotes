@@ -71,7 +71,7 @@ class NotesLocalDataSource @Inject constructor(
         noteQueries
             .selectAll(personId.value, toNote)
             .asFlow()
-            .mapToList()
+            .mapToList(dispatchers.Default)
             .map { notes ->
                 withContext(dispatchers.Default) {
                     NotesList(
@@ -94,7 +94,7 @@ class NotesLocalDataSource @Inject constructor(
         return noteQueries
             .selectAllFilteredByText(personId.value, filterSql, toNote)
             .asFlow()
-            .mapToList()
+            .mapToList(dispatchers.Default)
             .map { notes ->
                 withContext(dispatchers.Default) {
                     NotesList(

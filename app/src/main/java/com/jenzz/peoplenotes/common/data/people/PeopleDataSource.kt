@@ -51,7 +51,7 @@ class PeopleLocalDataSource @Inject constructor(
         personQueries
             .selectById(personId.value, toPerson)
             .asFlow()
-            .mapToOne()
+            .mapToOne(dispatchers.Default)
 
     override fun observeAllPeople(sortBy: PeopleSortBy, filter: String): Flow<People> {
         val comparator = when (sortBy) {
@@ -63,7 +63,7 @@ class PeopleLocalDataSource @Inject constructor(
         return personQueries
             .selectAll(filterSql, toPerson)
             .asFlow()
-            .mapToList()
+            .mapToList(dispatchers.Default)
             .map { persons ->
                 withContext(dispatchers.Default) {
                     People(
