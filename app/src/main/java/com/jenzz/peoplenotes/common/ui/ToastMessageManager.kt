@@ -29,13 +29,17 @@ class ToastMessageManager {
 
     suspend fun emitMessage(message: ToastMessage) {
         mutex.withLock {
-            _messages.value = _messages.value + message
+            _messages.emit(
+                _messages.value + message
+            )
         }
     }
 
     suspend fun clearMessage(id: ToastMessageId) {
         mutex.withLock {
-            _messages.value = _messages.value.filterNot { message -> message.id == id }
+            _messages.emit(
+                _messages.value.filterNot { message -> message.id == id }
+            )
         }
     }
 }

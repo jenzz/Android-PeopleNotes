@@ -62,36 +62,36 @@ class PeopleViewModel @Inject constructor(
                     filter = state.searchTerm,
                 )
             }
-            .onEach { people ->
-                this.isLoading.value = false
-                this.people.value = people
+            .onEach { filteredPeople ->
+                isLoading.emit(false)
+                people.emit(filteredPeople)
             }
             .launchIn(viewModelScope)
     }
 
     fun onSearchBarStateChange(state: SearchBarState) {
-        searchBarState.value = state
+        searchBarState.tryEmit(state)
     }
 
     fun onDelete(person: PersonSimplified) {
-        showDeleteConfirmation.value = person
+        showDeleteConfirmation.tryEmit(person)
     }
 
     fun onDeleteCancel() {
-        showDeleteConfirmation.value = null
+        showDeleteConfirmation.tryEmit(null)
     }
 
     fun onDeleteConfirm(personId: PersonId) {
-        isLoading.value = true
-        showDeleteConfirmation.value = null
         viewModelScope.launch {
+            isLoading.emit(true)
+            showDeleteConfirmation.emit(null)
             when (val result = useCases.deletePerson(personId)) {
                 is DeletePersonResult.RemainingNotesForPerson -> {
-                    isLoading.value = false
-                    showDeleteWithNotesConfirmation.value = result.person.simplified()
+                    isLoading.emit(false)
+                    showDeleteWithNotesConfirmation.emit(result.person.simplified())
                 }
                 is DeletePersonResult.Success -> {
-                    isLoading.value = false
+                    isLoading.emit(false)
                     toastMessageManager.emitMessage(
                         ToastMessage(
                             text = TextResource.fromId(
@@ -106,11 +106,11 @@ class PeopleViewModel @Inject constructor(
     }
 
     fun onDeleteWithNotesConfirm(personId: PersonId) {
-        isLoading.value = true
-        showDeleteWithNotesConfirmation.value = null
         viewModelScope.launch {
+            isLoading.emit(true)
+            showDeleteWithNotesConfirmation.emit(null)
             val person = useCases.deletePersonWithNotes(personId)
-            isLoading.value = false
+            isLoading.emit(false)
             toastMessageManager.emitMessage(
                 ToastMessage(
                     text = TextResource.fromId(
@@ -123,7 +123,7 @@ class PeopleViewModel @Inject constructor(
     }
 
     fun onDeleteWithNotesCancel() {
-        showDeleteWithNotesConfirmation.value = null
+        showDeleteWithNotesConfirmation.tryEmit(null)
     }
 
     fun onToastShown(id: ToastMessageId) {

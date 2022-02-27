@@ -13,6 +13,7 @@ import com.jenzz.peoplenotes.feature.add_note.ui.AddNoteUiState.InitialLoad
 import com.jenzz.peoplenotes.feature.add_note.ui.AddNoteUiState.Loaded
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -25,7 +26,8 @@ class AddNoteViewModel @Inject constructor(
     private val personId = navArgs.personId
     private val noteId = navArgs.noteId
 
-    val state = MutableStateFlow<AddNoteUiState>(InitialLoad)
+    private val _state = MutableStateFlow<AddNoteUiState>(InitialLoad)
+    val state = _state.asStateFlow()
 
     init {
         if (noteId != null) {
@@ -38,7 +40,7 @@ class AddNoteViewModel @Inject constructor(
     private fun initEditNote(noteId: NoteId) {
         viewModelScope.launch {
             val note = useCases.getNote(noteId)
-            state.emit(
+            _state.emit(
                 createLoadedState(note = note.text.value, person = note.person)
             )
         }
@@ -47,19 +49,19 @@ class AddNoteViewModel @Inject constructor(
     private fun initNewNote() {
         viewModelScope.launch {
             val person = useCases.getPerson(personId)
-            state.emit(
+            _state.emit(
                 createLoadedState(note = "", person = person)
             )
         }
     }
 
     fun onNoteChange(note: String) {
-        when (val state = state.value) {
+        when (val state = _state.value) {
             is InitialLoad ->
                 error("Note cannot change during initial load.")
             is Loaded ->
                 viewModelScope.launch {
-                    this@AddNoteViewModel.state.emit(
+                    this@AddNoteViewModel._state.emit(
                         state.copy(note = state.note.copy(value = note, error = null))
                     )
                 }
@@ -67,7 +69,7 @@ class AddNoteViewModel @Inject constructor(
     }
 
     fun onAddNote() {
-        when (val state = state.value) {
+        when (val state = _state.value) {
             is InitialLoad ->
                 error("Note cannot be saved during initial load.")
             is Loaded ->
@@ -91,8 +93,8 @@ class AddNoteViewModel @Inject constructor(
         )
 
     private suspend fun saveNote(state: Loaded) {
-        this.state.emit(state.copy(inputsEnabled = false))
-        this.state.emit(
+        _state.emit(state.copy(inputsEnabled = false))
+        _state.emit(
             when (val result = useCases.saveNote(state.note.value, noteId, personId)) {
                 is SaveNoteResult.Success ->
                     state.copy(isNoteAdded = true)

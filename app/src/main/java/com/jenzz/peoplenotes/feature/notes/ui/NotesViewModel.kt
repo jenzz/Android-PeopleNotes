@@ -57,31 +57,31 @@ class NotesViewModel @Inject constructor(
                     filter = state.searchTerm,
                 )
             }
-            .onEach { notes ->
-                this.isLoading.value = false
-                this.notes.value = notes
+            .onEach { filteredNotes ->
+                isLoading.emit(false)
+                notes.emit(filteredNotes)
             }
             .launchIn(viewModelScope)
     }
 
     fun onSearchBarStateChange(state: SearchBarState) {
-        searchBarState.value = state
+        searchBarState.tryEmit(state)
     }
 
     fun onDelete(noteId: NoteId) {
-        showDeleteConfirmation.value = noteId
+        showDeleteConfirmation.tryEmit(noteId)
     }
 
     fun onDeleteCancel() {
-        showDeleteConfirmation.value = null
+        showDeleteConfirmation.tryEmit(null)
     }
 
     fun onDeleteConfirm(noteId: NoteId) {
-        isLoading.value = true
-        showDeleteConfirmation.value = null
         viewModelScope.launch {
+            isLoading.emit(true)
+            showDeleteConfirmation.emit(null)
             useCases.deleteNote(noteId)
-            isLoading.value = false
+            isLoading.emit(false)
             toastMessageManager.emitMessage(
                 ToastMessage(text = TextResource.fromId(R.string.note_deleted))
             )
