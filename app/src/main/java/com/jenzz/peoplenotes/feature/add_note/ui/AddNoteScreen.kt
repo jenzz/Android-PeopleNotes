@@ -12,6 +12,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -108,21 +109,27 @@ fun AddNoteLoaded(
         modifier = Modifier.padding(all = MaterialTheme.spacing.large),
         verticalArrangement = Arrangement.spacedBy(space = MaterialTheme.spacing.medium),
     ) {
-        val firstNameInput = remember { FocusRequester() }
+        val noteInput = remember { FocusRequester() }
+        val focusManager = LocalFocusManager.current
+        val onSubmit = {
+            focusManager.clearFocus()
+            onAddNoteClick()
+        }
         NotesInputField(
-            modifier = Modifier.focusRequester(firstNameInput),
+            modifier = Modifier.focusRequester(noteInput),
             enabled = state.inputsEnabled,
             imeAction = ImeAction.Done,
+            keyboardActions = KeyboardActions(onDone = { onSubmit() }),
             state = state.note,
             onValueChange = onNoteChange,
         )
         SubmitButton(
             enabled = state.inputsEnabled,
             text = R.string.save,
-            onClick = onAddNoteClick,
+            onClick = onSubmit,
         )
         LaunchedEffect(Unit) {
-            firstNameInput.requestFocus()
+            noteInput.requestFocus()
         }
     }
 }
