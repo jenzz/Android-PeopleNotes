@@ -3,8 +3,8 @@ package com.jenzz.peoplenotes.feature.add_note.ui
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ArrowBack
@@ -14,15 +14,13 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.jenzz.peoplenotes.R
 import com.jenzz.peoplenotes.common.data.notes.NoteId
 import com.jenzz.peoplenotes.common.data.people.PersonId
-import com.jenzz.peoplenotes.common.ui.TextFieldUiState
 import com.jenzz.peoplenotes.common.ui.theme.spacing
 import com.jenzz.peoplenotes.common.ui.widgets.LoadingView
-import com.jenzz.peoplenotes.common.ui.widgets.NotesTextField
+import com.jenzz.peoplenotes.common.ui.widgets.NotesInputField
 import com.jenzz.peoplenotes.common.ui.widgets.SubmitButton
 import com.jenzz.peoplenotes.ext.rememberFlowWithLifecycle
 import com.ramcosta.composedestinations.annotation.Destination
@@ -127,22 +125,4 @@ fun AddNoteLoaded(
             firstNameInput.requestFocus()
         }
     }
-}
-
-@Composable
-private fun NotesInputField(
-    modifier: Modifier,
-    enabled: Boolean,
-    imeAction: ImeAction,
-    state: TextFieldUiState,
-    onValueChange: (String) -> Unit,
-) {
-    NotesTextField(
-        modifier = modifier.heightIn(min = 112.dp),
-        enabled = enabled,
-        singleLine = false,
-        imeAction = imeAction,
-        state = state,
-        onValueChange = onValueChange,
-    )
 }

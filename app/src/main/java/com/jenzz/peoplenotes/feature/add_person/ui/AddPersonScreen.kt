@@ -4,7 +4,6 @@ import android.content.res.Configuration.UI_MODE_NIGHT_NO
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material.*
@@ -20,12 +19,12 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.datasource.CollectionPreviewParameterProvider
-import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.jenzz.peoplenotes.R
 import com.jenzz.peoplenotes.common.ui.TextFieldUiState
 import com.jenzz.peoplenotes.common.ui.theme.PeopleNotesTheme
 import com.jenzz.peoplenotes.common.ui.theme.spacing
+import com.jenzz.peoplenotes.common.ui.widgets.NotesInputField
 import com.jenzz.peoplenotes.common.ui.widgets.NotesTextField
 import com.jenzz.peoplenotes.common.ui.widgets.SubmitButton
 import com.jenzz.peoplenotes.ext.rememberFlowWithLifecycle
@@ -173,26 +172,6 @@ private fun LastNameInputField(
         modifier = modifier,
         enabled = enabled,
         singleLine = true,
-        imeAction = imeAction,
-        keyboardActions = keyboardActions,
-        state = state,
-        onValueChange = onValueChange,
-    )
-}
-
-@Composable
-private fun NotesInputField(
-    modifier: Modifier,
-    enabled: Boolean,
-    imeAction: ImeAction,
-    keyboardActions: KeyboardActions,
-    state: TextFieldUiState,
-    onValueChange: (String) -> Unit,
-) {
-    NotesTextField(
-        modifier = modifier.heightIn(min = 112.dp),
-        enabled = enabled,
-        singleLine = false,
         imeAction = imeAction,
         keyboardActions = keyboardActions,
         state = state,
