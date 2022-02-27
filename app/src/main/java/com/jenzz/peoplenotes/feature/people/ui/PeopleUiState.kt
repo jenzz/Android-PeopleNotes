@@ -4,10 +4,10 @@ import com.jenzz.peoplenotes.common.data.people.People
 import com.jenzz.peoplenotes.common.data.people.PersonSimplified
 import com.jenzz.peoplenotes.common.ui.ListStyle
 import com.jenzz.peoplenotes.common.ui.ToastMessage
-import com.jenzz.peoplenotes.common.ui.widgets.SearchBarState
+import com.jenzz.peoplenotes.common.ui.widgets.SearchBarInput
 
 data class PeopleUiState(
-    val searchBarState: SearchBarState = SearchBarState(
+    val searchBar: SearchBarInput = SearchBarInput(
         searchTerm = "",
         listStyle = ListStyle.DEFAULT,
         sortBy = PeopleSortBy.toSortByState(),
@@ -25,8 +25,8 @@ data class PeopleUiState(
     val showActions: Boolean =
         !isLoading && !isEmpty
 
-    fun isEmptyFiltered(searchBarState: SearchBarState): Boolean =
+    fun isEmptyFiltered(searchBar: SearchBarInput): Boolean =
         isEmpty
-                && searchBarState.searchTerm.isNotEmpty()
+                && searchBar.searchTerm.isNotEmpty()
                 && people.totalCount > 0
 }

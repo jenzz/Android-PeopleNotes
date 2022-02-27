@@ -9,8 +9,8 @@ import com.jenzz.peoplenotes.common.ui.TextResource
 import com.jenzz.peoplenotes.common.ui.ToastMessage
 import com.jenzz.peoplenotes.common.ui.ToastMessageId
 import com.jenzz.peoplenotes.common.ui.ToastMessageManager
+import com.jenzz.peoplenotes.common.ui.widgets.SearchBarInput
 import com.jenzz.peoplenotes.common.ui.widgets.SearchBarState
-import com.jenzz.peoplenotes.ext.saveableStateFlowOf
 import com.jenzz.peoplenotes.feature.notes.data.NotesUseCases
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
@@ -28,15 +28,12 @@ class NotesViewModel @Inject constructor(
 
     private val toastMessageManager = ToastMessageManager()
     private val isLoading = MutableStateFlow(initialState.isLoading)
-    private val searchBarState = savedStateHandle.saveableStateFlowOf(
-        key = "searchBarState",
-        initialValue = initialState.searchBarState,
-    )
+    private val searchBar = SearchBarState(savedStateHandle, initialState.searchBar)
     private val notes = MutableStateFlow(initialState.notes)
     private val showDeleteConfirmation = MutableStateFlow(initialState.showDeleteConfirmation)
 
     val state = combine(
-        searchBarState,
+        searchBar.state,
         isLoading,
         notes,
         showDeleteConfirmation,
@@ -49,7 +46,11 @@ class NotesViewModel @Inject constructor(
     )
 
     init {
-        searchBarState
+        searchBar
+            .state
+            .onEach {
+                isLoading.emit(true)
+            }
             .flatMapLatest { state ->
                 useCases.observeNotesWithPerson(
                     personId = navArgs.personId,
@@ -57,15 +58,30 @@ class NotesViewModel @Inject constructor(
                     filter = state.searchTerm,
                 )
             }
-            .onEach { filteredNotes ->
+            .onEach { newNotes ->
                 isLoading.emit(false)
-                notes.emit(filteredNotes)
+                notes.emit(newNotes)
+            }
+            .launchIn(viewModelScope)
+
+        searchBar
+            .sortBy
+            .drop(1) // Do not notify on initial load.
+            .onEach { sortBy ->
+                toastMessageManager.emitMessage(
+                    message = ToastMessage(
+                        text = TextResource.fromId(
+                            id = R.string.sorted_by,
+                            sortBy.label
+                        )
+                    )
+                )
             }
             .launchIn(viewModelScope)
     }
 
-    fun onSearchBarStateChange(state: SearchBarState) {
-        searchBarState.tryEmit(state)
+    fun onSearchBarStateChange(state: SearchBarInput) {
+        searchBar.onStateChange(state)
     }
 
     fun onDelete(noteId: NoteId) {
@@ -83,7 +99,7 @@ class NotesViewModel @Inject constructor(
             useCases.deleteNote(noteId)
             isLoading.emit(false)
             toastMessageManager.emitMessage(
-                ToastMessage(text = TextResource.fromId(R.string.note_deleted))
+                message = ToastMessage(text = TextResource.fromId(R.string.note_deleted))
             )
         }
     }

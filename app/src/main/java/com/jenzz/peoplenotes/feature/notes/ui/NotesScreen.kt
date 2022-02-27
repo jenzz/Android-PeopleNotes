@@ -118,7 +118,7 @@ private fun HandleDeleteConfirmation(
 @Composable
 fun NotesContent(
     state: NotesUiState,
-    onSearchBarStateChanged: (SearchBarState) -> Unit,
+    onSearchBarStateChanged: (SearchBarInput) -> Unit,
     onClick: (Note) -> Unit,
     onDelete: (NoteId) -> Unit,
     onSettingsClick: () -> Unit,
@@ -135,12 +135,12 @@ fun NotesContent(
                     top = MaterialTheme.spacing.medium,
                     end = MaterialTheme.spacing.medium,
                 ),
-                state = state.searchBarState,
+                state = state.searchBar,
                 onStateChange = onSearchBarStateChanged,
                 showActions = state.showActions,
                 placeholder = stringResource(id = R.string.search_notes, state.notesCount),
                 visualTransformation = SuffixVisualTransformation(
-                    text = state.searchBarState.searchTerm,
+                    text = state.searchBar.searchTerm,
                     suffix = " (${state.notesCount})",
                 ),
                 onSettingsClick = onSettingsClick,
@@ -158,14 +158,14 @@ fun NotesContent(
         when {
             state.isLoading ->
                 LoadingView()
-            state.isEmptyFiltered(state.searchBarState) ->
-                EmptyFilteredView(state.searchBarState.searchTerm)
+            state.isEmptyFiltered(state.searchBar) ->
+                EmptyFilteredView(state.searchBar.searchTerm)
             state.isEmpty ->
                 EmptyView(state.notes.requirePerson())
             else ->
                 NotesLoaded(
                     state = state,
-                    searchBarState = state.searchBarState,
+                    searchBar = state.searchBar,
                     onClick = onClick,
                     onDelete = onDelete,
                 )
@@ -210,11 +210,11 @@ private fun EmptyView(
 @Composable
 private fun NotesLoaded(
     state: NotesUiState,
-    searchBarState: SearchBarState,
+    searchBar: SearchBarInput,
     onClick: (Note) -> Unit,
     onDelete: (NoteId) -> Unit,
 ) {
-    when (searchBarState.listStyle) {
+    when (searchBar.listStyle) {
         ListStyle.Rows ->
             NotesLoadedRows(
                 notes = state.notes,
@@ -414,7 +414,7 @@ class NotesPreviewParameterProvider : PreviewParameterProvider<NotesUiState> {
                 lastModified = LocalDateTime.now(),
             )
             return NotesUiState(
-                searchBarState = SearchBarState(
+                searchBar = SearchBarInput(
                     searchTerm = "",
                     listStyle = ListStyle.DEFAULT,
                     sortBy = SortByState(items = emptyList()),

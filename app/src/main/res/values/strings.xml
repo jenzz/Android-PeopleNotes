@@ -4,7 +4,7 @@
     <string name="search_people">Search people (%1$d)</string>
     <string name="search_notes">Search notes (%1$d)</string>
     <string name="sort_by">Sort by</string>
-    <string name="sorted_by">Sorted by %1$s</string>
+    <string name="sorted_by">Sorted by: %1$s</string>
     <string name="last_modified">Last modified</string>
     <string name="last_modified_at">Last modified: %1$s</string>
     <string name="most_recent_first">Most recent first</string>

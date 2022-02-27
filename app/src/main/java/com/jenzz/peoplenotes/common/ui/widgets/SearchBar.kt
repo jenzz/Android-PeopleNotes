@@ -25,15 +25,20 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.lifecycle.SavedStateHandle
 import com.jenzz.peoplenotes.R
 import com.jenzz.peoplenotes.common.ui.*
+import com.jenzz.peoplenotes.ext.saveableStateFlowOf
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import kotlinx.parcelize.Parcelize
 
 @Composable
 fun SearchBar(
     modifier: Modifier = Modifier,
-    state: SearchBarState,
-    onStateChange: (SearchBarState) -> Unit,
+    state: SearchBarInput,
+    onStateChange: (SearchBarInput) -> Unit,
     showActions: Boolean,
     placeholder: String,
     visualTransformation: () -> VisualTransformation,
@@ -46,9 +51,13 @@ fun SearchBar(
             visualTransformation = visualTransformation,
             showActions = showActions,
             searchTerm = state.searchTerm,
-            onSearchTermChange = { searchTerm -> onStateChange(state.copy(searchTerm = searchTerm)) },
+            onSearchTermChange = { searchTerm ->
+                onStateChange(state.copy(searchTerm = searchTerm))
+            },
             listStyle = state.listStyle,
-            onListStyleChange = { listStyle -> onStateChange(state.copy(listStyle = listStyle)) },
+            onListStyleChange = { listStyle ->
+                onStateChange(state.copy(listStyle = listStyle))
+            },
             sortBy = state.sortBy,
             onSortByChange = { selectedSortBy ->
                 onStateChange(
@@ -233,8 +242,39 @@ private fun SortByDropdownItem(
 }
 
 @Parcelize
-data class SearchBarState(
+data class SearchBarInput(
     val searchTerm: String,
     val listStyle: ListStyle,
     val sortBy: SortByState,
 ) : Parcelable
+
+class SearchBarState(
+    savedStateHandle: SavedStateHandle,
+    initialState: SearchBarInput,
+) {
+
+    private val _state = savedStateHandle.saveableStateFlowOf(
+        key = "state",
+        initialValue = initialState,
+    )
+    val state = _state.asStateFlow()
+
+    val searchTerm =
+        _state
+            .map { state -> state.searchTerm }
+            .distinctUntilChanged()
+
+    val listStyle =
+        _state
+            .map { state -> state.listStyle }
+            .distinctUntilChanged()
+
+    val sortBy =
+        _state
+            .map { state -> state.sortBy.selected }
+            .distinctUntilChanged()
+
+    fun onStateChange(state: SearchBarInput) {
+        _state.tryEmit(state)
+    }
+}

@@ -12,9 +12,9 @@ import com.jenzz.peoplenotes.common.ui.TextResource
 import com.jenzz.peoplenotes.common.ui.ToastMessage
 import com.jenzz.peoplenotes.common.ui.ToastMessageId
 import com.jenzz.peoplenotes.common.ui.ToastMessageManager
+import com.jenzz.peoplenotes.common.ui.widgets.SearchBarInput
 import com.jenzz.peoplenotes.common.ui.widgets.SearchBarState
 import com.jenzz.peoplenotes.ext.combine
-import com.jenzz.peoplenotes.ext.saveableStateFlowOf
 import com.jenzz.peoplenotes.feature.people.data.PeopleUseCases
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
@@ -31,17 +31,14 @@ class PeopleViewModel @Inject constructor(
 
     private val toastMessageManager = ToastMessageManager()
     private val isLoading = MutableStateFlow(initialState.isLoading)
-    private val searchBarState = savedStateHandle.saveableStateFlowOf(
-        key = "searchBarState",
-        initialValue = initialState.searchBarState,
-    )
+    private val searchBar = SearchBarState(savedStateHandle, initialState.searchBar)
     private val people = MutableStateFlow(initialState.people)
     private val showDeleteConfirmation = MutableStateFlow(initialState.showDeleteConfirmation)
     private val showDeleteWithNotesConfirmation =
         MutableStateFlow(initialState.showDeleteWithNotesConfirmation)
 
     val state = combine(
-        searchBarState,
+        searchBar.state,
         isLoading,
         people,
         showDeleteConfirmation,
@@ -55,22 +52,39 @@ class PeopleViewModel @Inject constructor(
     )
 
     init {
-        searchBarState
+        searchBar
+            .state
+            .onEach { isLoading.emit(true) }
             .flatMapLatest { state ->
                 useCases.observePeople(
                     sortBy = state.sortBy.selected,
                     filter = state.searchTerm,
                 )
             }
-            .onEach { filteredPeople ->
+            .onEach { newPeople ->
                 isLoading.emit(false)
-                people.emit(filteredPeople)
+                people.emit(newPeople)
+            }
+            .launchIn(viewModelScope)
+
+        searchBar
+            .sortBy
+            .drop(1) // Do not notify on initial load.
+            .onEach { sortBy ->
+                toastMessageManager.emitMessage(
+                    message = ToastMessage(
+                        text = TextResource.fromId(
+                            id = R.string.sorted_by,
+                            sortBy.label
+                        )
+                    )
+                )
             }
             .launchIn(viewModelScope)
     }
 
-    fun onSearchBarStateChange(state: SearchBarState) {
-        searchBarState.tryEmit(state)
+    fun onSearchBarStateChange(state: SearchBarInput) {
+        searchBar.onStateChange(state)
     }
 
     fun onDelete(person: PersonSimplified) {
@@ -93,7 +107,7 @@ class PeopleViewModel @Inject constructor(
                 is DeletePersonResult.Success -> {
                     isLoading.emit(false)
                     toastMessageManager.emitMessage(
-                        ToastMessage(
+                        message = ToastMessage(
                             text = TextResource.fromId(
                                 id = R.string.person_deleted,
                                 result.person.fullName
@@ -112,7 +126,7 @@ class PeopleViewModel @Inject constructor(
             val person = useCases.deletePersonWithNotes(personId)
             isLoading.emit(false)
             toastMessageManager.emitMessage(
-                ToastMessage(
+                message = ToastMessage(
                     text = TextResource.fromId(
                         id = R.string.person_deleted,
                         person.fullName

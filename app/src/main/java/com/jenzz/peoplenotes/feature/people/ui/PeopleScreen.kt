@@ -122,7 +122,7 @@ fun HandleDeleteWithNotesConfirmation(
 @Composable
 private fun PeopleContent(
     state: PeopleUiState,
-    onSearchBarStateChange: (SearchBarState) -> Unit,
+    onSearchBarStateChange: (SearchBarInput) -> Unit,
     onClick: (Person) -> Unit,
     onDelete: (PersonSimplified) -> Unit,
     onAddPersonManuallyClick: () -> Unit,
@@ -150,7 +150,7 @@ private fun PeopleContent(
                     top = MaterialTheme.spacing.medium,
                     end = MaterialTheme.spacing.medium,
                 ),
-                state = state.searchBarState,
+                state = state.searchBar,
                 onStateChange = onSearchBarStateChange,
                 showActions = state.showActions,
                 placeholder = stringResource(
@@ -158,7 +158,7 @@ private fun PeopleContent(
                     state.people.persons.size
                 ),
                 visualTransformation = SuffixVisualTransformation(
-                    text = state.searchBarState.searchTerm,
+                    text = state.searchBar.searchTerm,
                     suffix = " (${state.people.persons.size})",
                 ),
                 onSettingsClick = onSettingsClick,
@@ -166,8 +166,8 @@ private fun PeopleContent(
             when {
                 state.isLoading ->
                     LoadingView()
-                state.isEmptyFiltered(state.searchBarState) ->
-                    EmptyFilteredView(state.searchBarState.searchTerm)
+                state.isEmptyFiltered(state.searchBar) ->
+                    EmptyFilteredView(state.searchBar.searchTerm)
                 state.isEmpty ->
                     EmptyView()
                 else ->
@@ -221,7 +221,7 @@ private fun PeopleLoaded(
     onClick: (Person) -> Unit,
     onDelete: (PersonSimplified) -> Unit,
 ) {
-    when (state.searchBarState.listStyle) {
+    when (state.searchBar.listStyle) {
         ListStyle.Rows ->
             PeopleLoadedRows(
                 people = state.people.persons,
