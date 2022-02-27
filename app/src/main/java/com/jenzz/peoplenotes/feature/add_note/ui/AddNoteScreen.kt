@@ -24,6 +24,7 @@ import com.jenzz.peoplenotes.common.ui.widgets.LoadingView
 import com.jenzz.peoplenotes.common.ui.widgets.NotesInputField
 import com.jenzz.peoplenotes.common.ui.widgets.SubmitButton
 import com.jenzz.peoplenotes.ext.rememberFlowWithLifecycle
+import com.jenzz.peoplenotes.feature.destinations.NotesScreenDestination
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
@@ -47,7 +48,13 @@ fun AddNoteScreen(
         onNavigateUp = navigator::navigateUp,
         onNoteChange = viewModel::onNoteChange,
         onAddNoteClick = viewModel::onAddNote,
-        onNoteAdded = { navigator.popBackStack() },
+        onNoteAdded = {
+            navigator.navigate(NotesScreenDestination(navArgs.personId)) {
+                popUpTo(NotesScreenDestination.route) {
+                    inclusive = true
+                }
+            }
+        },
     )
 }
 
