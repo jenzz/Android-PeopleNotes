@@ -1,6 +1,8 @@
 package com.jenzz.peoplenotes.feature.notes.ui
 
 import android.content.res.Configuration
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -11,9 +13,8 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
@@ -40,11 +41,17 @@ import com.jenzz.peoplenotes.common.ui.theme.PeopleNotesTheme
 import com.jenzz.peoplenotes.common.ui.theme.elevation
 import com.jenzz.peoplenotes.common.ui.theme.spacing
 import com.jenzz.peoplenotes.common.ui.widgets.*
-import com.jenzz.peoplenotes.ext.*
+import com.jenzz.peoplenotes.ext.random
+import com.jenzz.peoplenotes.ext.rememberFlowWithLifecycle
+import com.jenzz.peoplenotes.ext.stringResourceWithStyledPlaceholders
+import com.jenzz.peoplenotes.ext.toNonEmptyString
 import com.jenzz.peoplenotes.feature.destinations.AddNoteScreenDestination
+import com.jenzz.peoplenotes.feature.destinations.DeleteNoteDialogDestination
 import com.jenzz.peoplenotes.feature.destinations.SettingsScreenDestination
+import com.jenzz.peoplenotes.feature.notes.ui.dialogs.DeleteNoteDialogResult
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import com.ramcosta.composedestinations.result.ResultRecipient
 import java.time.LocalDateTime
 
 data class NotesScreenNavArgs(
@@ -57,9 +64,17 @@ fun NotesScreen(
     viewModel: NotesViewModel = hiltViewModel(),
     navArgs: NotesScreenNavArgs,
     navigator: DestinationsNavigator,
+    deleteNoteResultRecipient: ResultRecipient<DeleteNoteDialogDestination, DeleteNoteDialogResult>,
 ) {
     val state by rememberFlowWithLifecycle(viewModel.state)
         .collectAsState(initial = viewModel.initialState)
+    HandleDeleteConfirmation(
+        state = state,
+        navigator = navigator,
+        resultRecipient = deleteNoteResultRecipient,
+        onDeleteConfirm = viewModel::onDeleteConfirm,
+        onDeleteCancel = viewModel::onDeleteCancel,
+    )
     NotesContent(
         state = state,
         onSearchBarStateChanged = viewModel::onSearchBarStateChange,
@@ -68,6 +83,7 @@ fun NotesScreen(
                 AddNoteScreenDestination(personId = navArgs.personId, noteId = note.id)
             )
         },
+        onDelete = viewModel::onDelete,
         onSettingsClick = {
             navigator.navigate(SettingsScreenDestination)
         },
@@ -81,10 +97,30 @@ fun NotesScreen(
 }
 
 @Composable
+private fun HandleDeleteConfirmation(
+    state: NotesUiState,
+    navigator: DestinationsNavigator,
+    resultRecipient: ResultRecipient<DeleteNoteDialogDestination, DeleteNoteDialogResult>,
+    onDeleteConfirm: (NoteId) -> Unit,
+    onDeleteCancel: () -> Unit,
+) {
+    state.showDeleteConfirmation?.let { personId ->
+        navigator.navigate(DeleteNoteDialogDestination(personId))
+    }
+    resultRecipient.onResult { result ->
+        when (result) {
+            is DeleteNoteDialogResult.Yes -> onDeleteConfirm(result.personId)
+            is DeleteNoteDialogResult.No -> onDeleteCancel()
+        }
+    }
+}
+
+@Composable
 fun NotesContent(
     state: NotesUiState,
     onSearchBarStateChanged: (SearchBarState) -> Unit,
     onClick: (Note) -> Unit,
+    onDelete: (NoteId) -> Unit,
     onSettingsClick: () -> Unit,
     onAddNoteClick: () -> Unit,
     onToastShown: (ToastMessageId) -> Unit,
@@ -131,6 +167,7 @@ fun NotesContent(
                     state = state,
                     searchBarState = state.searchBarState,
                     onClick = onClick,
+                    onDelete = onDelete,
                 )
         }
     }
@@ -171,17 +208,20 @@ private fun NotesLoaded(
     state: NotesUiState,
     searchBarState: SearchBarState,
     onClick: (Note) -> Unit,
+    onDelete: (NoteId) -> Unit,
 ) {
     when (searchBarState.listStyle) {
         ListStyle.Rows ->
             NotesLoadedRows(
                 notes = state.notes,
                 onClick = onClick,
+                onDelete = onDelete,
             )
         ListStyle.Grid ->
             NotesLoadedGrid(
                 notes = state.notes,
                 onClick = onClick,
+                onDelete = onDelete,
             )
     }
 }
@@ -190,6 +230,7 @@ private fun NotesLoaded(
 private fun NotesLoadedRows(
     notes: NotesList,
     onClick: (Note) -> Unit,
+    onDelete: (NoteId) -> Unit,
 ) {
     LazyColumn(
         contentPadding = PaddingValues(all = MaterialTheme.spacing.medium),
@@ -199,6 +240,7 @@ private fun NotesLoadedRows(
             NoteRow(
                 note = note,
                 onClick = onClick,
+                onDelete = onDelete,
             )
         }
     }
@@ -208,6 +250,7 @@ private fun NotesLoadedRows(
 private fun NotesLoadedGrid(
     notes: NotesList,
     onClick: (Note) -> Unit,
+    onDelete: (NoteId) -> Unit,
 ) {
     StaggeredVerticalGrid(
         modifier = Modifier
@@ -219,7 +262,8 @@ private fun NotesLoadedGrid(
             NoteGrid(
                 modifier = Modifier.padding(all = MaterialTheme.spacing.small),
                 note = note,
-                onClick = onClick
+                onClick = onClick,
+                onDelete = onDelete,
             )
         }
     }
@@ -229,12 +273,13 @@ private fun NotesLoadedGrid(
 private fun NoteRow(
     note: Note,
     onClick: (Note) -> Unit,
+    onDelete: (NoteId) -> Unit,
 ) {
-    Card(
+    NoteCard(
         modifier = Modifier.fillMaxWidth(),
-        elevation = MaterialTheme.elevation.small,
-        shape = RoundedCornerShape(corner = CornerSize(16.dp)),
-        onClick = { onClick(note) },
+        note = note,
+        onClick = onClick,
+        onDelete = onDelete,
     ) {
         Text(
             modifier = Modifier.padding(all = MaterialTheme.spacing.medium),
@@ -248,17 +293,80 @@ fun NoteGrid(
     modifier: Modifier = Modifier,
     note: Note,
     onClick: (Note) -> Unit,
+    onDelete: (NoteId) -> Unit,
 ) {
-    Card(
+    NoteCard(
         modifier = modifier.fillMaxWidth(),
-        elevation = MaterialTheme.elevation.small,
-        shape = RoundedCornerShape(corner = CornerSize(16.dp)),
-        onClick = { onClick(note) }
+        note = note,
+        onClick = onClick,
+        onDelete = onDelete,
     ) {
         Text(
             modifier = Modifier.padding(all = MaterialTheme.spacing.medium),
             text = note.text.value,
         )
+    }
+}
+
+@Composable
+private fun NoteCard(
+    modifier: Modifier = Modifier,
+    note: Note,
+    onClick: (Note) -> Unit,
+    onDelete: (NoteId) -> Unit,
+    content: @Composable () -> Unit,
+) {
+    var selected by rememberSaveable { mutableStateOf(false) }
+    Card(
+        modifier = modifier.fillMaxWidth(),
+        elevation = MaterialTheme.elevation.small,
+        shape = RoundedCornerShape(corner = CornerSize(16.dp)),
+        border = if (selected)
+            BorderStroke(
+                width = 1.dp,
+                color = MaterialTheme.colors.onSurface
+            ) else null,
+    ) {
+        Box(
+            modifier = Modifier.combinedClickable(
+                onClick = { onClick(note) },
+                onLongClick = { selected = true },
+            )
+        ) {
+            content()
+            NoteDropDownMenu(
+                note = note,
+                expanded = selected,
+                onDismissRequest = { selected = false },
+                onDelete = { noteId ->
+                    selected = false
+                    onDelete(noteId)
+                },
+            )
+        }
+    }
+}
+
+@Composable
+private fun NoteDropDownMenu(
+    note: Note,
+    expanded: Boolean,
+    onDismissRequest: () -> Unit,
+    onDelete: (NoteId) -> Unit,
+) {
+    DropdownMenu(
+        expanded = expanded,
+        onDismissRequest = onDismissRequest,
+    ) {
+        DropdownMenuItem(onClick = { onDelete(note.id) }) {
+            Text(
+                text = stringResource(id = R.string.delete),
+                style = MaterialTheme.typography.body1.copy(
+                    fontWeight = FontWeight.Normal,
+                    color = MaterialTheme.colors.onSurface,
+                ),
+            )
+        }
     }
 }
 
@@ -281,6 +389,7 @@ private fun NotesContentPreview(
                 state = state,
                 onSearchBarStateChanged = {},
                 onClick = {},
+                onDelete = {},
                 onSettingsClick = {},
                 onAddNoteClick = {},
                 onToastShown = {},

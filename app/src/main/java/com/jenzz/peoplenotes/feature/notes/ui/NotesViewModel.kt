@@ -3,6 +3,10 @@ package com.jenzz.peoplenotes.feature.notes.ui
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.jenzz.peoplenotes.R
+import com.jenzz.peoplenotes.common.data.notes.NoteId
+import com.jenzz.peoplenotes.common.ui.TextResource
+import com.jenzz.peoplenotes.common.ui.ToastMessage
 import com.jenzz.peoplenotes.common.ui.ToastMessageId
 import com.jenzz.peoplenotes.common.ui.ToastMessageManager
 import com.jenzz.peoplenotes.common.ui.widgets.SearchBarState
@@ -17,7 +21,7 @@ import javax.inject.Inject
 class NotesViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     navArgs: NotesScreenNavArgs,
-    useCases: NotesUseCases,
+    private val useCases: NotesUseCases,
 ) : ViewModel() {
 
     val initialState = NotesUiState()
@@ -29,11 +33,13 @@ class NotesViewModel @Inject constructor(
         initialValue = initialState.searchBarState,
     )
     private val notes = MutableStateFlow(initialState.notes)
+    private val showDeleteConfirmation = MutableStateFlow(initialState.showDeleteConfirmation)
 
     val state = combine(
         searchBarState.asStateFlow(),
         isLoading,
         notes,
+        showDeleteConfirmation,
         toastMessageManager.message,
         ::NotesUiState,
     ).stateIn(
@@ -60,6 +66,26 @@ class NotesViewModel @Inject constructor(
 
     fun onSearchBarStateChange(state: SearchBarState) {
         searchBarState.value = state
+    }
+
+    fun onDelete(noteId: NoteId) {
+        showDeleteConfirmation.value = noteId
+    }
+
+    fun onDeleteCancel() {
+        showDeleteConfirmation.value = null
+    }
+
+    fun onDeleteConfirm(noteId: NoteId) {
+        isLoading.value = true
+        showDeleteConfirmation.value = null
+        viewModelScope.launch {
+            useCases.deleteNote(noteId)
+            isLoading.value = false
+            toastMessageManager.emitMessage(
+                ToastMessage(text = TextResource.fromId(R.string.note_deleted))
+            )
+        }
     }
 
     fun onToastShown(id: ToastMessageId) {

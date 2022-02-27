@@ -1,5 +1,6 @@
 package com.jenzz.peoplenotes.feature.notes.data
 
+import com.jenzz.peoplenotes.common.data.notes.NoteId
 import com.jenzz.peoplenotes.common.data.notes.NotesRepository
 import com.jenzz.peoplenotes.common.data.people.PeopleRepository
 import com.jenzz.peoplenotes.common.data.people.PersonId
@@ -11,6 +12,7 @@ import javax.inject.Inject
 
 class NotesUseCases @Inject constructor(
     val observeNotesWithPerson: ObserveNotesWithPersonUseCase,
+    val deleteNote: DeleteNoteUseCase,
 )
 
 class ObserveNotesWithPersonUseCase @Inject constructor(
@@ -33,4 +35,13 @@ class ObserveNotesWithPersonUseCase @Inject constructor(
                     notes = notes,
                 )
             }
+}
+
+class DeleteNoteUseCase @Inject constructor(
+    private val notesRepository: NotesRepository,
+) {
+
+    suspend operator fun invoke(id: NoteId) {
+        notesRepository.delete(id)
+    }
 }

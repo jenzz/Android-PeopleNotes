@@ -1,5 +1,6 @@
 package com.jenzz.peoplenotes.feature.notes.ui
 
+import com.jenzz.peoplenotes.common.data.notes.NoteId
 import com.jenzz.peoplenotes.common.data.notes.NotesList
 import com.jenzz.peoplenotes.common.ui.ListStyle
 import com.jenzz.peoplenotes.common.ui.ToastMessage
@@ -13,6 +14,7 @@ data class NotesUiState(
     ),
     val isLoading: Boolean = true,
     val notes: NotesList = NotesList(),
+    val showDeleteConfirmation: NoteId? = null,
     val toastMessage: ToastMessage? = null,
 ) {
 

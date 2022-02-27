@@ -55,14 +55,14 @@ fun PeopleScreen(
     HandleDeleteConfirmation(
         state = state,
         navigator = navigator,
-        deletePersonResultRecipient = deletePersonResultRecipient,
+        resultRecipient = deletePersonResultRecipient,
         onDeleteConfirm = viewModel::onDeleteConfirm,
         onDeleteCancel = viewModel::onDeleteCancel,
     )
     HandleDeleteWithNotesConfirmation(
         state = state,
         navigator = navigator,
-        deletePersonWithNotesResultRecipient = deletePersonWithNotesResultRecipient,
+        resultRecipient = deletePersonWithNotesResultRecipient,
         onDeleteWithNotesConfirm = viewModel::onDeleteWithNotesConfirm,
         onDeleteWithNotesCancel = viewModel::onDeleteWithNotesCancel,
     )
@@ -88,14 +88,14 @@ fun PeopleScreen(
 private fun HandleDeleteConfirmation(
     state: PeopleUiState,
     navigator: DestinationsNavigator,
-    deletePersonResultRecipient: ResultRecipient<DeletePersonDialogDestination, DeletePersonDialogResult>,
+    resultRecipient: ResultRecipient<DeletePersonDialogDestination, DeletePersonDialogResult>,
     onDeleteConfirm: (PersonId) -> Unit,
     onDeleteCancel: () -> Unit,
 ) {
     state.showDeleteConfirmation?.let { personId ->
         navigator.navigate(DeletePersonDialogDestination(personId))
     }
-    deletePersonResultRecipient.onResult { result ->
+    resultRecipient.onResult { result ->
         when (result) {
             is DeletePersonDialogResult.Yes -> onDeleteConfirm(result.personId)
             is DeletePersonDialogResult.No -> onDeleteCancel()
@@ -107,14 +107,14 @@ private fun HandleDeleteConfirmation(
 fun HandleDeleteWithNotesConfirmation(
     state: PeopleUiState,
     navigator: DestinationsNavigator,
-    deletePersonWithNotesResultRecipient: ResultRecipient<DeletePersonWithNotesDialogDestination, DeletePersonWithNotesDialogResult>,
+    resultRecipient: ResultRecipient<DeletePersonWithNotesDialogDestination, DeletePersonWithNotesDialogResult>,
     onDeleteWithNotesConfirm: (PersonId) -> Unit,
     onDeleteWithNotesCancel: () -> Unit,
 ) {
     state.showDeleteWithNotesConfirmation?.let { personId ->
         navigator.navigate(DeletePersonWithNotesDialogDestination(personId))
     }
-    deletePersonWithNotesResultRecipient.onResult { result ->
+    resultRecipient.onResult { result ->
         when (result) {
             is DeletePersonWithNotesDialogResult.Yes -> onDeleteWithNotesConfirm(result.personId)
             is DeletePersonWithNotesDialogResult.No -> onDeleteWithNotesCancel()
@@ -381,12 +381,13 @@ private fun PersonCard(
             content()
             PersonDropDownMenu(
                 person = person,
-                selected = selected,
+                expanded = selected,
                 onDismissRequest = { selected = false },
-            ) { person ->
-                selected = false
-                onDelete(person.id)
-            }
+                onDelete = { personId ->
+                    selected = false
+                    onDelete(personId)
+                },
+            )
         }
     }
 }
@@ -413,15 +414,15 @@ private fun PersonImage(
 @Composable
 private fun PersonDropDownMenu(
     person: Person,
-    selected: Boolean,
+    expanded: Boolean,
     onDismissRequest: () -> Unit,
-    onDelete: (Person) -> Unit,
+    onDelete: (PersonId) -> Unit,
 ) {
     DropdownMenu(
-        expanded = selected,
+        expanded = expanded,
         onDismissRequest = onDismissRequest,
     ) {
-        DropdownMenuItem(onClick = { onDelete(person) }) {
+        DropdownMenuItem(onClick = { onDelete(person.id) }) {
             Text(
                 text = stringResource(id = R.string.delete),
                 style = MaterialTheme.typography.body1.copy(
