@@ -5,5 +5,7 @@ data class NotesList(
     val totalCount: Int = 0,
 ) {
 
+    val size: Int = items.size
+
     val isEmpty: Boolean = items.isEmpty()
 }

@@ -48,6 +48,7 @@ import com.jenzz.peoplenotes.ext.toNonEmptyString
 import com.jenzz.peoplenotes.feature.destinations.AddNoteScreenDestination
 import com.jenzz.peoplenotes.feature.destinations.DeleteNoteDialogDestination
 import com.jenzz.peoplenotes.feature.destinations.SettingsScreenDestination
+import com.jenzz.peoplenotes.feature.notes.data.Notes
 import com.jenzz.peoplenotes.feature.notes.ui.dialogs.DeleteNoteDialogResult
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
@@ -161,7 +162,7 @@ fun NotesContent(
             state.isEmptyFiltered(state.searchBarState) ->
                 EmptyFilteredView()
             state.isEmpty ->
-                EmptyView()
+                EmptyView(state.notes.requirePerson())
             else ->
                 NotesLoaded(
                     state = state,
@@ -189,7 +190,9 @@ private fun EmptyFilteredView() {
 }
 
 @Composable
-private fun EmptyView() {
+private fun EmptyView(
+    person: Person,
+) {
     EmptyView(
         modifier = Modifier.fillMaxSize(),
         text = stringResourceWithStyledPlaceholders(
@@ -197,7 +200,7 @@ private fun EmptyView() {
             spanStyle = {
                 SpanStyle(fontWeight = FontWeight.Bold)
             },
-            "state.person.fullName", // TODO JD
+            person.fullName,
         ),
         icon = R.drawable.ic_note,
     )
@@ -228,7 +231,7 @@ private fun NotesLoaded(
 
 @Composable
 private fun NotesLoadedRows(
-    notes: NotesList,
+    notes: Notes,
     onClick: (Note) -> Unit,
     onDelete: (NoteId) -> Unit,
 ) {
@@ -236,7 +239,7 @@ private fun NotesLoadedRows(
         contentPadding = PaddingValues(all = MaterialTheme.spacing.medium),
         verticalArrangement = Arrangement.spacedBy(space = MaterialTheme.spacing.medium),
     ) {
-        items(notes.items) { note ->
+        items(notes.list.items) { note ->
             NoteRow(
                 note = note,
                 onClick = onClick,
@@ -248,7 +251,7 @@ private fun NotesLoadedRows(
 
 @Composable
 private fun NotesLoadedGrid(
-    notes: NotesList,
+    notes: Notes,
     onClick: (Note) -> Unit,
     onDelete: (NoteId) -> Unit,
 ) {
@@ -258,7 +261,7 @@ private fun NotesLoadedGrid(
             .padding(all = MaterialTheme.spacing.small),
         maxColumnWidth = 220.dp,
     ) {
-        notes.items.forEach { note ->
+        notes.list.items.forEach { note ->
             NoteGrid(
                 modifier = Modifier.padding(all = MaterialTheme.spacing.small),
                 note = note,
@@ -416,16 +419,19 @@ class NotesPreviewParameterProvider : PreviewParameterProvider<NotesUiState> {
                     sortBy = SortByState(items = emptyList()),
                 ),
                 isLoading = false,
-                notes = NotesList(
-                    items = (0..10).map { i ->
-                        Note(
-                            id = NoteId(i),
-                            text = "".toNonEmptyString(),
-                            lastModified = LocalDateTime.now(),
-                            person = person
-                        )
-                    },
-                    totalCount = 10,
+                notes = Notes(
+                    person = person,
+                    list = NotesList(
+                        items = (0..10).map { i ->
+                            Note(
+                                id = NoteId(i),
+                                text = "".toNonEmptyString(),
+                                lastModified = LocalDateTime.now(),
+                                person = person
+                            )
+                        },
+                        totalCount = 10,
+                    ),
                 ),
                 toastMessage = null,
             )

@@ -59,7 +59,7 @@ class NotesViewModel @Inject constructor(
             }
             .onEach { notes ->
                 this.isLoading.value = false
-                this.notes.value = notes.notes
+                this.notes.value = notes
             }
             .launchIn(viewModelScope)
     }

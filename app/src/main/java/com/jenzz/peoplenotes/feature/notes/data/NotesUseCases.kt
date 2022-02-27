@@ -32,7 +32,7 @@ class ObserveNotesWithPersonUseCase @Inject constructor(
             ) { person, notes ->
                 Notes(
                     person = person,
-                    notes = notes,
+                    list = notes,
                 )
             }
 }
