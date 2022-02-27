@@ -41,7 +41,7 @@ class PeopleViewModel @Inject constructor(
         MutableStateFlow(initialState.showDeleteWithNotesConfirmation)
 
     val state = combine(
-        searchBarState.asStateFlow(),
+        searchBarState,
         isLoading,
         people,
         showDeleteConfirmation,
@@ -55,7 +55,7 @@ class PeopleViewModel @Inject constructor(
     )
 
     init {
-        searchBarState.asStateFlow()
+        searchBarState
             .flatMapLatest { state ->
                 useCases.observePeople(
                     sortBy = state.sortBy.selected,

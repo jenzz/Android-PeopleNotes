@@ -36,7 +36,7 @@ class NotesViewModel @Inject constructor(
     private val showDeleteConfirmation = MutableStateFlow(initialState.showDeleteConfirmation)
 
     val state = combine(
-        searchBarState.asStateFlow(),
+        searchBarState,
         isLoading,
         notes,
         showDeleteConfirmation,
@@ -49,7 +49,7 @@ class NotesViewModel @Inject constructor(
     )
 
     init {
-        searchBarState.asStateFlow()
+        searchBarState
             .flatMapLatest { state ->
                 useCases.observeNotesWithPerson(
                     personId = navArgs.personId,
