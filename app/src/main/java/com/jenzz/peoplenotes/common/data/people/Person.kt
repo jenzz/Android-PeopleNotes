@@ -3,6 +3,8 @@ package com.jenzz.peoplenotes.common.data.people
 import android.os.Parcel
 import android.os.Parcelable
 import androidx.compose.ui.graphics.Color
+import kotlinx.parcelize.IgnoredOnParcel
+import kotlinx.parcelize.Parcelize
 import java.time.LocalDateTime
 
 data class Person(
@@ -16,6 +18,24 @@ data class Person(
     val fullName: String = "${firstName.value} ${lastName.value}"
 
     val firstNameLetter: String = firstName.toString().first().uppercase()
+}
+
+fun Person.simplified(): PersonSimplified =
+    PersonSimplified(
+        id = id,
+        firstName = firstName,
+        lastName = lastName,
+    )
+
+@Parcelize
+data class PersonSimplified(
+    val id: PersonId,
+    val firstName: FirstName,
+    val lastName: LastName,
+) : Parcelable {
+
+    @IgnoredOnParcel
+    val fullName: String = "${firstName.value} ${lastName.value}"
 }
 
 @JvmInline

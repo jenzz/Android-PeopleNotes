@@ -6,6 +6,8 @@ import androidx.lifecycle.viewModelScope
 import com.jenzz.peoplenotes.R
 import com.jenzz.peoplenotes.common.data.people.DeletePersonResult
 import com.jenzz.peoplenotes.common.data.people.PersonId
+import com.jenzz.peoplenotes.common.data.people.PersonSimplified
+import com.jenzz.peoplenotes.common.data.people.simplified
 import com.jenzz.peoplenotes.common.ui.TextResource
 import com.jenzz.peoplenotes.common.ui.ToastMessage
 import com.jenzz.peoplenotes.common.ui.ToastMessageId
@@ -71,8 +73,8 @@ class PeopleViewModel @Inject constructor(
         searchBarState.value = state
     }
 
-    fun onDelete(personId: PersonId) {
-        showDeleteConfirmation.value = personId
+    fun onDelete(person: PersonSimplified) {
+        showDeleteConfirmation.value = person
     }
 
     fun onDeleteCancel() {
@@ -83,15 +85,20 @@ class PeopleViewModel @Inject constructor(
         isLoading.value = true
         showDeleteConfirmation.value = null
         viewModelScope.launch {
-            when (useCases.deletePerson(personId)) {
+            when (val result = useCases.deletePerson(personId)) {
                 is DeletePersonResult.RemainingNotesForPerson -> {
                     isLoading.value = false
-                    showDeleteWithNotesConfirmation.value = personId
+                    showDeleteWithNotesConfirmation.value = result.person.simplified()
                 }
                 is DeletePersonResult.Success -> {
                     isLoading.value = false
                     toastMessageManager.emitMessage(
-                        ToastMessage(text = TextResource.fromId(R.string.person_deleted))
+                        ToastMessage(
+                            text = TextResource.fromId(
+                                id = R.string.person_deleted,
+                                result.person.fullName
+                            ),
+                        )
                     )
                 }
             }
@@ -102,10 +109,15 @@ class PeopleViewModel @Inject constructor(
         isLoading.value = true
         showDeleteWithNotesConfirmation.value = null
         viewModelScope.launch {
-            useCases.deletePersonWithNotes(personId)
+            val person = useCases.deletePersonWithNotes(personId)
             isLoading.value = false
             toastMessageManager.emitMessage(
-                ToastMessage(text = TextResource.fromId(id = R.string.person_deleted))
+                ToastMessage(
+                    text = TextResource.fromId(
+                        id = R.string.person_deleted,
+                        person.fullName
+                    ),
+                )
             )
         }
     }

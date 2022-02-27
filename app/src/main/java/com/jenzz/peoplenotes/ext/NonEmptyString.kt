@@ -1,7 +1,11 @@
 package com.jenzz.peoplenotes.ext
 
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
+
+@Parcelize
 @JvmInline
-value class NonEmptyString(val value: String) : Comparable<NonEmptyString> {
+value class NonEmptyString(val value: String) : Comparable<NonEmptyString>, Parcelable {
 
     init {
         require(value.isNotEmpty()) { "String must not be empty." }

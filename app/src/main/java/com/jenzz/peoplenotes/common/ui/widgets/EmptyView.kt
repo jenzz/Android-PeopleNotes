@@ -40,7 +40,7 @@ fun EmptyView(
     @DrawableRes icon: Int,
 ) {
     Column(
-        modifier = modifier,
+        modifier = modifier.padding(horizontal = MaterialTheme.spacing.extraLarge),
         verticalArrangement = verticalArrangement,
         horizontalAlignment = horizontalAlignment,
     ) {

@@ -8,6 +8,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import com.jenzz.peoplenotes.R
 import com.jenzz.peoplenotes.common.data.people.PersonId
+import com.jenzz.peoplenotes.common.data.people.PersonSimplified
+import com.jenzz.peoplenotes.ext.stringResourceWithBoldPlaceholders
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.result.ResultBackNavigator
 import com.ramcosta.composedestinations.spec.DestinationStyle
@@ -17,17 +19,23 @@ import kotlinx.parcelize.Parcelize
 @Composable
 fun DeletePersonWithNotesDialog(
     resultBackNavigator: ResultBackNavigator<DeletePersonWithNotesDialogResult>,
-    personId: PersonId,
+    person: PersonSimplified,
 ) {
     AlertDialog(
         text = {
-            Text(text = stringResource(id = R.string.delete_person_with_notes_dialog))
+            Text(
+                text = stringResourceWithBoldPlaceholders(
+                    id = R.string.delete_person_with_notes_dialog,
+                    person.fullName,
+                    person.firstName,
+                )
+            )
         },
         confirmButton = {
             TextButton(
                 onClick = {
                     resultBackNavigator.navigateBack(
-                        DeletePersonWithNotesDialogResult.Yes(personId)
+                        DeletePersonWithNotesDialogResult.Yes(person.id)
                     )
                 }
             ) {

@@ -18,7 +18,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
@@ -43,7 +42,7 @@ import com.jenzz.peoplenotes.common.ui.theme.spacing
 import com.jenzz.peoplenotes.common.ui.widgets.*
 import com.jenzz.peoplenotes.ext.random
 import com.jenzz.peoplenotes.ext.rememberFlowWithLifecycle
-import com.jenzz.peoplenotes.ext.stringResourceWithStyledPlaceholders
+import com.jenzz.peoplenotes.ext.stringResourceWithBoldPlaceholders
 import com.jenzz.peoplenotes.ext.toNonEmptyString
 import com.jenzz.peoplenotes.feature.destinations.AddNoteScreenDestination
 import com.jenzz.peoplenotes.feature.destinations.DeleteNoteDialogDestination
@@ -160,7 +159,7 @@ fun NotesContent(
             state.isLoading ->
                 LoadingView()
             state.isEmptyFiltered(state.searchBarState) ->
-                EmptyFilteredView()
+                EmptyFilteredView(state.searchBarState.searchTerm)
             state.isEmpty ->
                 EmptyView(state.notes.requirePerson())
             else ->
@@ -181,10 +180,15 @@ fun NotesContent(
 }
 
 @Composable
-private fun EmptyFilteredView() {
+private fun EmptyFilteredView(
+    searchTerm: String,
+) {
     EmptyView(
         modifier = Modifier.fillMaxSize(),
-        text = stringResource(id = R.string.empty_notes_filtered),
+        text = stringResourceWithBoldPlaceholders(
+            id = R.string.empty_notes_filtered,
+            searchTerm,
+        ),
         icon = R.drawable.ic_sentiment_very_dissatisfied,
     )
 }
@@ -195,11 +199,8 @@ private fun EmptyView(
 ) {
     EmptyView(
         modifier = Modifier.fillMaxSize(),
-        text = stringResourceWithStyledPlaceholders(
+        text = stringResourceWithBoldPlaceholders(
             id = R.string.empty_notes,
-            spanStyle = {
-                SpanStyle(fontWeight = FontWeight.Bold)
-            },
             person.fullName,
         ),
         icon = R.drawable.ic_note,

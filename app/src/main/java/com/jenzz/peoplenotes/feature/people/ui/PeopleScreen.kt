@@ -30,10 +30,7 @@ import com.jenzz.peoplenotes.common.ui.theme.elevation
 import com.jenzz.peoplenotes.common.ui.theme.spacing
 import com.jenzz.peoplenotes.common.ui.widgets.*
 import com.jenzz.peoplenotes.common.ui.widgets.MultiFloatingActionButtonState.Collapsed
-import com.jenzz.peoplenotes.ext.formatFullDateTime
-import com.jenzz.peoplenotes.ext.random
-import com.jenzz.peoplenotes.ext.rememberFlowWithLifecycle
-import com.jenzz.peoplenotes.ext.toNonEmptyString
+import com.jenzz.peoplenotes.ext.*
 import com.jenzz.peoplenotes.feature.destinations.*
 import com.jenzz.peoplenotes.feature.people.ui.dialogs.DeletePersonDialogResult
 import com.jenzz.peoplenotes.feature.people.ui.dialogs.DeletePersonWithNotesDialogResult
@@ -92,8 +89,8 @@ private fun HandleDeleteConfirmation(
     onDeleteConfirm: (PersonId) -> Unit,
     onDeleteCancel: () -> Unit,
 ) {
-    state.showDeleteConfirmation?.let { personId ->
-        navigator.navigate(DeletePersonDialogDestination(personId))
+    state.showDeleteConfirmation?.let { person ->
+        navigator.navigate(DeletePersonDialogDestination(person))
     }
     resultRecipient.onResult { result ->
         when (result) {
@@ -127,7 +124,7 @@ private fun PeopleContent(
     state: PeopleUiState,
     onSearchBarStateChange: (SearchBarState) -> Unit,
     onClick: (Person) -> Unit,
-    onDelete: (PersonId) -> Unit,
+    onDelete: (PersonSimplified) -> Unit,
     onAddPersonManuallyClick: () -> Unit,
     onImportFromContactsClick: () -> Unit,
     onSettingsClick: () -> Unit,
@@ -170,7 +167,7 @@ private fun PeopleContent(
                 state.isLoading ->
                     LoadingView()
                 state.isEmptyFiltered(state.searchBarState) ->
-                    EmptyFilteredView()
+                    EmptyFilteredView(state.searchBarState.searchTerm)
                 state.isEmpty ->
                     EmptyView()
                 else ->
@@ -196,10 +193,15 @@ private fun PeopleContent(
 }
 
 @Composable
-private fun EmptyFilteredView() {
+private fun EmptyFilteredView(
+    searchTerm: String,
+) {
     EmptyView(
         modifier = Modifier.fillMaxSize(),
-        text = stringResource(id = R.string.empty_people_filtered),
+        text = stringResourceWithBoldPlaceholders(
+            id = R.string.empty_people_filtered,
+            searchTerm,
+        ),
         icon = R.drawable.ic_sentiment_very_dissatisfied,
     )
 }
@@ -217,7 +219,7 @@ private fun EmptyView() {
 private fun PeopleLoaded(
     state: PeopleUiState,
     onClick: (Person) -> Unit,
-    onDelete: (PersonId) -> Unit,
+    onDelete: (PersonSimplified) -> Unit,
 ) {
     when (state.searchBarState.listStyle) {
         ListStyle.Rows ->
@@ -239,7 +241,7 @@ private fun PeopleLoaded(
 private fun PeopleLoadedRows(
     people: List<Person>,
     onClick: (Person) -> Unit,
-    onDelete: (PersonId) -> Unit,
+    onDelete: (PersonSimplified) -> Unit,
 ) {
     LazyColumn(
         contentPadding = PaddingValues(all = MaterialTheme.spacing.medium),
@@ -259,7 +261,7 @@ private fun PeopleLoadedRows(
 private fun PeopleLoadedGrid(
     people: List<Person>,
     onClick: (Person) -> Unit,
-    onDelete: (PersonId) -> Unit,
+    onDelete: (PersonSimplified) -> Unit,
 ) {
     StaggeredVerticalGrid(
         modifier = Modifier
@@ -282,7 +284,7 @@ private fun PeopleLoadedGrid(
 private fun PersonRow(
     person: Person,
     onClick: (Person) -> Unit,
-    onDelete: (PersonId) -> Unit,
+    onDelete: (PersonSimplified) -> Unit,
 ) {
     PersonCard(
         person = person,
@@ -318,7 +320,7 @@ private fun PersonGrid(
     modifier: Modifier = Modifier,
     person: Person,
     onClick: (Person) -> Unit,
-    onDelete: (PersonId) -> Unit,
+    onDelete: (PersonSimplified) -> Unit,
 ) {
     PersonCard(
         modifier = modifier,
@@ -358,7 +360,7 @@ private fun PersonCard(
     modifier: Modifier = Modifier,
     person: Person,
     onClick: (Person) -> Unit,
-    onDelete: (PersonId) -> Unit,
+    onDelete: (PersonSimplified) -> Unit,
     content: @Composable () -> Unit,
 ) {
     var selected by rememberSaveable { mutableStateOf(false) }
@@ -380,12 +382,12 @@ private fun PersonCard(
         ) {
             content()
             PersonDropDownMenu(
-                person = person,
+                person = person.simplified(),
                 expanded = selected,
                 onDismissRequest = { selected = false },
-                onDelete = { personId ->
+                onDelete = { person ->
                     selected = false
-                    onDelete(personId)
+                    onDelete(person)
                 },
             )
         }
@@ -413,16 +415,16 @@ private fun PersonImage(
 
 @Composable
 private fun PersonDropDownMenu(
-    person: Person,
+    person: PersonSimplified,
     expanded: Boolean,
     onDismissRequest: () -> Unit,
-    onDelete: (PersonId) -> Unit,
+    onDelete: (PersonSimplified) -> Unit,
 ) {
     DropdownMenu(
         expanded = expanded,
         onDismissRequest = onDismissRequest,
     ) {
-        DropdownMenuItem(onClick = { onDelete(person.id) }) {
+        DropdownMenuItem(onClick = { onDelete(person) }) {
             Text(
                 text = stringResource(id = R.string.delete),
                 style = MaterialTheme.typography.body1.copy(
@@ -501,7 +503,11 @@ class PeoplePreviewParameterProvider : PreviewParameterProvider<PeopleUiState> {
                     persons = emptyList(),
                     totalCount = 0
                 ),
-                showDeleteConfirmation = PersonId(1),
+                showDeleteConfirmation = PersonSimplified(
+                    id = PersonId(1),
+                    firstName = FirstName("First Name".toNonEmptyString()),
+                    lastName = LastName("Last Name".toNonEmptyString()),
+                ),
                 showDeleteWithNotesConfirmation = null,
                 toastMessage = ToastMessage(
                     text = TextResource.fromText("User Message 1")

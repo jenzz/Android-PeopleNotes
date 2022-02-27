@@ -1,7 +1,7 @@
 package com.jenzz.peoplenotes.feature.people.ui
 
 import com.jenzz.peoplenotes.common.data.people.People
-import com.jenzz.peoplenotes.common.data.people.PersonId
+import com.jenzz.peoplenotes.common.data.people.PersonSimplified
 import com.jenzz.peoplenotes.common.ui.ListStyle
 import com.jenzz.peoplenotes.common.ui.ToastMessage
 import com.jenzz.peoplenotes.common.ui.widgets.SearchBarState
@@ -14,8 +14,8 @@ data class PeopleUiState(
     ),
     val isLoading: Boolean = true,
     val people: People = People(),
-    val showDeleteConfirmation: PersonId? = null,
-    val showDeleteWithNotesConfirmation: PersonId? = null,
+    val showDeleteConfirmation: PersonSimplified? = null,
+    val showDeleteWithNotesConfirmation: PersonSimplified? = null,
     val toastMessage: ToastMessage? = null,
 ) {
 

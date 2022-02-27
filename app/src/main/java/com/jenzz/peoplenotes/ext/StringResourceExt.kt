@@ -6,6 +6,7 @@ import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.font.FontWeight
 
 @Composable
 @ReadOnlyComposable
@@ -15,14 +16,29 @@ fun stringResourceWithStyledPlaceholders(
     vararg formatArgs: Any,
 ): AnnotatedString {
     val text = stringResource(id, *formatArgs)
+    var startIndex = 0
     val spanStyles = formatArgs.mapIndexed { i, formatArg ->
-        val placeholder = formatArg.toString()
-        val start = text.indexOf(placeholder)
+        val arg = formatArg.toString()
+        val start = text.indexOf(arg, startIndex)
+        val end = start + arg.length
+        startIndex = end
         AnnotatedString.Range(
             item = spanStyle(i),
             start = start,
-            end = start + placeholder.length,
+            end = end,
         )
     }
     return AnnotatedString(text = text, spanStyles = spanStyles)
 }
+
+@Composable
+@ReadOnlyComposable
+fun stringResourceWithBoldPlaceholders(
+    @StringRes id: Int,
+    vararg formatArgs: Any,
+): AnnotatedString =
+    stringResourceWithStyledPlaceholders(
+        id = id,
+        spanStyle = { SpanStyle(fontWeight = FontWeight.Bold) },
+        formatArgs = formatArgs,
+    )

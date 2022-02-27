@@ -27,7 +27,7 @@ interface PeopleDataSource {
 
     suspend fun add(person: NewPerson): Person
 
-    suspend fun delete(personId: PersonId)
+    suspend fun delete(personId: PersonId): Person
 }
 
 class PeopleLocalDataSource @Inject constructor(
@@ -97,9 +97,10 @@ class PeopleLocalDataSource @Inject constructor(
             }
         }
 
-    override suspend fun delete(personId: PersonId) {
+    override suspend fun delete(personId: PersonId): Person =
         withContext(dispatchers.Default) {
+            val person = get(personId)
             personQueries.delete(personId.value)
+            person
         }
-    }
 }

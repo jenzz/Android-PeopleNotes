@@ -21,25 +21,28 @@ class PeopleAndNotesRepository @Inject constructor(
     suspend fun delete(personId: PersonId): DeletePersonResult {
         val notes = notesRepository.observeNotes(personId).first()
         return if (notes.isEmpty) {
-            peopleRepository.delete(personId)
-            DeletePersonResult.Success
+            val person = peopleRepository.delete(personId)
+            DeletePersonResult.Success(person)
         } else {
-            DeletePersonResult.RemainingNotesForPerson(personId, notes)
+            val person = peopleRepository.get(personId)
+            DeletePersonResult.RemainingNotesForPerson(person, notes)
         }
     }
 
-    suspend fun deleteWithNotes(personId: PersonId) {
+    suspend fun deleteWithNotes(personId: PersonId): Person {
         notesRepository.deleteAllByPerson(personId)
-        peopleRepository.delete(personId)
+        return peopleRepository.delete(personId)
     }
 }
 
 sealed class DeletePersonResult {
 
-    object Success : DeletePersonResult()
+    data class Success(
+        val person: Person,
+    ) : DeletePersonResult()
 
     data class RemainingNotesForPerson(
-        val personId: PersonId,
+        val person: Person,
         val notes: NotesList,
     ) : DeletePersonResult()
 }

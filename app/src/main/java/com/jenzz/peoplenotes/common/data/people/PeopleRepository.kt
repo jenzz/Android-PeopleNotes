@@ -20,7 +20,6 @@ class PeopleRepository @Inject constructor(
     suspend fun add(person: NewPerson): Person =
         localDataSource.add(person)
 
-    suspend fun delete(personId: PersonId) {
+    suspend fun delete(personId: PersonId): Person =
         localDataSource.delete(personId)
-    }
 }
