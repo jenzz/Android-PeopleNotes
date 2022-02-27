@@ -23,10 +23,12 @@ class AddNoteViewModel @Inject constructor(
     private val useCases: AddNoteUseCases,
 ) : ViewModel() {
 
+    val initialState = InitialLoad
+
     private val personId = navArgs.personId
     private val noteId = navArgs.noteId
 
-    private val _state = MutableStateFlow<AddNoteUiState>(InitialLoad)
+    private val _state = MutableStateFlow<AddNoteUiState>(initialState)
     val state = _state.asStateFlow()
 
     init {

@@ -37,7 +37,7 @@ fun SettingsScreen(
     navigator: DestinationsNavigator,
 ) {
     val state by rememberFlowWithLifecycle(viewModel.state)
-        .collectAsState(initial = SettingsUiState.InitialLoad)
+        .collectAsState(initial = viewModel.initialState)
     SettingsContent(
         state = state,
         onNavigateUp = navigator::navigateUp,

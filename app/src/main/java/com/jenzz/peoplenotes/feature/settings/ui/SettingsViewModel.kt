@@ -19,6 +19,8 @@ class SettingsViewModel @Inject constructor(
     private val useCases: SettingsUseCases,
 ) : ViewModel() {
 
+    val initialState = InitialLoad
+
     val state: StateFlow<SettingsUiState> =
         useCases
             .observeSettings()
@@ -26,7 +28,7 @@ class SettingsViewModel @Inject constructor(
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(5000),
-                initialValue = InitialLoad
+                initialValue = initialState
             )
 
     fun onThemeChange(theme: ThemePreference) {

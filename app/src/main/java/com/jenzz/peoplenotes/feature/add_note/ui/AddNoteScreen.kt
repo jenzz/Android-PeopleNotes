@@ -40,7 +40,7 @@ fun AddNoteScreen(
     navArgs: AddNoteScreenNavArgs,
 ) {
     val state by rememberFlowWithLifecycle(viewModel.state)
-        .collectAsState(initial = AddNoteUiState.InitialLoad)
+        .collectAsState(initial = viewModel.initialState)
     AddNoteContent(
         state = state,
         title = if (navArgs.noteId != null) R.string.edit_note else R.string.add_note,
